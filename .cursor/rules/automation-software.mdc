@@ -51,6 +51,9 @@ alwaysApply: false
 - **pytest** (or equivalent) with **mock config** so CI does not need real credentials.
 - Regression tests before refactors to locators or form navigation.
 - Record fixtures for HTML snapshots of critical form steps when stable.
+- **Page Object** when the same selectors appear in 3+ tests; cap new spec files at ~3–5 scenarios.
+- **Network mocking** (`page.route` / intercept) for third-party calls so CI does not depend on live sites.
+- Enable **trace or video on failure** in CI for the automation runner you use.
 
 ## Agent sessions (when using Cursor/Lovable) **[core]**
 

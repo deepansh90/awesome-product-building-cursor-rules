@@ -42,6 +42,8 @@ alwaysApply: false
 - Document renderer choice in an ADR (Canvas for broad mobile support vs WebGL for effects — project decides).
 - **`[applicable if zero-download audio]`** — WebAudio synth / procedural SFX.
 - **`[applicable if large asset pipeline]`** — lazy load, cache strategy, mobile size budget.
+- **`[applicable if action / many spawned entities]`** — object pooling for bullets/particles; target ~**16 ms** sim slice per frame on low-end mobile.
+- **Visual regression** only on stable HUD chrome, not gameplay frames (see `universal-product.mdc` §4).
 
 ## §4 Screens, embeds, and host sites **[core]**
 

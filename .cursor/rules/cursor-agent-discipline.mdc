@@ -12,7 +12,8 @@ alwaysApply: true
 - Output **FULL file content** when producing a file edit — never use placeholders such as `// ... existing code ...`, `// rest of function`, or `# previous implementation`.
 - Prefer **partial edits** (search-and-replace, targeted patches) over delete-and-recreate entire files — preserves git history.
 - Do not invent changes beyond what the user requested; preserve unrelated code and structure.
-- Verify claims against the codebase; use `@Files` for 2–3 relevant files instead of bloated `@Codebase` context.
+- Verify claims against the codebase; cite `file:line` or command output — never claim "tests pass" without running them. Use `@Files` for 2–3 relevant files instead of bloated `@Codebase` context.
+- On multi-file work: prefer **one file per commit** when practical; review each diff before stacking the next.
 
 ## Tool boundaries (UI generator + IDE)
 
@@ -34,7 +35,8 @@ Sync via Git: UI tool pushes layout; IDE pushes logic and tests. Use `product_sp
 ## Git & session hygiene
 
 - Commit (or stash) before long autonomous agent runs.
-- Small, focused commits with clear messages (`feat:`, `fix:`, `docs:`).
+- **Conventional Commits:** `type(scope): description` — types `feat|fix|docs|refactor|test|chore|ci|perf|build`; optional body explains *why*; `BREAKING CHANGE:` footer or `feat!` when APIs break.
+- **PR body must include:** purpose, implementation notes, tests run (exact commands), rollout/rollback note if relevant, linked issue/ticket.
 - Fresh chat after ~20 failed debug turns; paste a 3–4 sentence summary + current error.
 - Stick to **one model** per task; switch models in a new chat if needed.
 - Set API spend limits; require confirmation for destructive terminal commands when available.
@@ -46,6 +48,7 @@ Sync via Git: UI tool pushes layout; IDE pushes logic and tests. Use `product_sp
 - DRY — one source of truth for shared logic.
 - Handle edge cases; consider security on every change.
 - Add or update tests for new behaviour at trust boundaries.
+- **E2E:** stable `data-testid` or roles on asserted elements; mock network at boundaries when tests must be deterministic (see `website-building.mdc` § Verification).
 
 ## What this rule does not cover
 

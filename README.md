@@ -56,7 +56,7 @@ Keep both in sync via Git. See [Lovable + Cursor workflow](https://github.com/mu
 Patterns informed by community collections and public best-practice guides, including:
 
 - [cursor-ai-tips](https://github.com/murataslan1/cursor-ai-tips) (agent workflow, common mistakes)
-- [awesome-cursorrules](https://github.com/PatrickJS/awesome-cursorrules) (adapted Python, Java, SwiftUI snippets)
+- [awesome-cursorrules](https://github.com/PatrickJS/awesome-cursorrules) (Conventional Commits, Playwright E2E, Python/Java/SwiftUI stack patterns)
 
 - **Dieter Rams** — product/UI principles referenced in `universal-product.mdc` §1b (clarity, honesty, as little design as possible)
 

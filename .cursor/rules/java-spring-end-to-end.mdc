@@ -22,10 +22,11 @@ Package by responsibility:
 
 Rules:
 
-- Controllers do **not** query the database directly.
-- Services use repositories; entities do not leak to API responses — use DTOs.
-- **`@Transactional`** on multi-step writes in the service layer.
-- Global exception handling (`@RestControllerAdvice`) for consistent error shapes.
+- Controllers do **not** query the database directly; no per-method `try/catch` when `@RestControllerAdvice` handles errors.
+- **Service interface** + `*ServiceImpl` for testability and clear boundaries.
+- Services use repositories; entities do not leak to API responses — use **DTO records** with compact-constructor validation.
+- **`@Transactional`** on multi-step writes in the service layer; `.orElseThrow` with domain exceptions for missing rows.
+- Global exception handling (`@RestControllerAdvice`) for consistent error shapes — avoid mandatory generic `ApiResponse<T>` wrappers unless the repo already uses them.
 
 ## API design **[core]**
 
@@ -37,7 +38,7 @@ Rules:
 ## Persistence **[core]**
 
 - Spring Data JPA (or chosen ORM) with migrations (**Flyway** / **Liquibase**).
-- Avoid N+1: `JOIN FETCH`, `@EntityGraph`, or DTO projections for heavy reads.
+- Avoid N+1: `JOIN FETCH`, **`@EntityGraph(attributePaths = …)`** for relationship reads, or repository `@Query` returning DTO for multi-join reads.
 - Lazy loading discipline; know what runs inside a transaction.
 
 ## Security **[core]**

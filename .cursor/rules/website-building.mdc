@@ -36,6 +36,13 @@ Apply `universal-product.mdc` §1b (Dieter Rams) on every visual change:
 - **Long-lasting:** prefer design tokens / CSS variables in `style.css` over scattered magic numbers; document token meanings in `design_spec.md`.
 - Calm typography; edge-to-edge readability; semantic breakpoints (`sm:`, `lg:`); touch-friendly targets; preserve `:focus-visible` — full a11y in `universal-product.mdc` §2a.
 
+## SPA resilience & SEO **[core]**
+
+- **Error boundaries:** route- or section-level fallback UI with retry/home — never a blank screen on render failure.
+- **Code splitting:** lazy-load heavy routes (games, admin, charts) via dynamic `import()` or framework equivalent.
+- **SEO (per route):** unique `<title>`, meta description, canonical URL, Open Graph tags — even for hash routes, set document title on navigation.
+- **`[applicable if TypeScript]`** enable `strict`; prefer `unknown` over `any`; explicit return types on exported functions.
+
 ## SPA hosting **[core]**
 
 - Production build outputs to `dist/` (or equivalent).
@@ -64,7 +71,9 @@ npm run test:e2e   # when present
 ```
 
 - Structural/data tests under `tests/` when applicable.
-- E2E smoke: extend route list when adding hash or path pages; assert **stable copy** on each route.
+- **E2E smoke:** extend route list when adding hash or path pages; assert **stable copy** on each route.
+- Put **`data-testid`** (or accessible role + name) on anything E2E asserts; cap new spec files at ~3–5 scenarios; reset state in `beforeEach`.
+- **Network mocking:** use `page.route` (Playwright) or `cy.intercept` (Cypress) for flaky third parties so CI stays deterministic.
 - After changing vendored assets under `public/`, run full build so `dist/` matches.
 
 ## Git & deploy **[core]**

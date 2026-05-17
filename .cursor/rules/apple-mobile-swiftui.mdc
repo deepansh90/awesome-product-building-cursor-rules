@@ -10,16 +10,21 @@ alwaysApply: false
 
 ## Project structure **[core]**
 
-Organize by concern:
+Canonical layout under `Sources/`:
 
-- `Views/` — SwiftUI screens and components
-- `ViewModels/` or feature modules — state and user actions
-- `Services/` — networking, persistence, platform APIs
-- `Models/` — domain types
-- `Resources/` — assets, strings, localized bundles
-- `Tests/` — unit and UI tests
+```
+Sources/
+  App/           # @main entry, app delegate/scene
+  Views/         # SwiftUI screens and components
+  ViewModels/    # @Observable / ObservableObject state
+  Services/      # networking, persistence, platform APIs
+  Models/        # domain types
+  Resources/     # assets, Localizable.strings
+Tests/           # unit + UI tests (parallel to Sources)
+```
 
-Keep the app entry point in the root package; feature subpackages by layer or feature.
+- Feature subpackages by layer or vertical slice when the app grows.
+- View models that touch UI: mark **`@MainActor`**; keep networking off the main actor.
 
 ## UI & layout **[core]**
 
@@ -27,7 +32,8 @@ Align with `universal-product.mdc` §1b (Dieter Rams): prefer **system-native** 
 
 - Prefer **native SwiftUI** controls, **SF Symbols**, and system materials for a consistent iOS look.
 - **VStack, HStack, ZStack, Spacer, padding** for layout; **LazyVGrid / LazyHGrid** for grids; **GeometryReader** only when necessary.
-- **Gestures** and haptics for primary interactions; clear navigation hierarchy.
+- **`NavigationStack`** with typed routes (or coordinator) for deep links and back-stack clarity.
+- **Gestures** and light **haptics** on primary actions; clear navigation hierarchy.
 - Support **Dynamic Type**, **safe areas**, and **light/dark** appearance.
 - Respect `prefers-reduced-motion` for non-essential animation.
 

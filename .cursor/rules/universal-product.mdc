@@ -46,7 +46,7 @@ The same user job must complete on every surface; layout and chrome may differ.
 - **Input modalities [applicable if UI]:** support whichever of pointer / touch / keyboard / assistive tech the surface actually receives; visible focus on every interactive element.
   - **[applicable if touch UI]** meet or exceed platform minimum touch targets (~44–48 density-independent units — 44 pt iOS HIG, 48 dp Android Material) with adequate spacing.
   - **[applicable if desktop/web UI]** full keyboard-only path for every primary task.
-- **Accessibility [applicable if consumer-facing UI, regulated industry, or public-sector product]:** meet **WCAG 2.2 AA** — logical focus order, accessible name + description for custom controls, sufficient colour contrast, errors announced and linked inline (not modal-only on small screens). Internal admin tools may scope to keyboard + screen-reader smoke checks only.
+- **Accessibility [applicable if consumer-facing UI, regulated industry, or public-sector product]:** meet **WCAG 2.2 AA** — logical focus order, accessible name + description for custom controls, sufficient colour contrast, errors announced and linked inline (not modal-only on small screens). Use **`aria-live="polite"`** for inline form errors; **focus trap** in modals with focus restored on close; **skip-to-main** link for keyboard users; **`aria-current`** on active nav items. Internal admin tools may scope to keyboard + screen-reader smoke checks only.
 - **Motion & vision [applicable if UI has animations or theming]:** respect `prefers-reduced-motion`; never convey state through motion alone. Honour **system font scaling / Dynamic Type**, high-contrast modes, and `prefers-color-scheme`.
 - **Layout beyond width [applicable if UI on phones/tablets]:** mobile-first, container queries where supported, **safe areas / notches**, **RTL** via CSS logical properties / platform RTL APIs. Decide explicit **content vs navigation priority** at narrow widths — truncate, reflow, or "more" pattern.
 - **Foldables / multi-window [applicable if Android/desktop multi-window matters to the segment]:** handle resize and posture changes without losing state.
@@ -95,8 +95,8 @@ Bar is **behavioural tests at trust boundaries**, not a line-coverage number. Ea
 - **Accessibility automation [applicable if consumer-facing UI or regulated industry]:** axe-core (web), ESLint a11y rules, XCTest accessibility APIs (iOS), Compose UI / Espresso accessibility checks (Android), or equivalent in CI.
 - **Integration tests [applicable if you have a DB, queue, or external service]:** real dependencies via Testcontainers/Docker; mock only at the network boundary.
 - **Contract tests [applicable if 2+ services talk]:** Pact or OpenAPI schema tests.
-- **E2E tests [applicable if you ship a UI with critical multi-step flows]:** Playwright / Cypress / Maestro / XCUITest / Espresso on a real device + browser matrix.
-- **Visual regression [applicable if brand-critical UI or high design churn]:** snapshot tooling of choice on critical screens.
+- **E2E tests [applicable if you ship a UI with critical multi-step flows]:** Playwright / Cypress / Maestro / XCUITest / Espresso on a real device + browser matrix. Use **test data factories** and parameterized boundary cases; **Page Object** helpers when the same locators appear in 3+ tests.
+- **Visual regression [applicable if brand-critical UI or high design churn]:** snapshot only **stable, low-churn chrome** (headers, nav) — not volatile content or gameplay frames.
 - **Load tests [applicable if you have SLOs or significant concurrency]:** k6/Locust/JMeter.
 - **Chaos tests [applicable if multi-instance + high-availability target]:** kill pods, drop network, partition disks.
 - **Mutation testing [applicable if safety-critical or finance/health domain]:** Stryker/Pitest or equivalent.

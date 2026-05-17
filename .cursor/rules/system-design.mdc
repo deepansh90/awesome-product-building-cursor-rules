@@ -11,7 +11,7 @@ A generic rule for producing useful **High-Level** and **Low-Level** designs for
 
 ## 0. Frame the Problem Before Designing **[core]**
 
-Spend the first 10–15 minutes clarifying, not drawing. Emerge with a one-line problem statement, written requirements, and scale numbers.
+**Agent workflow:** analyze the request → write a short plan (files, risks) → implement only after approval on non-trivial work. Spend the first 10–15 minutes clarifying, not drawing. Emerge with a one-line problem statement, written requirements, and scale numbers.
 
 - **Functional requirements:** what the system *does*. List as user-visible jobs and APIs. Reject ambiguity in writing.
 - **Non-functional requirements (NFRs):** **availability** target (99.9 ≈ 1.5 min/day, 99.99 ≈ 8.6 s/day, 99.999 ≈ 0.86 s/day downtime), **consistency** (strong vs eventual — CAP framing), **latency** budget (e.g., p99 < 200 ms), **scale** (DAU, QPS, storage, bandwidth), **security/compliance** scope.
@@ -19,7 +19,8 @@ Spend the first 10–15 minutes clarifying, not drawing. Emerge with a one-line 
 - **Predicted bottlenecks [applicable if back-of-envelope done]:** from the numbers, name the 1–2 components most likely to break first (DB write QPS, hot partition, cache stampede, egress bandwidth, queue depth, mobile cold-start) and pin the next deep dive to them.
 - **Physics sanity check [applicable if latency-sensitive or global]:** compare the hot path against datacenter RTT (~0.5 ms), RAM (~100 ns) vs SSD (~1 ms) vs HDD (~20 ms), and cross-region RTT (~70–150 ms) so the design isn't fighting physics. Pick **p95** for user-facing latency budgets, **p99** for internal SLOs.
 - **Open assumptions + rejected alternatives [core]:** write both down in HLD. Implicit assumptions are how designs rot; rejected paths are how reviewers learn the reasoning.
-- **Inputs / downstream consumers [core for non-trivial]:** at the top of the HLD list inputs (PRD link, ticket, discovery docs) and consumers (LLD, runbooks, feature flags, alerts) so the doc is reproducible.
+- **Inputs / downstream consumers [core for non-trivial]:** at the top of the HLD list inputs (PRD link, ticket with technical context + dependencies + test considerations, discovery docs) and consumers (LLD, runbooks, feature flags, alerts) so the doc is reproducible.
+- **Acceptance criteria [applicable if product-facing]:** optional **Given–When–Then** scenarios linked from the traceability table.
 - **Out of scope:** name explicitly what you will *not* design — anti-feature list is half the value.
 
 ## 1. High-Level Design (HLD) **[core, depth scales with change class]**
