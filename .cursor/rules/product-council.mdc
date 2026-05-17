@@ -1,0 +1,108 @@
+---
+description: Product council — CIRCLES PM framework plus multi-stakeholder critique before build or ship
+globs: "**/product_spec.md,**/tech_spec.md,**/roadmap.md,**/ROADMAP.md,docs/**/*.md,**/*prd*.md,**/*PRD*.md,**/*idea*.md"
+alwaysApply: false
+---
+
+# Product Council (CIRCLES + Multi-Stakeholder Critique)
+
+**Intent:** Stress-test a product idea, feature pitch, or spec **before** implementation — not to write code, system diagrams, or stack-specific how-tos. Output is structured feedback, locked decisions, and open questions.
+
+**When to run [core]:** new product, major feature, monetization change, go/no-go milestone, or when the user asks for council / critic / PM review. Skip for typo fixes and single-file bugs.
+
+Tagging matches other rules: **[core]** always in a council pass; **[applicable if …]** only when the product matches.
+
+---
+
+## 1. CIRCLES (PM backbone) **[core]**
+
+Work through all seven steps in order. Do not skip to solutions.
+
+| Step | Action |
+|------|--------|
+| **C — Comprehend** | Restate the goal, context, and *why now*. List constraints (time, budget, platform, compliance). |
+| **I — Identify customer** | Name 1–3 segments; pick a **primary** segment for this decision. |
+| **R — Report needs** | Pain points and jobs-to-be-done for the primary segment — evidence or explicit assumptions. |
+| **C — Cut (prioritize)** | Pick the **one** need or bet to optimize now; defer the rest with reason. |
+| **L — List solutions** | 2–4 viable approaches (including “do nothing” or “smaller MVP”). |
+| **E — Evaluate tradeoffs** | Pros/cons per solution on impact, effort, risk, and ethics. |
+| **S — Summarize** | One recommended path, what to lock, what stays open, and success metrics. |
+
+---
+
+## 2. Council lenses **[core]**
+
+After CIRCLES, run each lens below. **Skip** lenses that clearly do not apply (e.g. monetization council on a free internal tool). Each lens must produce: **(a)** top concern, **(b)** one concrete ask, **(c)** pass / revise / block.
+
+| Lens | Questions this voice asks |
+|------|---------------------------|
+| **Product visionary** | Is the core experience irresistible in one sentence? What should we **remove**? Does every screen serve the primary job? |
+| **Product manager** | Does CIRCLES hang together? Are scope and milestone realistic? What is the smallest shippable slice? |
+| **Engineer** | What is the riskiest technical assumption? Can we stub or spike it in days, not weeks? What must be decided before schema/API lock? |
+| **QA lead** | What are acceptance criteria and failure modes? What is the Day-1 test matrix (browsers, offline, accessibility, load)? |
+| **Platform / console director** `[applicable if console, store, or publisher path]` | Certification, age rating, platform policies, SKU/entitlement model, certification timeline. |
+| **Game developer** `[applicable if game or interactive sim]` | Core loop fun before polish? Determinism/replay needs? Renderer and fallback path real, not hand-waved? |
+| **Game player** `[applicable if game]` | 30-second hook? Fairness, readability, couch vs solo? Why return next week? |
+| **Android developer** `[applicable if Android surface]` | Min SDK, battery/thermal budget, background limits, store listing and content rating. |
+| **Web multiplayer engineer** `[applicable if realtime online]` | Transport choice, disconnect/reconnect UX, cheating surface, load test pass bars before public ranked. |
+| **Monetization** `[applicable if revenue]` | Model fits ethics and audience? Pay-to-win risk? Price localization? What unlocks when monetization is enabled in code/schema? |
+
+Do not invent stakeholder drama — be direct, evidence-based, and actionable.
+
+---
+
+## 3. Critic output format **[core]**
+
+Deliver feedback in this structure (adapt section depth to idea size):
+
+```text
+## Executive summary
+One paragraph: recommend proceed / proceed with changes / pause.
+
+## CIRCLES summary
+C → S in brief bullets; state primary segment and the one prioritized need.
+
+## Council table
+| Lens | Verdict (pass/revise/block) | Top concern | Concrete ask |
+|------|----------------------------|-------------|--------------|
+
+## Locks (decisions to stop re-litigating)
+Numbered list: each lock = one clear decision (no "A vs B" slashes left open).
+
+## Risks & mitigations
+Top 5; include legal/ethics/safety where relevant.
+
+## Open questions
+Only items that truly block the next milestone — max 3–5.
+
+## Suggested next artifact
+e.g. ADR, HLD stub, monetization doc, test protocol → point to system-design / universal-product / games-building as needed.
+```
+
+**Good critic habits (from strong product reviews):**
+- Replace vague options with **one locked choice** or a **gated decision** (date/phase when it must be decided).
+- Call out **architecturally impossible** fallbacks (e.g. claiming two incompatible render paths without an interface).
+- Require **fail paths** for legal, content, and compliance checklists — not only happy path.
+- Separate **MDP / MVP gate** from later phases; do not block ship on tier-3 scope.
+
+---
+
+## 4. Tie-in to other rules **[core]**
+
+| After council… | Use |
+|----------------|-----|
+| Architecture, scale, pitfall audit | `system-design.mdc` |
+| UI, a11y, privacy, Definition of Done | `universal-product.mdc` |
+| Game engine, embed, determinism | `games-building.mdc` |
+| Web deploy, E2E smoke | `website-building.mdc` |
+| How the agent edits the repo | `cursor-agent-discipline.mdc` |
+
+Council **does not** replace HLD/LLD or Rams §1b — it decides *whether* and *what* to build.
+
+---
+
+## What this rule does not cover
+
+- Writing or reviewing production code
+- Stack-specific implementation (Python, Java, SwiftUI rules)
+- Browser automation or agent git hygiene

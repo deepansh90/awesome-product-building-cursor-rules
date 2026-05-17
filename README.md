@@ -30,18 +30,20 @@ Each rule has a **title** and **intent** at the top. Only `cursor-agent-discipli
 | [`python-web-backend.mdc`](.cursor/rules/python-web-backend.mdc) | Python Web Backends | FastAPI, Django, Flask |
 | [`java-spring-end-to-end.mdc`](.cursor/rules/java-spring-end-to-end.mdc) | Java Spring End-to-End | Spring Boot + JPA + test pyramid |
 | [`apple-mobile-swiftui.mdc`](.cursor/rules/apple-mobile-swiftui.mdc) | Apple iOS (SwiftUI) | Native iOS apps |
+| [`product-council.mdc`](.cursor/rules/product-council.mdc) | Product Council (CIRCLES) | Idea/spec critique before build |
 
 ## Cherry-pick by product type
 
 | Product type | Recommended rules |
 |--------------|-------------------|
 | Any product | `universal-product`, `cursor-agent-discipline` |
+| New idea, PRD, or major bet | + `product-council` (before `system-design`) |
 | New feature / architecture | + `system-design` |
 | Web app (React/Vite/etc.) | + `website-building` |
 | Python API / form bot | + `python-web-backend`; + `automation-software` if browser-driven |
 | Java / Spring full stack | + `java-spring-end-to-end` |
 | iOS / SwiftUI | + `apple-mobile-swiftui` |
-| Game (browser, embed, PWA) | + `games-building` |
+| Game (browser, embed, PWA) | + `product-council` + `games-building` |
 | Game embedded in parent site | + `games-building` + `website-building` |
 
 ## Tool boundaries
@@ -59,6 +61,7 @@ Patterns informed by community collections and public best-practice guides, incl
 - [awesome-cursorrules](https://github.com/PatrickJS/awesome-cursorrules) (Conventional Commits, Playwright E2E, Python/Java/SwiftUI stack patterns)
 
 - **Dieter Rams** — product/UI principles referenced in `universal-product.mdc` §1b (clarity, honesty, as little design as possible)
+- **CIRCLES** — product sense framework (Lewis C. Lin); used in `product-council.mdc`
 
 ## License
 
