@@ -25,7 +25,6 @@ alwaysApply: false
 
 - Pin Chromium/Chrome binary path per OS in config; document install steps in README.
 - Prefer **headed** mode while debugging; move to headless only after modal/popup handling is stable.
-- Support standard keyboard and gamepad mappings when the target site allows.
 
 ## Resilience **[core]**
 
@@ -42,27 +41,18 @@ alwaysApply: false
 
 ## Config architecture **[core]**
 
-- Modular packages: `browser`, `ui`, `ai` (optional), `resumes` (optional) — clear boundaries.
+- Modular config with clear boundaries (browser, credentials, profile data).
 - Prefer **overlay JSON** or documented config files over regex-editing source during setup wizards.
-- Setup wizard (local web UI) should write config once; document which files are safe to re-run vs overwrite.
 
 ## Testing & CI **[core]**
 
 - **pytest** (or equivalent) with **mock config** so CI does not need real credentials.
 - Regression tests before refactors to locators or form navigation.
 - Record fixtures for HTML snapshots of critical form steps when stable.
-- **Page Object** when the same selectors appear in 3+ tests; cap new spec files at ~3–5 scenarios.
-- **Network mocking** (`page.route` / intercept) for third-party calls so CI does not depend on live sites.
-- Enable **trace or video on failure** in CI for the automation runner you use.
-
-## Agent sessions (when using Cursor/Lovable) **[core]**
-
-- `git commit` before long autonomous agent runs.
-- Review diffs line-by-line before merge; automation bugs become real submissions.
-- Fresh chat after ~20 failed debug turns; summarize errors + config state in the new prompt.
-- See `cursor-agent-discipline.mdc` for edit and placeholder rules.
+- Shared E2E conventions (`data-testid`, network mocks, spec size) → `website-building.mdc` § Verification when tests live in the same repo.
 
 ## What this rule does not cover
 
 - Product philosophy, security policy → `universal-product.mdc`
+- Agent edit/git discipline → `cursor-agent-discipline.mdc`
 - Python REST APIs without a browser → `python-web-backend.mdc`

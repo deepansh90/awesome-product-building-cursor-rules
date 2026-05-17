@@ -9,8 +9,8 @@ alwaysApply: true
 
 ## CRITICAL edit rules
 
-- Output **FULL file content** when producing a file edit — never use placeholders such as `// ... existing code ...`, `// rest of function`, or `# previous implementation`.
-- Prefer **partial edits** (search-and-replace, targeted patches) over delete-and-recreate entire files — preserves git history.
+- Prefer **partial edits** (search-and-replace, targeted patches) over rewriting whole files — preserves git history.
+- When a full-file replacement is required, output the **complete** file — never placeholders such as `// ... existing code ...` or `# previous implementation`.
 - Do not invent changes beyond what the user requested; preserve unrelated code and structure.
 - Verify claims against the codebase; cite `file:line` or command output — never claim "tests pass" without running them. Use `@Files` for 2–3 relevant files instead of bloated `@Codebase` context.
 - On multi-file work: prefer **one file per commit** when practical; review each diff before stacking the next.
@@ -48,7 +48,6 @@ Sync via Git: UI tool pushes layout; IDE pushes logic and tests. Use `product_sp
 - DRY — one source of truth for shared logic.
 - Handle edge cases; consider security on every change.
 - Add or update tests for new behaviour at trust boundaries.
-- **E2E:** stable `data-testid` or roles on asserted elements; mock network at boundaries when tests must be deterministic (see `website-building.mdc` § Verification).
 
 ## What this rule does not cover
 

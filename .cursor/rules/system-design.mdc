@@ -11,7 +11,7 @@ A generic rule for producing useful **High-Level** and **Low-Level** designs for
 
 ## 0. Frame the Problem Before Designing **[core]**
 
-**Agent workflow:** analyze the request → write a short plan (files, risks) → implement only after approval on non-trivial work. Spend the first 10–15 minutes clarifying, not drawing. Emerge with a one-line problem statement, written requirements, and scale numbers.
+Spend the first 10–15 minutes clarifying, not drawing (implementation workflow → `cursor-agent-discipline.mdc`). Emerge with a one-line problem statement, written requirements, and scale numbers.
 
 - **Functional requirements:** what the system *does*. List as user-visible jobs and APIs. Reject ambiguity in writing.
 - **Non-functional requirements (NFRs):** **availability** target (99.9 ≈ 1.5 min/day, 99.99 ≈ 8.6 s/day, 99.999 ≈ 0.86 s/day downtime), **consistency** (strong vs eventual — CAP framing), **latency** budget (e.g., p99 < 200 ms), **scale** (DAU, QPS, storage, bandwidth), **security/compliance** scope.
@@ -54,9 +54,7 @@ Goal: a shared architectural blueprint reviewers can sign off on before any code
 | 8 | Real-time concurrency **[applicable if collaborative or stateful real-time]** | OT/CRDT, locks, sticky sessions, polling vs SSE vs WebSocket |
 | 9 | Anti-abuse / security | rate limit, signed webhooks, MFA, RLS, OWASP Top 10 |
 
-**[applicable if mobile client]** Add a *Mobile clients* row to the audit table:
-- **Android** — foreground/background lifecycle, Doze + App Standby, WorkManager constraints, network class (3G/4G/Wi-Fi/offline), battery budget, Play Store APK/AAB size limits, min/target SDK matrix.
-- **iOS** — app lifecycle (active / background / suspended), Background Tasks framework + BGAppRefreshTask budgets, Low Power Mode, App Transport Security, App Store size limits, min iOS version + Swift/Xcode toolchain matrix.
+**[applicable if mobile client]** Add a *Mobile clients* pitfall row: lifecycle, background limits, offline, store size/SDK matrix — platform details in `apple-mobile-swiftui.mdc` or Android project rules.
 
 **HLD style rules [core]:** changes first, rationale later; tables and diagrams over prose; no code snippets (that's LLD); aim for ≤ 600 words of prose plus diagrams + tables.
 
@@ -86,7 +84,6 @@ After HLD + LLD, pick the 1–2 highest-risk components — usually the ones fla
 - **Two future deep-dive directions** for whoever picks this up next.
 - **Known remaining weaknesses** — no design is perfect; list the gaps you *accepted* with reasoning. Distinct from §1's risk register (which tracks risks we are mitigating).
 - **Rollout + rollback plan** — feature flag, canary %, success metric, abort criteria.
-- **Quality self-score [optional, if the team runs an eval pipeline]** — score the HLD/LLD against the per-dimension rubric (traceability, dependency graph, signatures, conciseness) before merge.
 
 ## 4. Definition of Design Done **[core]**
 

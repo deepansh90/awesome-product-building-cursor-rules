@@ -28,20 +28,14 @@ Tests/           # unit + UI tests (parallel to Sources)
 
 ## UI & layout **[core]**
 
-Align with `universal-product.mdc` §1b (Dieter Rams): prefer **system-native** over custom chrome — SF Symbols and standard controls are the digital equivalent of Rams’ restrained industrial forms.
-
-- Prefer **native SwiftUI** controls, **SF Symbols**, and system materials for a consistent iOS look.
-- **VStack, HStack, ZStack, Spacer, padding** for layout; **LazyVGrid / LazyHGrid** for grids; **GeometryReader** only when necessary.
+- Prefer **native SwiftUI** controls, **SF Symbols**, and system materials (Rams-aligned restraint → `universal-product.mdc` §1b).
 - **`NavigationStack`** with typed routes (or coordinator) for deep links and back-stack clarity.
-- **Gestures** and light **haptics** on primary actions; clear navigation hierarchy.
-- Support **Dynamic Type**, **safe areas**, and **light/dark** appearance.
-- Respect `prefers-reduced-motion` for non-essential animation.
+- Light **haptics** on primary actions; support **Dynamic Type**, **safe areas**, and **light/dark** appearance.
 
 ## Accessibility **[core]**
 
-- Accessibility labels and hints on custom controls.
 - VoiceOver smoke test on the primary user flow before release.
-- Sufficient contrast; do not rely on color alone for state.
+- Full WCAG-style checklist → `universal-product.mdc` §2a.
 
 ## Testing & release **[core]**
 

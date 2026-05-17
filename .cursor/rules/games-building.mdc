@@ -43,7 +43,6 @@ alwaysApply: false
 - **`[applicable if zero-download audio]`** — WebAudio synth / procedural SFX.
 - **`[applicable if large asset pipeline]`** — lazy load, cache strategy, mobile size budget.
 - **`[applicable if action / many spawned entities]`** — object pooling for bullets/particles; target ~**16 ms** sim slice per frame on low-end mobile.
-- **Visual regression** only on stable HUD chrome, not gameplay frames (see `universal-product.mdc` §4).
 
 ## §4 Screens, embeds, and host sites **[core]**
 
@@ -66,12 +65,7 @@ Host routing details → `website-building.mdc` (vendored folder only).
 - In-match reference UI (moves, objectives) for onboarding.
 - Local settings + progress in `localStorage` / IndexedDB **`[applicable if client-only]`**.
 
-**Rams-aligned game UI [applicable if UI]:** (see `universal-product.mdc` §1b)
-- **Unobtrusive:** HUD shows only what the player needs now; hide advanced stats behind pause or a single "details" affordance.
-- **Honest:** damage, timers, and resource bars reflect real simulation state — no decorative fake chrome.
-- **Understandable:** icon-only controls need legends on first run or in pause overlay.
-- **As little design as possible:** readable type and contrast on busy backgrounds; avoid ornamental frames that shrink play area in embeds.
-
+**Game HUD / UI:** apply `universal-product.mdc` §1b; keep HUD minimal in embeds so play area is not shrunk by ornamental chrome.
 
 ## §6 Tools & live ops (client-only) **`[applicable if designer-heavy]`**
 

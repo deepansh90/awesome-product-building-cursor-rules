@@ -24,7 +24,7 @@ Industrial design principles (Braun, Vitsœ) apply directly to software UI: clar
 
 | Principle | What to enforce in UI/code |
 |-----------|----------------------------|
-| **Innovative** | Novel patterns only when they improve the user job; do not innovate for portfolio effect. |
+| **Innovative** | Novel patterns only when they improve the user job; do not innovate for showcase effect. |
 | **Useful** | Every control earns its place; remove chrome that does not help completion. |
 | **Aesthetic** | Restrained typography and color; calm hierarchy — beauty from order, not noise. |
 | **Understandable** | Labels match mental models; icons have text or tooltips; errors say what to do next. |
@@ -35,9 +35,9 @@ Industrial design principles (Braun, Vitsœ) apply directly to software UI: clar
 | **Environmentally friendly** | Lean assets, lazy load, respect reduced motion and battery; avoid shipping MB of unused CSS/JS. |
 | **As little design as possible** | Flat, legible surfaces by default; add decoration only when it teaches or delights without clutter. |
 
-**Skeuomorphism vs flat [applicable if visual UI]:** Early digital UIs used real-world metaphors (textures, bezels) to build familiarity — useful when a control is new. Mature products should bias toward **flat, clear hierarchy** (type scale, spacing, contrast, native/platform patterns). Avoid decorative skeuomorphism (fake materials, gratuitous depth) — it violates *honest* and *as little design as possible*. Use metaphor sparingly for **onboarding or novel interactions**, then simplify once learned.
+**Skeuomorphism vs flat [applicable if visual UI]:** Use real-world metaphor only for unfamiliar controls; otherwise prefer flat hierarchy (type, spacing, contrast). Decorative skeuomorphism violates *honest* and *as little design as possible*.
 
-**Design responsibility [core with UI]:** Interfaces shape behaviour — align with privacy and ethics (§6). If a pattern would fail the *honest* or *unobtrusive* test, do not ship it.
+**Design responsibility [core with UI]:** Align UI with privacy and ethics (§6); reject patterns that fail *honest* or *unobtrusive*.
 
 ## 2a. Cross-Surface Product Principles **[applicable if you ship any UI]**
 
@@ -49,7 +49,6 @@ The same user job must complete on every surface; layout and chrome may differ.
 - **Accessibility [applicable if consumer-facing UI, regulated industry, or public-sector product]:** meet **WCAG 2.2 AA** — logical focus order, accessible name + description for custom controls, sufficient colour contrast, errors announced and linked inline (not modal-only on small screens). Use **`aria-live="polite"`** for inline form errors; **focus trap** in modals with focus restored on close; **skip-to-main** link for keyboard users; **`aria-current`** on active nav items. Internal admin tools may scope to keyboard + screen-reader smoke checks only.
 - **Motion & vision [applicable if UI has animations or theming]:** respect `prefers-reduced-motion`; never convey state through motion alone. Honour **system font scaling / Dynamic Type**, high-contrast modes, and `prefers-color-scheme`.
 - **Layout beyond width [applicable if UI on phones/tablets]:** mobile-first, container queries where supported, **safe areas / notches**, **RTL** via CSS logical properties / platform RTL APIs. Decide explicit **content vs navigation priority** at narrow widths — truncate, reflow, or "more" pattern.
-- **Foldables / multi-window [applicable if Android/desktop multi-window matters to the segment]:** handle resize and posture changes without losing state.
 - **Network reality [applicable if UI hits a network]:** every screen has explicit **loading, empty, error, and partial-data** states that work on slow or flaky links. Skeletons over spinners; retry affordances; never blank-screen on failure.
 - **Offline / degraded behaviour [applicable if mobile or field-use product]:** define which flows must work offline; queue mutations with idempotency keys; reconcile on reconnect.
 
@@ -64,18 +63,6 @@ Share **design tokens** (spacing, type, colour, radius, elevation, motion). Use 
 - **RTL** mirroring of layout, icons, and gestures **[applicable if any RTL locale is supported]**.
 - **Timezone discipline:** store UTC, render in user's zone; one-off events → UTC instant; scheduled events → wall-clock + IANA zone (DST-safe); recurring events → **RRULE + IANA zone [applicable if calendar/scheduling product]**.
 - Pseudo-localize in CI to catch hard-coded strings and truncation early.
-
-## 2d. Example Technology Choices **[reference only — record the choice in an ADR]**
-
-Stack-agnostic. Examples (do not treat as mandates):
-
-- **Web:** TypeScript + React/Next.js, SvelteKit, Vue/Nuxt, or server-rendered HTML with progressive enhancement.
-- **Mobile:** React Native, Flutter, or native (SwiftUI / Jetpack Compose).
-- **Backend:** Node, Python (FastAPI/Django), JVM (Spring/Pekko/Scala), Go, Rust, .NET — pick for team fluency.
-- **APIs:** REST + OpenAPI by default; gRPC for service-to-service; GraphQL only when the client genuinely drives query shape.
-- **Data:** relational, document, or KV — pick by access pattern. Cache + queue only if needed.
-- **Infra:** containers + orchestrator, serverless, or PaaS.
-- **Auth:** OAuth2/OIDC + short-lived tokens; never roll your own crypto.
 
 ## 3. Architecture Principles
 
@@ -98,8 +85,6 @@ Bar is **behavioural tests at trust boundaries**, not a line-coverage number. Ea
 - **E2E tests [applicable if you ship a UI with critical multi-step flows]:** Playwright / Cypress / Maestro / XCUITest / Espresso on a real device + browser matrix. Use **test data factories** and parameterized boundary cases; **Page Object** helpers when the same locators appear in 3+ tests.
 - **Visual regression [applicable if brand-critical UI or high design churn]:** snapshot only **stable, low-churn chrome** (headers, nav) — not volatile content or gameplay frames.
 - **Load tests [applicable if you have SLOs or significant concurrency]:** k6/Locust/JMeter.
-- **Chaos tests [applicable if multi-instance + high-availability target]:** kill pods, drop network, partition disks.
-- **Mutation testing [applicable if safety-critical or finance/health domain]:** Stryker/Pitest or equivalent.
 
 CI blocks merge on red **[core]**.
 
@@ -128,7 +113,7 @@ Threat-model every feature.
 - **Data minimization:** collect only what the user's job requires.
 - **Purpose limitation:** use data only for what was disclosed; no silent repurposing.
 - **Retention:** define and enforce TTLs; honour GDPR/CCPA delete/export; keep audit trails **[applicable if regulated jurisdiction]**.
-- **User-visible honesty:** plain-language explanations of what is collected and why; no dark patterns in consent. Aligns with Rams' *honest* principle.
+- **User-visible honesty:** plain-language explanations of what is collected and why; no dark patterns in consent.
 
 ## 7. Definition of Done **[core]**
 

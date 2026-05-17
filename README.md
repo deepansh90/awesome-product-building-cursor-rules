@@ -7,7 +7,7 @@ Product and UI guidance is grounded in **Dieter Rams’ ten principles** (clarit
 ## Install
 
 ```bash
-git clone https://github.com/deepansh90/awesome-product-building-cursor-rules.git
+git clone https://github.com/<your-org>/awesome-product-building-cursor-rules.git
 cp -r awesome-product-building-cursor-rules/.cursor/rules /path/to/your-project/.cursor/rules
 ```
 

@@ -43,9 +43,9 @@ Rules:
 
 ## Security **[core]**
 
-- OWASP Top 10: parameterized queries via ORM, CSRF where session cookies apply, authz on every endpoint.
+- Parameterized queries via ORM, CSRF where session cookies apply, authz on every endpoint.
 - No secrets in committed `application.properties` — profiles + env for `dev` / `staging` / `prod`.
-- OWASP aligns with `universal-product.mdc` §5.
+- Threat model and OWASP bar → `universal-product.mdc` §5.
 
 ## Testing pyramid **[core]**
 
