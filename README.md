@@ -2,6 +2,8 @@
 
 Portable [Cursor](https://cursor.com) project rules for building products on **any stack**, **any screen size**, with **Cursor**, **Lovable**, or similar AI builders.
 
+Product and UI guidance is grounded in **Dieter Rams’ ten principles** (clarity, honesty, as little design as possible) — see `universal-product.mdc` §1b for a digital checklist, including when flat UI beats decorative skeuomorphism.
+
 ## Install
 
 ```bash
@@ -55,6 +57,8 @@ Patterns informed by community collections and public best-practice guides, incl
 
 - [cursor-ai-tips](https://github.com/murataslan1/cursor-ai-tips) (agent workflow, common mistakes)
 - [awesome-cursorrules](https://github.com/PatrickJS/awesome-cursorrules) (adapted Python, Java, SwiftUI snippets)
+
+- **Dieter Rams** — product/UI principles referenced in `universal-product.mdc` §1b (clarity, honesty, as little design as possible)
 
 ## License
 

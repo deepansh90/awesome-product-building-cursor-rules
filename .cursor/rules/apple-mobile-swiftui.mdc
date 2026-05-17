@@ -23,6 +23,8 @@ Keep the app entry point in the root package; feature subpackages by layer or fe
 
 ## UI & layout **[core]**
 
+Align with `universal-product.mdc` §1b (Dieter Rams): prefer **system-native** over custom chrome — SF Symbols and standard controls are the digital equivalent of Rams’ restrained industrial forms.
+
 - Prefer **native SwiftUI** controls, **SF Symbols**, and system materials for a consistent iOS look.
 - **VStack, HStack, ZStack, Spacer, padding** for layout; **LazyVGrid / LazyHGrid** for grids; **GeometryReader** only when necessary.
 - **Gestures** and haptics for primary interactions; clear navigation hierarchy.

@@ -73,7 +73,7 @@ Goal: each implementer can code without re-deriving decisions. Translate HLD wor
 - **State machines [applicable if entity has > 2 meaningful states]** — explicit ADT/enum, allowed transitions, terminal states.
 - **Config + flags** — new config keys (typed), defaults, feature-flag names and rollout plan.
 - **Test specification** — per work unit: happy path, edge cases, failure modes, test type (unit / integration / contract / E2E), expected coverage on changed code.
-- **UI component spec [applicable if UI work unit]** — props/state, accessibility name + role, responsive behaviour, loading/empty/error states (per `universal-product.mdc`), platform notes for Android (Compose) / iOS (SwiftUI) / web.
+- **UI component spec [applicable if UI work unit]** — props/state, accessibility name + role, responsive behaviour, loading/empty/error states (per `universal-product.mdc` §1b Rams checklist where relevant), platform notes for Android (Compose) / iOS (SwiftUI) / web.
 
 **LLD style rules [core]:** table format, no code blocks longer than a signature line, 300–600 lines total, deterministic enough that two implementers would produce equivalent code.
 

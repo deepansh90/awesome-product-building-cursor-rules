@@ -64,6 +64,13 @@ Host routing details → `website-building.mdc` (vendored folder only).
 - In-match reference UI (moves, objectives) for onboarding.
 - Local settings + progress in `localStorage` / IndexedDB **`[applicable if client-only]`**.
 
+**Rams-aligned game UI [applicable if UI]:** (see `universal-product.mdc` §1b)
+- **Unobtrusive:** HUD shows only what the player needs now; hide advanced stats behind pause or a single "details" affordance.
+- **Honest:** damage, timers, and resource bars reflect real simulation state — no decorative fake chrome.
+- **Understandable:** icon-only controls need legends on first run or in pause overlay.
+- **As little design as possible:** readable type and contrast on busy backgrounds; avoid ornamental frames that shrink play area in embeds.
+
+
 ## §6 Tools & live ops (client-only) **`[applicable if designer-heavy]`**
 
 - Local telemetry (usage, win rates) — on-device, privacy-first.

@@ -14,9 +14,30 @@ A generic engineering + design + security rule applicable to any product (static
 
 If a tag does not apply to your product, drop the whole bullet — do not water it down.
 
-## 1. Product Philosophy — Think Jobs, Design Rams **[core]**
+## 1. Product Philosophy **[core]**
 
-Articulate the **one real user job** the product solves in one sentence before writing code. Channel Steve Jobs: ruthlessly say *no* to features that do not serve that job, obsess over the first-run experience, make the default path the right path. Apply **Dieter Rams' ten principles** — good design is innovative, useful, aesthetic, understandable, unobtrusive, honest, long-lasting, thorough, environmentally friendly, and involves as little design as possible. Prefer one clear primary action per screen, predictable affordances, no dark patterns, no jargon. Measure success by *time-to-value* and *task completion rate*, not feature count.
+Articulate the **one real user job** in one sentence before writing code. Ruthlessly say *no* to features that do not serve that job. Obsess over first-run experience; make the default path the right path. Prefer **one clear primary action** per screen, predictable affordances, no dark patterns, no jargon. Measure success by *time-to-value* and *task completion rate*, not feature count.
+
+## 1b. Dieter Rams — ten principles (digital products) **[applicable if you ship any UI]**
+
+Industrial design principles (Braun, Vitsœ) apply directly to software UI: clarity over ornament, function over decoration. Use this checklist when reviewing layouts, components, or flows.
+
+| Principle | What to enforce in UI/code |
+|-----------|----------------------------|
+| **Innovative** | Novel patterns only when they improve the user job; do not innovate for portfolio effect. |
+| **Useful** | Every control earns its place; remove chrome that does not help completion. |
+| **Aesthetic** | Restrained typography and color; calm hierarchy — beauty from order, not noise. |
+| **Understandable** | Labels match mental models; icons have text or tooltips; errors say what to do next. |
+| **Unobtrusive** | UI defers to content; avoid modal stacks, interruptive banners, and competing CTAs. |
+| **Honest** | UI state matches reality (loading, empty, errors); no fake urgency, counts, or disabled faux affordances. |
+| **Long-lasting** | Design tokens and shared components over one-off styles; avoid trend skins that date in a year. |
+| **Thorough** | Align pixels *and* edge cases — focus rings, truncation, RTL, slow network, small screens. |
+| **Environmentally friendly** | Lean assets, lazy load, respect reduced motion and battery; avoid shipping MB of unused CSS/JS. |
+| **As little design as possible** | Flat, legible surfaces by default; add decoration only when it teaches or delights without clutter. |
+
+**Skeuomorphism vs flat [applicable if visual UI]:** Early digital UIs used real-world metaphors (textures, bezels) to build familiarity — useful when a control is new. Mature products should bias toward **flat, clear hierarchy** (type scale, spacing, contrast, native/platform patterns). Avoid decorative skeuomorphism (fake materials, gratuitous depth) — it violates *honest* and *as little design as possible*. Use metaphor sparingly for **onboarding or novel interactions**, then simplify once learned.
+
+**Design responsibility [core with UI]:** Interfaces shape behaviour — align with privacy and ethics (§6). If a pattern would fail the *honest* or *unobtrusive* test, do not ship it.
 
 ## 2a. Cross-Surface Product Principles **[applicable if you ship any UI]**
 
@@ -113,7 +134,7 @@ Threat-model every feature.
 
 A change ships only when: it serves one clear user job; the simplest design was chosen; behavioural tests pass; observability is wired for any component running in production; threat model reviewed for applicable risks; docs/runbooks updated; rollback is one click away.
 
-- **[applicable if UI]** verified on smallest + largest supported viewport, keyboard-only, and one representative mobile profile.
+- **[applicable if UI]** verified on smallest + largest supported viewport, keyboard-only, and one representative mobile profile; spot-check against Rams §1b (especially *understandable*, *honest*, *as little design as possible*).
 - **[applicable if accessibility scope applies]** reduced-motion and high-contrast spot-checked; screen-reader smoke test on primary flow.
 - **[applicable if i18n scope applies]** critical flows spot-checked in a secondary locale, and in RTL if any RTL locale is supported.
 - **[applicable if native mobile app]** tested on min-supported OS and current OS; light + dark mode; Dynamic Type / font scaling.

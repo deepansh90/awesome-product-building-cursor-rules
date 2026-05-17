@@ -27,9 +27,14 @@ Read before large changes.
 
 ## UI expectations (web-specific) **[core]**
 
-- Minimal visual noise; calm typography; edge-to-edge readability.
-- Semantic breakpoints (`sm:`, `lg:` or equivalent); touch-friendly targets where mobile matters.
-- Preserve `:focus-visible` and keyboard paths — details in `universal-product.mdc` §2a.
+Apply `universal-product.mdc` §1b (Dieter Rams) on every visual change:
+
+- **As little design as possible:** one type family (or paired set), limited weights, consistent spacing scale; no extra borders, gradients, or shadows unless they encode state.
+- **Understandable:** visible labels on primary actions; heading hierarchy (`h1` → `h2`) matches outline order; link text describes destination.
+- **Honest:** buttons disabled only when action is unavailable; loading states on async actions; no placeholder “coming soon” that looks clickable.
+- **Unobtrusive:** navigation supports reading flow; sidebars and sticky chrome do not cover main CTAs on mobile.
+- **Long-lasting:** prefer design tokens / CSS variables in `style.css` over scattered magic numbers; document token meanings in `design_spec.md`.
+- Calm typography; edge-to-edge readability; semantic breakpoints (`sm:`, `lg:`); touch-friendly targets; preserve `:focus-visible` — full a11y in `universal-product.mdc` §2a.
 
 ## SPA hosting **[core]**
 
