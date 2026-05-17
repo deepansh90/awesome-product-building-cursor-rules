@@ -1,0 +1,74 @@
+---
+description: Static/React/Vite websites — SPA deploy, vendored embeds, testing, docs map
+globs: "**/*.{jsx,tsx,vue,html,css,js,ts,mjs}",vite.config.*,wrangler.jsonc,vercel.json,e2e/**/*
+alwaysApply: false
+---
+
+# Web Applications (Static & SPA)
+
+**Intent:** Ship, test, and host marketing or product web apps and **host vendored client bundles** (e.g. games). Cross-surface UI policy lives in `universal-product.mdc` §2a. Game engines and replay logic live in `games-building.mdc`.
+
+## Docs map **[core]**
+
+| Doc | Purpose |
+|-----|---------|
+| `README.md` | Dev commands, deploy targets, design philosophy |
+| `design_spec.md` / `roadmap.md` | Product direction, paused features (e.g. monetization flags) |
+| `wrangler.jsonc` / `vercel.json` | Host-specific routing (only the file for your target) |
+
+Read before large changes.
+
+## Stack-agnostic defaults **[core]**
+
+- Prefer **static-first**: content as JSON or markdown under `public/`; minimal server logic.
+- Document routing (hash-based or path-based) in README so agents do not guess.
+- Global styling: one source of truth (`style.css` or design tokens); if using Tailwind, decide whether preflight is on or off and stay consistent.
+- **Monetization:** use explicit feature flags or a documented “monetization paused” constant — do not half-enable paywalls without updating `roadmap.md`.
+
+## UI expectations (web-specific) **[core]**
+
+- Minimal visual noise; calm typography; edge-to-edge readability.
+- Semantic breakpoints (`sm:`, `lg:` or equivalent); touch-friendly targets where mobile matters.
+- Preserve `:focus-visible` and keyboard paths — details in `universal-product.mdc` §2a.
+
+## SPA hosting **[core]**
+
+- Production build outputs to `dist/` (or equivalent).
+- **Cloudflare Workers / static assets:** `assets.directory` → `./dist`, `not_found_handling: single-page-application` so unknown paths fall back to `index.html`.
+- **Vercel / Netlify:** equivalent SPA rewrite rules in host config.
+- **Dev server:** if you vend a nested client SPA under `public/<app>/`, mirror SPA fallback in Vite (or host) preview so deep links work locally — not only in production.
+
+## Hosting vendored sub-apps **[core]**
+
+When embedding a separate client build (games, tools):
+
+1. Upstream build sets correct **asset `base`** subpath.
+2. Copy artifacts to `public/<app-id>/` with `index.html` at folder root.
+3. Host SPA fallback for `/public-path/*` client routes (host config + dev middleware).
+4. Optional theme overlay CSS on parent chrome for contrast when iframe'd.
+5. For game-specific iframe height, embed detection, and engine rules → `games-building.mdc`.
+
+## Verification gate **[core]**
+
+Before claiming done:
+
+```bash
+npm test
+npm run build
+npm run test:e2e   # when present
+```
+
+- Structural/data tests under `tests/` when applicable.
+- E2E smoke: extend route list when adding hash or path pages; assert **stable copy** on each route.
+- After changing vendored assets under `public/`, run full build so `dist/` matches.
+
+## Git & deploy **[core]**
+
+- Canonical branch `main`; mirror `master` only if your team still depends on it (`git push origin main:master`).
+- After deploy, if users see stale shells: purge CDN cache for `/` and `/assets/*`, hard-refresh; confirm latest CI deploy succeeded.
+
+## What this rule does not cover
+
+- System architecture documents → `system-design.mdc`
+- Browser job-application bots → `automation-software.mdc`
+- Game simulation, determinism, PWA inside the game → `games-building.mdc`

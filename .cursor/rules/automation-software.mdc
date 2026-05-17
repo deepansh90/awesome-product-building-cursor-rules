@@ -1,0 +1,65 @@
+---
+description: Browser automation and form-filling bots — Selenium/Playwright safety, config, resilience, human-in-the-loop
+globs: "**/*.{py,ts,js}",**/config/**,**/e2e/**,**/*bot*,**/*automation*
+alwaysApply: false
+---
+
+# Browser & Form Automation
+
+**Intent:** Build reliable browser agents for multi-step forms (job applications, onboarding wizards, data entry) — not general product quality, REST API design, or architecture documents.
+
+## Scope **[core]**
+
+- Automate repetitive browser workflows the user has authorized.
+- **Not** a license to bypass Terms of Service, CAPTCHAs, rate limits, or anti-bot systems.
+- **Not** a substitute for legal/compliance review of what you submit on behalf of users.
+
+## Safety & secrets **[core]**
+
+- Copy `secrets.example` → real secrets file **once**; never re-copy the example over configured credentials.
+- Run a **validate-config** (or equivalent) command before production runs.
+- Zero credentials in git; use environment variables or a vault for CI/production.
+- Separate **personals** (name, address, EEO fields) from **secrets** (passwords, API keys) from **search preferences**.
+
+## Browser stack **[core]**
+
+- Pin Chromium/Chrome binary path per OS in config; document install steps in README.
+- Prefer **headed** mode while debugging; move to headless only after modal/popup handling is stable.
+- Support standard keyboard and gamepad mappings when the target site allows.
+
+## Resilience **[core]**
+
+- Prefer **`WebDriverWait`** (or Playwright auto-wait) over fixed `sleep`.
+- **Stale-element recovery:** retry with fresh element references on DOM refresh.
+- Prefer **structural locators** (roles, stable CSS classes, `data-testid`) over visible text that changes with A/B tests or locale.
+- Catch **narrow exception types** (timeout, stale element, not found) — avoid bare `except Exception` in hot paths.
+
+## Human-in-the-loop **[core]**
+
+- **CAPTCHA / MFA / unknown questions:** stop, notify the user, do not guess sensitive answers (salary, visa, EEO, notice period).
+- Never auto-submit answers that do not match the user's configured profile.
+- Optional desktop notifications for success, failure, or required intervention.
+
+## Config architecture **[core]**
+
+- Modular packages: `browser`, `ui`, `ai` (optional), `resumes` (optional) — clear boundaries.
+- Prefer **overlay JSON** or documented config files over regex-editing source during setup wizards.
+- Setup wizard (local web UI) should write config once; document which files are safe to re-run vs overwrite.
+
+## Testing & CI **[core]**
+
+- **pytest** (or equivalent) with **mock config** so CI does not need real credentials.
+- Regression tests before refactors to locators or form navigation.
+- Record fixtures for HTML snapshots of critical form steps when stable.
+
+## Agent sessions (when using Cursor/Lovable) **[core]**
+
+- `git commit` before long autonomous agent runs.
+- Review diffs line-by-line before merge; automation bugs become real submissions.
+- Fresh chat after ~20 failed debug turns; summarize errors + config state in the new prompt.
+- See `cursor-agent-discipline.mdc` for edit and placeholder rules.
+
+## What this rule does not cover
+
+- Product philosophy, security policy → `universal-product.mdc`
+- Python REST APIs without a browser → `python-web-backend.mdc`

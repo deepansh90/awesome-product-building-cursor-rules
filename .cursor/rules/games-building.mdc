@@ -1,0 +1,102 @@
+---
+description: Game development — engine/shell split, determinism, screens/embeds, PWA, testing; tagged optional sections
+globs: "**/packages/**/*",**/game/**,**/games/**,public/games/**/*,**/*engine*/**,**/ROADMAP.md",**/android/**/assets/**
+alwaysApply: false
+---
+
+# Game Development
+
+**Intent:** Build any game genre (action, puzzle, idle, narrative) with optional determinism, embeds, and PWA — not general marketing site routing (see `website-building.mdc`). UI policy on all surfaces → `universal-product.mdc` §2a.
+
+**Tag legend:** **[core]** every game should consider; **[applicable if …]** skip when irrelevant (e.g. do not force netcode rules on a casual puzzle).
+
+## §1 Product locks before scale **[core]**
+
+- Lock **visual direction**, **monetization ethics** (e.g. cosmetics-only, no pay-to-win), and **renderer/runtime** early.
+- Record **ADRs** in `docs/decisions/` so future agents know *why*, not only *what*.
+- **`[applicable if public roster / real-world names]`** — legal/name checklist before scaling content (trademark, slurs, restricted names).
+- **`[applicable if freemium]`** — document DLC scope; never sell gameplay power.
+
+## §2 Architecture: engine vs shell **[core]**
+
+- **Pure game core** — no UI framework, no DOM, no `window` in simulation code (`packages/<engine>/` or equivalent).
+- **Presentation shell** — menu routes in your web framework; Canvas/WebGL/DOM renderer **reads** core state only.
+- **Versioned schemas** for entities, levels, and events so saves and replays survive refactors.
+
+**`[applicable if action / fighting / sports / deterministic replay]`**
+
+- **Fixed timestep** sim (e.g. 60 Hz) in core; render may interpolate.
+- **Deterministic math** — fixed-point or integer-only physics; avoid raw floats for authoritative state.
+- **Seeded PRNG** — all gameplay randomness from a seed stored with the replay.
+- **Input ring buffer** — early presses still register within a small window.
+- **Central feel module** — hitstop, shake, freeze frames in one place for designers and replay parity.
+- **Replay = inputs + seed**; automated verify must reproduce identical outcomes before claiming netcode-ready.
+
+**`[applicable if puzzle / turn-based / low stakes]`**
+
+- Determinism optional; still separate **solver/level data** from UI; document algorithms honestly for educational hosts.
+
+## §3 Renderer & assets **[core]**
+
+- Pick renderer for **lowest common device** (Canvas 2D, DOM, SVG) unless you need WebGL **`[applicable if 3D or heavy particles]`**.
+- Document renderer choice in an ADR (Canvas for broad mobile support vs WebGL for effects — project decides).
+- **`[applicable if zero-download audio]`** — WebAudio synth / procedural SFX.
+- **`[applicable if large asset pipeline]`** — lazy load, cache strategy, mobile size budget.
+
+## §4 Screens, embeds, and host sites **[core]**
+
+Standalone PWA **or** iframe on a parent site:
+
+- Detect embed: `window.self !== window.top` → compact layout class on `<html>` (project-defined prefix).
+- **Iframe / shell height** — `clamp()` / `dvh` floors so menus and CTAs are not clipped; `@media (max-height: …)` fallback.
+- **Touch** — minimum targets; on-screen controls when keyboard unavailable **`[applicable if mobile browser]`**.
+- **`[applicable if portrait-first mobile]`** — dedicated HUD pass (after core loop is fun on landscape/desktop).
+- **Host vendoring** — build with correct `base` subpath → copy to `public/games/<id>/` → host SPA fallback → theme overlay CSS for parent contrast.
+- **`[applicable if educational host]`** — short note naming real algorithms used (accurate labels only).
+
+Host routing details → `website-building.mdc` (vendored folder only).
+
+## §5 Player experience baseline **[core]**
+
+- Remappable controls + persisted settings **`[applicable if keyboard/gamepad]`**.
+- Pause that **stops the simulation tick**, not only hides UI.
+- Live audio sliders (master / SFX / music).
+- In-match reference UI (moves, objectives) for onboarding.
+- Local settings + progress in `localStorage` / IndexedDB **`[applicable if client-only]`**.
+
+## §6 Tools & live ops (client-only) **`[applicable if designer-heavy]`**
+
+- Local telemetry (usage, win rates) — on-device, privacy-first.
+- Tuning overlay writing to local storage without redeploy for every tweak.
+- Hidden admin or `noindex` QA routes; keep player navigation clean.
+
+## §7 Delivery & hardening **[core]**
+
+- **`[applicable if offline / installable]`** — PWA with documented SW strategy; scope or disable SW on embed subpaths so the parent site is not broken.
+- No debug globals exposing solver, full state, or level data in production; build verify fails if reintroduced.
+- Minify shipped client JS; `drop_console` where appropriate; README states client bundles are not secret — license + server validation when cheating matters.
+- Test on throttled network once before release.
+
+## §8 Testing & definition of done **[core]**
+
+- E2E (Playwright or equivalent): reach first interactive frame, complete minimal play path, screenshot on critical views.
+- **`[applicable if deterministic core]`** — automated replay verification in CI.
+- Smoke narrow + wide viewport; test embed and standalone if both ship.
+
+## §9 Optional / niche
+
+| Tag | Topics |
+|-----|--------|
+| **`[applicable if online multiplayer]`** | Lock rating/replay-diff model; async ladder via verified replays when deterministic |
+| **`[applicable if cloud save]`** | Schema migration, conflict resolution, backend ADR before UI |
+| **`[applicable if Android native shell]`** | WebView + bundled assets; Gradle sync from web build; min + current OS |
+| **`[applicable if iOS shell]`** | WKWebView bundle parity; safe areas |
+| **`[applicable if hot-seat local multiplayer]`** | Shared keyboard/gamepad; no netcode |
+| **`[applicable if CPU opponents]`** | AI module; difficulty tiers from local telemetry when possible |
+| **`[applicable if second engine port]`** | Alternate engine SKU; web build remains data source of truth |
+| **`[applicable if WebGL renderer]`** | Fallback path for WebGL-less devices |
+
+## §10 Roadmap hygiene **[core]**
+
+- Public `ROADMAP.md` with status: shipped / in progress / next / parked — and **why parked**.
+- Tier 0 = playable loop; tier 1 = polish; tier 2 = content; tier 3 = multiplayer/cloud/port — do not block ship on tier 3.

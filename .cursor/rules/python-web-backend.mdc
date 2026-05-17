@@ -1,0 +1,67 @@
+---
+description: Python web backends — FastAPI, Django, Flask patterns for APIs and server-rendered apps
+globs: "**/*.py",**/app/**,**/api/**,**/routes/**,requirements*.txt,pyproject.toml
+alwaysApply: false
+---
+
+# Python Web Backends
+
+**Intent:** FastAPI, Django, and Flask service patterns only — not Java/Spring, front-end UI, browser bots, or game engines.
+
+## Project layout **[core]**
+
+- Separate routes/controllers, services, models, and config.
+- Environment-based settings; secrets from env or vault — never committed.
+- Dependency management via `pyproject.toml` / `requirements.txt` with pinned versions in production.
+
+## Code quality **[core]**
+
+- **PEP 8** formatting; **type hints** on public APIs.
+- Docstrings on modules and non-obvious functions.
+- `try`/`except` at boundaries with meaningful error types; limit bare `except`.
+- Prefer `val` immutability patterns; avoid unnecessary global state.
+
+## Framework patterns
+
+**FastAPI / async APIs**
+
+- Async I/O for network-bound work; do not block the event loop.
+- Pydantic (or equivalent) for request/response validation.
+- Thin route handlers; business logic in services.
+- Dependency injection for DB sessions and auth.
+
+**Django**
+
+- MVT: keep views light; business logic in models/services/forms.
+- ORM over raw SQL; migrations for every schema change.
+- Built-in CSRF for session forms; validate all POST bodies.
+- Class-based views for complex flows; function views for simple ones.
+
+**Flask / lightweight**
+
+- Blueprints for modular routes.
+- **`[applicable if server-rendered HTML]`** progressive enhancement; HTMX or similar for partial updates without a heavy SPA when appropriate.
+
+## API design **[core]**
+
+- RESTful resources; consistent error envelopes.
+- Pagination sized for mobile clients (cursor or limit/offset documented).
+- Auth: derive user identity from token/session — never trust client-supplied user IDs in body.
+- OpenAPI or equivalent documented for public APIs.
+
+## Testing **[core]**
+
+- **pytest** for unit and integration tests.
+- Testcontainers or Docker for real DB in integration tests when feasible.
+- Mock only at network boundaries, not your own domain logic.
+
+## Background work **`[applicable if I/O bound jobs]`**
+
+- Celery, RQ, or framework-native task queues for long jobs.
+- Idempotent task handlers; retries with backoff.
+
+## What this rule does not cover
+
+- Browser automation → `automation-software.mdc`
+- Product security policy → `universal-product.mdc` §5
+- Java services → `java-spring-end-to-end.mdc`

@@ -1,0 +1,121 @@
+---
+description: Universal Product Excellence — philosophy, multi-device UI, security, privacy, Definition of Done (stack-agnostic)
+alwaysApply: false
+---
+
+# Universal Product Excellence
+
+**Intent:** Single owner for product philosophy, cross-surface UI and accessibility (§2a–2c), security, privacy, and Definition of Done — not HLD diagrams, web deploy, game engines, or browser bots.
+
+A generic engineering + design + security rule applicable to any product (static site, CLI, web, mobile, full-stack, embedded), any tech stack, any team. Items are tagged by applicability:
+
+- **[core]** — applies to every product.
+- **[applicable if …]** — applies only when the product matches the listed condition (UI, mobile, multi-tenant, etc.). Skip otherwise.
+
+If a tag does not apply to your product, drop the whole bullet — do not water it down.
+
+## 1. Product Philosophy — Think Jobs, Design Rams **[core]**
+
+Articulate the **one real user job** the product solves in one sentence before writing code. Channel Steve Jobs: ruthlessly say *no* to features that do not serve that job, obsess over the first-run experience, make the default path the right path. Apply **Dieter Rams' ten principles** — good design is innovative, useful, aesthetic, understandable, unobtrusive, honest, long-lasting, thorough, environmentally friendly, and involves as little design as possible. Prefer one clear primary action per screen, predictable affordances, no dark patterns, no jargon. Measure success by *time-to-value* and *task completion rate*, not feature count.
+
+## 2a. Cross-Surface Product Principles **[applicable if you ship any UI]**
+
+The same user job must complete on every surface; layout and chrome may differ.
+
+- **Input modalities [applicable if UI]:** support whichever of pointer / touch / keyboard / assistive tech the surface actually receives; visible focus on every interactive element.
+  - **[applicable if touch UI]** meet or exceed platform minimum touch targets (~44–48 density-independent units — 44 pt iOS HIG, 48 dp Android Material) with adequate spacing.
+  - **[applicable if desktop/web UI]** full keyboard-only path for every primary task.
+- **Accessibility [applicable if consumer-facing UI, regulated industry, or public-sector product]:** meet **WCAG 2.2 AA** — logical focus order, accessible name + description for custom controls, sufficient colour contrast, errors announced and linked inline (not modal-only on small screens). Internal admin tools may scope to keyboard + screen-reader smoke checks only.
+- **Motion & vision [applicable if UI has animations or theming]:** respect `prefers-reduced-motion`; never convey state through motion alone. Honour **system font scaling / Dynamic Type**, high-contrast modes, and `prefers-color-scheme`.
+- **Layout beyond width [applicable if UI on phones/tablets]:** mobile-first, container queries where supported, **safe areas / notches**, **RTL** via CSS logical properties / platform RTL APIs. Decide explicit **content vs navigation priority** at narrow widths — truncate, reflow, or "more" pattern.
+- **Foldables / multi-window [applicable if Android/desktop multi-window matters to the segment]:** handle resize and posture changes without losing state.
+- **Network reality [applicable if UI hits a network]:** every screen has explicit **loading, empty, error, and partial-data** states that work on slow or flaky links. Skeletons over spinners; retry affordances; never blank-screen on failure.
+- **Offline / degraded behaviour [applicable if mobile or field-use product]:** define which flows must work offline; queue mutations with idempotency keys; reconcile on reconnect.
+
+## 2b. Design System Across Surfaces **[applicable if 2+ client surfaces share a brand]**
+
+Share **design tokens** (spacing, type, colour, radius, elevation, motion). Use shared **component semantics** (same labels, roles, behaviour for the same job on every client). Design **APIs that don't assume desktop**: pagination sized for mobile, optional/sparse field sets, attachment-size limits.
+
+## 2c. Internationalization & Localization **[applicable if shipped outside one locale]**
+
+- Externalize all user-visible strings; use ICU MessageFormat-style placeholders for plurals/gender — no concatenation.
+- **Locale-aware formats** for dates, numbers, currency, units, addresses, names.
+- **RTL** mirroring of layout, icons, and gestures **[applicable if any RTL locale is supported]**.
+- **Timezone discipline:** store UTC, render in user's zone; one-off events → UTC instant; scheduled events → wall-clock + IANA zone (DST-safe); recurring events → **RRULE + IANA zone [applicable if calendar/scheduling product]**.
+- Pseudo-localize in CI to catch hard-coded strings and truncation early.
+
+## 2d. Example Technology Choices **[reference only — record the choice in an ADR]**
+
+Stack-agnostic. Examples (do not treat as mandates):
+
+- **Web:** TypeScript + React/Next.js, SvelteKit, Vue/Nuxt, or server-rendered HTML with progressive enhancement.
+- **Mobile:** React Native, Flutter, or native (SwiftUI / Jetpack Compose).
+- **Backend:** Node, Python (FastAPI/Django), JVM (Spring/Pekko/Scala), Go, Rust, .NET — pick for team fluency.
+- **APIs:** REST + OpenAPI by default; gRPC for service-to-service; GraphQL only when the client genuinely drives query shape.
+- **Data:** relational, document, or KV — pick by access pattern. Cache + queue only if needed.
+- **Infra:** containers + orchestrator, serverless, or PaaS.
+- **Auth:** OAuth2/OIDC + short-lived tokens; never roll your own crypto.
+
+## 3. Architecture Principles
+
+**[core]** Apply **SOLID, DRY, KISS, YAGNI, twelve-factor**, and clean/hexagonal layering. **Structured logs with correlation IDs** for anything that runs. Never trust user IDs from request bodies — derive from the auth token.
+
+**[applicable if the product serves traffic or runs a service]** RED metrics (Rate, Errors, Duration) with p50/p95/p99.
+
+**[applicable if the product makes network calls, has async work, or runs multi-instance]** Idempotent APIs with idempotency keys; retry + exponential backoff + jitter; circuit breakers; timeouts at every hop; DLQs for poison messages; at-least-once delivery with idempotent processing (never claim *exactly-once*).
+
+**[applicable if 2+ services or > 1 deploy environment]** Distributed tracing, SLOs with error budgets, feature flags, canary/blue-green deploys with one-click rollback.
+
+## 4. Testing Discipline
+
+Bar is **behavioural tests at trust boundaries**, not a line-coverage number. Each repo declares its own minimum (e.g., "changed lines covered" or "critical paths covered") in its README/ADR.
+
+- **Unit / component tests [core]:** in whatever framework the language uses. Test behaviour, not implementation.
+- **Accessibility automation [applicable if consumer-facing UI or regulated industry]:** axe-core (web), ESLint a11y rules, XCTest accessibility APIs (iOS), Compose UI / Espresso accessibility checks (Android), or equivalent in CI.
+- **Integration tests [applicable if you have a DB, queue, or external service]:** real dependencies via Testcontainers/Docker; mock only at the network boundary.
+- **Contract tests [applicable if 2+ services talk]:** Pact or OpenAPI schema tests.
+- **E2E tests [applicable if you ship a UI with critical multi-step flows]:** Playwright / Cypress / Maestro / XCUITest / Espresso on a real device + browser matrix.
+- **Visual regression [applicable if brand-critical UI or high design churn]:** snapshot tooling of choice on critical screens.
+- **Load tests [applicable if you have SLOs or significant concurrency]:** k6/Locust/JMeter.
+- **Chaos tests [applicable if multi-instance + high-availability target]:** kill pods, drop network, partition disks.
+- **Mutation testing [applicable if safety-critical or finance/health domain]:** Stryker/Pitest or equivalent.
+
+CI blocks merge on red **[core]**.
+
+## 5. Security Non-Negotiables
+
+Threat-model every feature.
+
+**[core, every product]**
+- **Zero secrets in code/repos** — use a vault; push protection + pre-commit `gitleaks`/`trufflehog`; rotate on schedule and on suspicion.
+- **Validate every input at trust boundaries.**
+- **SAST + DAST + dependency scanning** in CI; follow OWASP Top 10.
+- **Least-privilege IAM**; encrypt at rest and in transit (TLS 1.3); mask sensitive values in logs.
+
+**[applicable only if the listed component exists]**
+- **Strict CSP, HSTS, SameSite cookies [applicable if web surface].**
+- **Parameterised queries / ORMs [applicable if SQL DB]** — no string-concatenated SQL.
+- **Row-Level Security [applicable if multi-tenant DB].**
+- **Webhook signing** — HMAC + timestamp + short replay window, constant-time verify **[applicable if you send or receive webhooks]**.
+- **Account takeover defences** — MFA, breached-password checks, auth rate-limit + lockout, device fingerprinting, session rotation on privilege change **[applicable if user accounts]**.
+- **Supply-chain hardening** — SLSA levels, signed artifacts, SBOMs **[applicable if you publish binaries/images]**.
+- **Mobile platform hardening** — certificate pinning, jailbreak/root detection where the threat model demands, keystore/keychain for secrets, no PII in app logs **[applicable if native mobile app]**.
+
+## 6. Privacy & Product Ethics **[applicable if you handle personal data]**
+
+- **Data classification:** label every field as public / internal / PII / regulated, so IAM, encryption, retention, and audit policies line up consistently.
+- **Data minimization:** collect only what the user's job requires.
+- **Purpose limitation:** use data only for what was disclosed; no silent repurposing.
+- **Retention:** define and enforce TTLs; honour GDPR/CCPA delete/export; keep audit trails **[applicable if regulated jurisdiction]**.
+- **User-visible honesty:** plain-language explanations of what is collected and why; no dark patterns in consent. Aligns with Rams' *honest* principle.
+
+## 7. Definition of Done **[core]**
+
+A change ships only when: it serves one clear user job; the simplest design was chosen; behavioural tests pass; observability is wired for any component running in production; threat model reviewed for applicable risks; docs/runbooks updated; rollback is one click away.
+
+- **[applicable if UI]** verified on smallest + largest supported viewport, keyboard-only, and one representative mobile profile.
+- **[applicable if accessibility scope applies]** reduced-motion and high-contrast spot-checked; screen-reader smoke test on primary flow.
+- **[applicable if i18n scope applies]** critical flows spot-checked in a secondary locale, and in RTL if any RTL locale is supported.
+- **[applicable if native mobile app]** tested on min-supported OS and current OS; light + dark mode; Dynamic Type / font scaling.
+
+For architecture sign-off before coding, see `system-design.mdc` §4.
