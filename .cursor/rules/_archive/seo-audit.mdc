@@ -1,0 +1,146 @@
+---
+description: SEO audit — technical SEO, crawlability, indexation, ranking drops, site health check, Core Web Vitals. Use when diagnosing why a site is not ranking or traffic fell; start here before tweaking titles.
+globs: "**/*.{html,jsx,tsx,vue,md}",public/**/*,robots.txt,sitemap*,wrangler.jsonc,vercel.json
+alwaysApply: false
+---
+
+# SEO Audit
+
+**Intent:** Identify SEO issues site-wide and deliver a prioritized fix plan. Not single-page element optimization (`on-page-seo.mdc`), not designing scaled page programs (`programmatic-seo.mdc`), not backlink campaigns (`off-page-seo.mdc`).
+
+---
+
+## Before you audit **[core]**
+
+1. Read `.agents/product-marketing.md` if present — business goals, priority keywords/topics.
+2. Gather (ask if missing):
+   - Site type (SaaS, e-commerce, blog, local, multilingual)
+   - Known issues, recent migrations or redesigns
+   - Scope: full site vs specific sections
+   - GSC / analytics access (or best available evidence)
+
+3. **Do not** start with title tweaks if crawlability or indexation is broken.
+
+---
+
+## Audit priority order **[core]**
+
+1. **Crawlability & indexation** — can Google find and index pages?
+2. **Technical foundations** — fast, secure, mobile-ready?
+3. **On-page optimization** — titles, headings, content alignment?
+4. **Content quality** — does it deserve to rank (E-E-A-T, depth)?
+5. **Authority & links** — off-site credibility?
+
+---
+
+## Schema detection caveat **[core]**
+
+`curl` and static fetches often **miss JS-injected JSON-LD** (Yoast, RankMath, SPA `useEffect`). Never report "no schema" from fetch alone.
+
+Verify with: [Rich Results Test](https://search.google.com/test/rich-results), rendered DOM, or Screaming Frog with JS rendering.
+
+---
+
+## Technical SEO **[core]**
+
+### Crawlability
+- `robots.txt` — no accidental blocks; sitemap reference present
+- XML sitemap — canonical indexable URLs only; submitted to GSC
+- Architecture — important pages within 3 clicks; no orphans
+- `[applicable if large site]` Crawl budget — params, faceted nav, infinite scroll fallbacks
+
+### Indexation
+- `site:domain.com` vs expected URL count
+- GSC coverage — noindex on money pages, wrong canonicals, redirect chains, soft 404s
+- HTTPS + www/non-www + trailing slash consistency
+
+### Speed & Core Web Vitals
+- LCP < 2.5s, INP < 200ms, CLS < 0.1
+- TTFB, images, JS weight, caching, CDN
+
+### Mobile & security
+- Responsive (not separate m. site); tap targets; same content as desktop
+- HTTPS sitewide; no mixed content
+
+---
+
+## International SEO `[applicable if multilingual]`
+
+- Hreflang: self-reference, reciprocal tags, valid ISO codes, `x-default`
+- Each locale self-canonical — never cross-locale canonical to English
+- Fully translated main content — not boilerplate-only locales
+- Thin locale pages can drag site-wide quality — don't create locales you can't make helpful
+
+---
+
+## On-page & content (audit lens) **[core]**
+
+Flag issues; detailed fix patterns → `on-page-seo.mdc`.
+
+| Area | Check |
+|------|-------|
+| Titles / metas | Unique, length, keyword alignment, CTR-worthy |
+| Headings | One H1; logical hierarchy |
+| Content | Intent match, depth vs top 3, thin/doorway pages |
+| Images | Alt text, compression, modern formats |
+| Internal links | Important pages linked; descriptive anchors; cannibalization |
+| E-E-A-T | Author, sources, about/contact, freshness |
+
+---
+
+## Site-type quick hits `[applicable if type matches]`
+
+| Type | Common gaps |
+|------|-------------|
+| SaaS | Thin product/feature pages; blog disconnected from product; missing comparison/alternative pages |
+| E-commerce | Thin categories; duplicate descriptions; faceted duplicates; missing product schema |
+| Content/blog | Outdated posts; cannibalization; weak topical clusters |
+| Local | NAP inconsistency; missing LocalBusiness schema; weak location content |
+
+---
+
+## Output format **[core]**
+
+### Executive summary
+- Overall health (1–2 sentences)
+- Top 3–5 priority issues
+- Quick wins
+
+### Findings tables
+For each issue:
+
+| Issue | Impact (H/M/L) | Evidence | Fix | Priority (1–5) |
+
+Group under: Technical | On-Page | Content | Authority
+
+### Prioritized action plan
+1. Critical (blocking indexation/ranking)
+2. High-impact improvements
+3. Quick wins
+4. Long-term recommendations
+
+Hand off page-level implementation → `on-page-seo.mdc`. Scaled page-set problems → `programmatic-seo.mdc`.
+
+---
+
+## Free tools **[core]**
+
+Google Search Console, PageSpeed Insights, Rich Results Test, Mobile-Friendly Test, Bing Webmaster Tools.
+
+---
+
+## What this rule does not cover
+
+| Need | Use instead |
+|------|-------------|
+| Ship unique title/meta per SPA route | `on-page-seo.mdc` |
+| Design 100+ template pages | `programmatic-seo.mdc` |
+| AI Overviews / llms.txt | `ai-seo.mdc` (archive) |
+| Link building outreach | `off-page-seo.mdc` (archive) |
+
+## Related rules
+
+- Fix individual pages → `on-page-seo.mdc`
+- pSEO program design → `programmatic-seo.mdc`
+- Context + priority keywords → `product-marketing-context.mdc`
+- Deploy, prerender, sitemap code → `website-building.mdc`

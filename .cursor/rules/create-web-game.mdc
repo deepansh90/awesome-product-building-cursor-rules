@@ -1,0 +1,508 @@
+---
+description: Create web apps and games — SPA/static ship, copy economy, hosting, game engine/shell, embeds, PWA, verification
+globs: "**/*.{html,css,jsx,tsx,vue,svelte}","**/wrangler.jsonc","**/vercel.json","**/public/**","**/games/**","**/src/**","**/style.css","**/index.html"
+alwaysApply: false
+---
+
+# Create Web App / Game
+
+**Intent:** Ship marketing sites, SPAs, and browser games (including embeds/PWA). Convert to Android → `convert-web-to-mobile.mdc`. Store publish → `publish-mobile.mdc`. UI philosophy → `product-excellence.mdc`. SEO → `seo-gtm.mdc`.
+
+**Tag legend:** **[core]** always consider; **[applicable if …]** skip when irrelevant.
+
+---
+
+# Part A — Web applications (static & SPA)
+
+# Web Applications (Static & SPA)
+
+**Intent:** Ship, test, and host marketing or product web apps and **host vendored client bundles** (e.g. games). Cross-surface UI policy lives in `product-excellence.mdc` §2a. Game engines and replay logic live in `create-web-game.mdc`. **Simplification passes** (cut copy, chrome, redundancy) → this rule § Simplification + `incubation.mdc` Mode A.
+
+**Applicability:** If a section's `[applicable if …]` does not match your product, **skip the entire section** — do not copy proxy, editor, or ingest patterns onto simple marketing sites.
+
+## Docs map **[core]**
+
+| Doc | Purpose |
+|-----|---------|
+| `README.md` | Dev commands, deploy targets, design philosophy |
+| `design_spec.md` / `design_specification.md` / `roadmap.md` | Product direction, paused features (e.g. monetization flags) |
+| `wrangler.jsonc` / `vercel.json` | Host-specific routing (only the file for your target) |
+
+Read before large changes.
+
+## Stack-agnostic defaults **[core]**
+
+- Prefer **static-first**: content as JSON or markdown under `public/`; minimal server logic.
+- Document routing (hash-based or path-based) in README so agents do not guess.
+- Global styling: one source of truth (`style.css` or design tokens); if using Tailwind, decide whether preflight is on or off and stay consistent.
+- **Monetization:** use explicit feature flags or a documented “monetization paused” constant — do not half-enable paywalls without updating `roadmap.md`.
+
+## UI expectations (web-specific) **[core]**
+
+Visual and accessibility policy → `product-excellence.mdc` §1b (Rams) and §2a. Web-only: keep one global style source (`style.css` or tokens); document tokens in `design_spec.md` when used. Design-only polish (no new routes or behavior) → `incubation.mdc` Mode A before claiming UI done.
+
+## Simplification & copy economy **[core]**
+
+One job per screen. If the user can infer it from layout, **do not label it again in prose**. Run this audit before claiming UI done (pairs with `incubation.mdc` Mode A).
+
+### Copy source of truth
+
+- **Centralize visible strings** in one module (e.g. `src/lib/i18n.js`, `copy.ts`) — EN + any locale variants. Components consume `t(lang).key`; avoid hardcoded marketing paragraphs in JSX.
+- **SEO vs UI:** longer keyword copy may live in `index.html`, `seo.js`, or prerender landings — **not** duplicated in the hero, trust bar, and three-column “SEO grids” on the same viewport.
+- **Data vs display:** JSON can hold rich hints; the UI may show **caps** (max bullets, max chars) via formatters — trim at display, then shorten source data in a follow-up if still noisy.
+
+### Redundancy audit
+
+Ask for every line of text on a route:
+
+| Question | If yes → |
+|----------|----------|
+| Is this fact shown elsewhere on the same viewport? | Remove the duplicate (keep one source of truth). |
+| Is this the same pitch in hero + trust bar + footer + 3 feature cards? | **One headline + one subline** on the MDP; trust bar = one short line or logos only. |
+| Is this a collapsed/closed section with no visible payoff? | Open by default with real content, or **delete** the section. |
+| Is this geographic, aspirational, or “studio” fluff on a tool page? | Cut or move to a tertiary route — not footer chrome on the MDP. |
+| Is this engineering status dressed as user copy? | Hide when idle; show only during incomplete work (e.g. “Analyzing…”). |
+| Are there two cards for one concept (e.g. “Blueprint” + “Signals”)? | **Merge into one card** with one eyebrow label. |
+
+**Anti-patterns (seen in production):**
+
+- Hero H1 + subline + **three SEO columns** restating company tags (same page).
+- Same chapter name in header, sidebar tab, and main panel heading.
+- Same photo count in stats line, sidebar badge, grid header, and download button label.
+- Trust copy in hero + floating strip + footer (pick **one** surface + `/privacy` link).
+- Pattern detail: **Trigger / Constraint / Win** labels plus a separate **Signals** box with overlapping bullets.
+- Pattern detail: pattern name in page title **and** again inside the guide card.
+- Brand wordmark run together (`BRANDNAME`) — use explicit word spacing in a shared `BrandLogo` component.
+- Footer with three columns repeating nav + location + taglines the header already implies.
+- List/grid cards with long descriptions when **name + count + CTA** suffices.
+
+### Hero & trust (marketing / tool MDP) **[applicable if landing + app tabs share one shell]**
+
+- **Hero:** one H1 + one subline (≤ ~12 words each when possible). No feature grid under the hero unless each card opens distinct content not visible elsewhere.
+- **Trust bar:** logos **or** one metrics line — not both repeating the hero pitch.
+- **Tabs / primary nav:** labels only; no paragraph under every tab on first paint.
+- **Curated path cards**: title + **three-word** subtitle max — or title only.
+
+### Detail pages & reference content **[applicable if cheat sheets, patterns, chapters, docs]**
+
+Use **one card per concept**, identical structure across all items:
+
+```text
+[EYEBROW — one word, e.g. Pattern / Chapter]
+[optional media — GIF/diagram, sized for readability]
+[one gist line — trigger → outcome, no field labels]
+[· up to 2 cues — short bullets, not paragraphs]
+[template / code block — if applicable]
+[list of items — problems, links, etc.]
+```
+
+Rules:
+
+| Do | Don't |
+|----|--------|
+| One eyebrow (`Pattern`, `Chapter`) | Separate “Blueprint”, “Signals”, “More signals” boxes |
+| Gist: `{trigger} → {win}` in one line | Labeled rows for Trigger / Constraint / Win |
+| Show **≤ 2** cues; cap ~90 chars each in UI | Dump full `howToIdentify` arrays on page |
+| Cap gist ~140 chars in formatter | Multi-sentence intro before the list |
+| Page `<h1>`/`h2` holds the name | Repeat name inside the guide card |
+| Same component for all items | Per-pattern layout forks |
+
+Implement via a shared component + props (`blueprint`, `signals`, `visual`) and constants (`MAX_CUES`, `MAX_GIST_CHARS`). Unit-test formatters.
+
+**List pages:** grid cards = **title + metadata** (count, badge) — drop redundant descriptions when the title is self-explanatory.
+
+### FAQ, About, legal
+
+- **FAQ:** ≤ 4–6 questions; **one-line answers**. Cut overlapping questions.
+- **About:** one paragraph + optional quote + stats — not three story paragraphs + disclaimer + quote.
+- **Privacy / Terms:** plain-language essentials; avoid repeating the same disclaimer in footer, about, and legal.
+
+### Free tiers & tool directories **[applicable if affiliate / resource lists]**
+
+- Section header: eyebrow + title + **one** subtitle per band (Free vs Pro).
+- Tool cards: **name + eligibility badge + CTA** — drop taglines when the name is clear; hide long “how we use it” lists on card face (link out or `<details>` if truly needed).
+- Dividers between bands: one short line (`Need paid tools →`), not a paragraph.
+
+### Header chrome (multi-tab apps)
+
+- Single row: **logo `shrink-0` · nav `flex-1 min-w-0` (scroll) · lang + theme `ml-auto shrink-0`**.
+- Avoid `absolute` controls overlapping nav on mobile.
+- Theme default: explicit in app state (e.g. `'default'`), not an aesthetic preference baked in without product reason.
+
+### Routing & blank screens **[applicable if hash + path SEO landings]**
+
+- If `maybeRedirectLegacyHash()` (or equivalent) runs **before** React mount and returns `true`, the app **never renders** — blank screen with no console error.
+- **Fix:** when `pathname` already equals the canonical path, **return false** even if the hash has sub-routes.
+- Add E2E for canonical path + hash sub-routes after any redirect refactor.
+
+### Attribution & vendored media
+
+- Local / anonymous assets: **no** author name or article links in UI unless legally required.
+- Third-party (e.g. Wikimedia): **Commons + optional Wikipedia overview** — not personal Medium/blog attribution mixed into pattern guides.
+
+### Brand & chrome
+
+- **Wordmark:** multi-word names get visible space, not concatenated spans. One shared component for header + footer.
+- **Header:** logo `shrink-0` left; primary CTA right; `justify-between` + explicit `gap` — nav must not crowd the mark.
+- **Footer (tool-first sites):** two columns max — brand blurb + contact email; short Explore list (Designer, How it works, Privacy). One copyright line. No location pins unless the product is *about* place.
+- **Buttons:** one geometric language per tier (e.g. primary CTAs all `rounded-full`); do not mix pill and boxy on the same funnel step.
+
+### Idle onboarding (paste / upload flows)
+
+- **Narrow reading column** (`max-w-2xl` / `max-w-3xl`) — not full-bleed empty canvas.
+- **Hero stack:** job statement → single trust line (Privacy · process modal) → form. No sixth text layer.
+- **Sample / demo output:** show real thumbnails **inline** or omit entirely. Never a closed `<details>` that only shows a headline — users read it as broken.
+- **Remove** sidebar placeholders that restate what the main panel already does.
+
+### Workspace stats (one calm line)
+
+When users ingest batches (folders, galleries), expose **numbers only** in one `role="status"` line under the title:
+
+```text
+43 in folder · 31 shown · 9 duplicates hidden · 3 blur filtered · 4 selected
+```
+
+Rules:
+
+- Always: `N in folder · M shown`.
+- Append segments **only when > 0** (duplicates, blur-filtered, excluded, selected).
+- During async work: replace with `Analyzing…` or `Layout 12/43` — not the full stats string.
+- Implement via a pure formatter (e.g. `formatWorkspaceStats()`) + unit tests; do not scatter string templates in JSX.
+- Full breakdown belongs in **settings / curation dialog**, not repeated in the grid header.
+
+### Progressive disclosure that earns its keep
+
+- **Good:** Export PDF primary; Edit folder + Curation + Analyze batch in overflow `⋯`.
+- **Good:** Advanced thresholds inside collapsed `<details>` in a dialog.
+- **Bad:** Icon tabs plus a text heading repeating the tab name plus instructional microcopy for obvious interactions (“Click to select”).
+- **Bad:** Stats line when nothing is in progress and every number is duplicated elsewhere.
+
+### Verification for simplification **[core]**
+
+- Desktop + mobile screenshot: can a new user name the **one** primary action in 3 seconds?
+- Count distinct places the same noun appears — **≤ 2** per viewport.
+- Pattern/detail routes: exactly **one** guide card above the list; no `Trigger:` labels in DOM.
+- E2E smoke: assert stable copy on routes you keep; **remove** assertions for deleted boilerplate; update `page-objects` hero patterns when H1 changes.
+- After copy pass: run `npm test` + spot-check `/patterns#…/pattern/…` (or equivalent deep link) for blank-screen regressions.
+
+## SPA resilience & SEO **[core]**
+
+- **Error boundaries:** route- or section-level fallback UI with retry/home — never a blank screen on render failure.
+- **Code splitting:** lazy-load heavy routes (games, admin, charts) via dynamic `import()` or framework equivalent.
+- **Shareable UI state `[applicable if filters/tabs/search should be linkable]`:** put bookmarkable state in URL hash or query params — not ephemeral UI (modals, scroll, drafts) or sensitive values.
+- **SEO (per route):** unique `<title>`, meta description, canonical URL, Open Graph tags — even for hash routes, set document title on navigation.
+- **Third-party scripts & CSP `[applicable if you add external trackers/widgets]`:** update CSP to match what you actually load — do not add analytics by default; if you do add a tracker, allowlist its domains explicitly (avoid `'unsafe-inline'` / `'unsafe-eval'` unless your bundler requires them).
+- **`[applicable if TypeScript]`** enable `strict`; prefer `unknown` over `any`.
+
+## Performance & Optimization **[core]**
+
+- **Core Web Vitals (CWV):** Monitor and optimize for LCP (Largest Contentful Paint), INP (Interaction to Next Paint), and CLS (Cumulative Layout Shift).
+- **Asset & Image Optimization:** Use modern image formats (WebP/AVIF), provide responsive `srcset`, and use `loading="lazy"` for off-screen media.
+- **Progressive Web App (PWA):** `[applicable if offline capable]` Implement Service Workers using reliable caching strategies (e.g., stale-while-revalidate for assets, network-first for data) to provide resilient offline/flaky-network experiences.
+
+## SPA hosting **[core]**
+
+- Production build outputs to `dist/` (or equivalent).
+- **Cloudflare Workers / static assets:** `assets.directory` → `./dist`, `not_found_handling: single-page-application` so unknown paths fall back to `index.html`.
+- **Vercel / Netlify:** equivalent SPA rewrite rules in host config.
+- **Dev server:** if you vend a nested client SPA under `public/<app>/`, mirror SPA fallback in Vite (or host) preview so deep links work locally — not only in production.
+
+**DSA Patterns production deploy** → § *DSA Patterns site* below (Wrangler upload, CDN purge, `main`/`master` mirror).
+
+## Thin server on static apps **[applicable if Workers/API routes proxy third-party URLs or ingest user links]**
+
+Static-first does not mean zero server logic. When you add a **fetch proxy** or **link-ingest** handler (Drive folders, OG images, etc.), treat it as a shared resource every user hits.
+
+- **Allowlist upstream hosts** — HTTPS only; validate hostname *and* path pattern before `fetch`; re-check after redirects.
+- **Upstream timeout** — every outbound `fetch` gets `AbortController` + a strict deadline (e.g. 10s); return **504** on abort; `clearTimeout` in `finally` so hung calls cannot exhaust the connection pool.
+- **Rate limit by real client IP** — extract IP in order: `cf-connecting-ip` → first `x-forwarded-for` → `x-real-ip` → `"unknown"`. If deploy omits all headers, every user shares one bucket — document required proxy/CDN headers in README.
+- **Same-origin gate for browser proxies `[applicable if open relay abuse is a concern]`** — prefer matching `Origin` or `Referer`; know that strict deny-when-both-missing breaks some privacy browsers and non-browser clients — weigh abuse vs compatibility.
+- **Response hygiene** — enforce expected `content-type`, cap body size, use `cache-control: private` for user-specific bytes; generic error messages to clients (log upstream bodies server-side only).
+- **Server-side validation mirrors UI** — client regex is UX, not security; reject hostname bypass (e.g. `evil.com/folders/{id}`) in the handler before parsing IDs.
+- **Privacy-aligned defaults `[applicable if handling user media/links]`** — prefer client-side export over uploading user media when feasible; avoid PII in telemetry; do not persist user content server-side without a threat model (localStorage/session for prefs, auth, or cart is fine).
+
+Extract shared helpers (`getClientIp`, URL allowlist) into `src/lib/` and unit-test them.
+- **Proxied media URLs** — wrap third-party image URLs through one helper (e.g. `proxiedXUrl()`); keep helper and server allowlist in the **same module** with unit tests. When upstream changes hostname/path (e.g. `drive.google.com/thumbnail` vs `lh3.googleusercontent.com`), update both together or thumbnails break silently.
+
+## External link ingest **[applicable if users paste third-party folder/file URLs]**
+
+- **Primary + fallback paths** — API key (full listing) + best-effort fallback (smaller cap); log fallback server-side; toast honest limits to users (~60 vs 500+).
+- **Hard caps in code and tests** — max items ingested, folder depth, export batch size; constants referenced in unit tests and `product_spec.md`.
+- **Abort long ingest** — server handler timeout (e.g. 60s) separate from per-fetch proxy timeout.
+
+## Editor / workspace routes **[applicable if marketing landing + heavy tool on same site]**
+
+- **Progressive disclosure** — marketing chrome (header, footer) before first success; after success, **hide** site header; compact workspace toolbar. Keep escape hatches (privacy, edit source) in overflow — not a second row of equal-weight buttons.
+- **One primary action per workspace** — e.g. Export PDF filled; Download only when selection &gt; 0; everything else in `⋯` menu or Curation dialog.
+- **One stats line** — see § Simplification → Workspace stats; never restate counts in sidebar, grid header, and toolbar.
+- **Sidebar vs main** — sidebar = chapter list + mode icons (spreads/photos); main = content only. No dashed placeholder in sidebar when the grid lives in main.
+- **Main panel headings** — drop redundant chapter suffix when chapter is highlighted in sidebar; photos view needs no “Photos / Chapter / N photos · click to…” block — actions only (Select all / Clear).
+- **Contextual inspector `[applicable if complex editor]`** — right rail shows one context (cover, caption); instructional paragraphs → `sr-only` or dialog.
+- **Mobile tool nav `[applicable if editor has a side rail]`** — vertical rail → bottom filmstrip; pad main content above fixed nav.
+- **Human labels** — map internal enums to plain language (`blur filtered` not `filtered`; `duplicates hidden` not internal scorer jargon).
+
+## Trust UX for user-supplied input **[applicable if users paste links or run client-heavy export]**
+
+- **Process modal `[applicable if server reads user links/files]`** — deep trust dive in one modal; hero gets a single inline link (Privacy · How we process…). No third floating trust strip above the footer.
+- **Inline errors** — map domain failures (private link, timeout, rate limit) via a formatter; add one recovery hint; never stack traces.
+- **Client-heavy export `[applicable if PDF/canvas/render in browser]`** — detect OOM/memory failures and suggest recovery (fewer items, close tabs, split batches).
+- **Demo/sample output `[applicable if paste-or-upload onboarding]`** — optional **visible** sample row on landing; on the tool route, prefer doing the real job over sample chrome. If samples exist, they must be visible without a click — otherwise remove.
+
+## Hosting vendored sub-apps **[core]**
+
+When embedding a separate client build (games, tools):
+
+1. Upstream build sets correct **asset `base`** subpath.
+2. Copy artifacts to `public/<app-id>/` with `index.html` at folder root.
+3. Host SPA fallback for `/public-path/*` client routes (host config + dev middleware).
+4. Optional theme overlay CSS on parent chrome for contrast when iframe'd.
+5. **`[applicable if parent host is static-only]`** Static parent cannot run your Worker/API — ship embed/preview mode with mocked ingest; document that live third-party calls need full deploy + secrets. Hidden previews: `noindex`, omit from sitemap; sync script in parent repo after vendoring.
+6. For game-specific iframe height, embed detection, and engine rules → `create-web-game.mdc`.
+
+## Verification gate **[core]**
+
+Before claiming done:
+
+```bash
+npm test
+npm run build
+npm run test:e2e   # when present
+```
+
+- Structural/data tests under `tests/` when applicable.
+- **E2E smoke:** extend route list when adding hash or path pages; assert **stable copy** on each route.
+- Prefer **accessible role + name** for E2E selectors; use `data-testid` only when roles are ambiguous; reset state in `beforeEach`.
+- **Network mocking `[applicable if third-party APIs in CI]`:** use `page.route` / `cy.intercept` or env flags so CI stays deterministic.
+- **Funnel E2E `[applicable if multi-step submit → export flow]`:** one spec for the happy path, not only per-route smoke.
+- **Manual runbook `[applicable if CI mocks external APIs]`:** optional `teste2e.md` with real credentials for pre-release QA; keep CI mocked.
+- After changing vendored assets under `public/`, run full build so `dist/` matches.
+
+## Git & deploy **[core]**
+
+- **Canonical branch:** prefer `main`; if the remote still mirrors **`master`**, keep aligned: `git push origin main` then `git push origin main:master` when your workflow references both.
+- After deploy, if users see stale shells: purge CDN cache for `/` and `/assets/*` (and `/games/*` when vendored embeds changed), hard-refresh; confirm latest CI deploy succeeded.
+
+## Static Portal Site Integration **[applicable if hosting embedded apps/games]**
+
+**Project map** for agents working in static host portals. Embedded sub-apps → §12 (*Host site integration*).
+
+### Authoritative docs (read before large changes)
+
+| Doc | Use for |
+|-----|--------|
+| `README.md` | Dev commands, deployment targets, Capacitor/PWA config, testing, design philosophy |
+| Host routing config | Cloudflare Workers (`wrangler.jsonc`) or Vercel (`vercel.json`) SPA routing |
+| `design_specification.md` | Static-first React, CSS tokens, component architecture |
+| `roadmap.md` | Product direction and paused features |
+
+### Stack and structure
+
+- **Framework:** React / Vite / static HTML.
+- **Routing:** Hash-based or path-based SPA routing.
+- **Data:** Static JSON under `public/data/` or asset bundles under `public/games/<slug>/`.
+
+### UI and UX (site-specific)
+
+- **Design philosophy:** Simplicity, edge-to-edge readability, calm typography; avoid visual noise.
+- **Themes:** Standardize on high-contrast Default and Dark/Midnight themes using CSS tokens.
+- **Accessibility:** Preserve `:focus-visible` focus indicators and keyboard navigation.
+
+### Monetization and premium code
+
+- **Monetization paused:** Search `MONETIZATION_PAUSED` in components when toggling paywalls/pricing.
+
+### Verification & Deployment
+
+```bash
+npm test
+npm run build
+npm run test:e2e
+```
+
+- **Git integration:** Treat `main` as source of truth; fast-forward `master` when both exist (`git merge --ff-only`).
+- **CDN cache:** Purge CDN cache for `/` and asset subpaths after deploying static updates.
+
+## What this rule does not cover
+
+- System architecture documents → `system-design.mdc`
+- Product ideation, vision Q&A, scope essentialism → `incubation.mdc`; go/no-go critique → `incubation.mdc`
+- Browser job-application bots → `automation-software.mdc`
+- Game simulation, determinism, PWA inside the game → `create-web-game.mdc`
+
+
+---
+
+# Part B — Game development
+
+# Game Development
+
+**Intent:** Build any game genre (action, puzzle, idle, narrative) with optional determinism, embeds, and PWA — not general marketing site routing (see `create-web-game.mdc`). UI policy on all surfaces → `product-excellence.mdc` §2a.
+
+**Tag legend:** **[core]** every game should consider; **[applicable if …]** skip when irrelevant (e.g. do not force netcode rules on a casual puzzle).
+
+## §1 Product locks before scale **[core]**
+
+- Lock **visual direction**, **monetization ethics** (e.g. cosmetics-only, no pay-to-win), and **renderer/runtime** early. Name the **nearest genre reference** for UI/HUD (e.g. 2048 for tile puzzles, classic brawlers for fighters) — see `product-excellence.mdc` §2d.
+- Record **ADRs** in `docs/decisions/` so future agents know *why*, not only *what*.
+- **`[applicable if public roster / real-world names]`** — legal/name checklist before scaling content (trademark, slurs, restricted names).
+- **`[applicable if freemium]`** — document DLC scope; never sell gameplay power.
+
+## §1b Product design craft **[core]**
+
+Systems and feel before feature lists. Prefer Cursor agents `@game-designer`, `@level-designer`, `@narrative-designer`, `@technical-artist`, `@game-audio-engineer` when authoring GDDs or levels; keep this rule as the engineering checklist.
+
+- **Design pillars** — lock 3–5 non-negotiable player experiences before adding features; every mechanic must serve at least one pillar.
+- **Three-loop model** — document moment-to-moment (0–30s), session (5–30 min), and long-term (hours–weeks) loops. For puzzle embeds: solve beat → session of N levels → campaign/meta progression.
+- **Time pressure policy** — Blitz/time-attack modes are excellent hooks for active puzzles, but must **never** be forced onto meditative titles where they cause cognitive overload.
+- **Mechanic spec minimum** — for each core mechanic: purpose, player fantasy, inputs/outputs, success and failure states, edge cases, tuning levers. Mark unplaytested numbers `[PLACEHOLDER]` until validated.
+- **Onboarding checklist** — core verb within ~30s of first control; first success guaranteed; each new mechanic in low-stakes context; at least one discoverable without wall-of-text; first session ends on a hook (unlock, cliff-hanger, or “one more”).
+- **Level / pacing `[applicable if level-based]`** — per level: player fantasy, pacing arc, mechanic taught (spatially when possible), critical-path readability. Ship order: blockout (solvable grey box) → playtest → dress (VFX/audio). Do not art-polish an untested layout.
+- **Audio feel `[applicable if SFX/music]`** — every core verb gets a clear sonic cue when audio is on; keep gesture-gated unlock and volume controls per §5; prefer lean WebAudio / procedural SFX when download budget is tight (§3).
+
+## §2 Architecture: engine vs shell **[core]**
+
+- **Pure game core** — no UI framework, no DOM, no `window` in simulation code (`packages/<engine>/` or equivalent).
+- **Presentation shell** — menu routes in your web framework; Canvas/WebGL/DOM renderer **reads** core state only.
+- **Versioned schemas** for entities, levels, and events so saves and replays survive refactors.
+
+**`[applicable if action / fighting / sports / deterministic replay]`**
+
+- **Fixed timestep** sim (e.g. 60 Hz) in core; render may interpolate.
+- **Deterministic math** — fixed-point or integer-only physics; avoid raw floats for authoritative state.
+- **Seeded PRNG** — all gameplay randomness from a seed stored with the replay.
+- **Input ring buffer** — early presses still register within a small window.
+- **Central feel module** — hitstop, shake, freeze frames in one place for designers and replay parity.
+- **Replay = inputs + seed**; automated verify must reproduce identical outcomes before claiming netcode-ready.
+
+**`[applicable if puzzle / turn-based / low stakes]`**
+
+- Determinism optional; still separate **solver/level data** from UI; document algorithms honestly for educational hosts.
+
+## §3 Renderer & assets **[core]**
+
+- Pick renderer for **lowest common device** (Canvas 2D, DOM, SVG) unless you need WebGL **`[applicable if 3D or heavy particles]`**.
+- Document renderer choice in an ADR (Canvas for broad mobile support vs WebGL for effects — project decides).
+- **`[applicable if zero-download audio]`** — WebAudio synth / procedural SFX.
+- **`[applicable if large asset pipeline]`** — lazy load, cache strategy, mobile size budget.
+- **`[applicable if action / many spawned entities]`** — object pooling for bullets/particles; target ~**16 ms** sim slice per frame on low-end mobile.
+
+## §4 Screens, embeds, and host sites **[core]**
+
+Stand-alone PWA **or** iframe on a parent site:
+
+- Detect embed: `window.self !== window.top` → compact layout class on `<html>` (project-defined prefix).
+- **Iframe / shell height** — `clamp()` / `dvh` floors so menus and CTAs are not clipped; `@media (max-height: …)` fallback.
+- **Touch** — minimum targets; on-screen controls when keyboard unavailable **`[applicable if mobile browser]`**.
+- **`[applicable if portrait-first mobile]`** — dedicated HUD pass (after core loop is fun on landscape/desktop).
+- **Host vendoring** — build with correct `base` subpath → copy to `public/games/<id>/` → host SPA fallback → theme overlay CSS for parent contrast.
+- **`[applicable if educational host]`** — short note naming real algorithms used (accurate labels only).
+
+Host routing details → `create-web-game.mdc` (vendored folder only).
+
+## §5 Player experience baseline **[core]**
+
+- Remappable controls + persisted settings **`[applicable if keyboard/gamepad]`**.
+- Pause that **stops the simulation tick**, not only hides UI.
+- Live audio sliders (master / SFX / music).
+- In-match reference UI (moves, objectives) for onboarding.
+- Local settings + progress in `localStorage` / IndexedDB **`[applicable if client-only]`**.
+- **Micro-Celebrations & Juice** — Sync the "Holy Trinity" of game feel on core verbs: Visual pop + Audio chord + Haptic vibration.
+- **Win States & Continuous Blitz Flow** — Avoid static "Solved." text. Require tally count-ups and particle bursts (respecting `prefers-reduced-motion`). In **Blitz/timed rush modes**, remove mid-run "Next" buttons—let dwell timers auto-advance levels continuously while showing non-blocking solve toasts.
+- **Session Completion & Audio Transitions** — On session end (time/lives out), fade background music (BGM) to 0 (silence) and play a dedicated procedural Web Audio chime (`sfxModeComplete` / `sfxTimeUp`) to clearly signal the transition.
+- **Auto-Home Navigation & Tap-to-Linger** — When a timed session finishes, trigger a 2-second auto-redirect to Home, but cancel the timer immediately if the player taps the results card so they can linger on their score/stats without being forced off-screen (skip auto-redirect in E2E test mode).
+
+**Game HUD / UI:** apply `product-excellence.mdc` §1b; keep HUD minimal in embeds so play area is not shrunk by ornamental chrome.
+
+## §6 Tools & live ops (client-only) **`[applicable if designer-heavy]`**
+
+- Local telemetry (usage, win rates) — on-device, privacy-first.
+- Tuning overlay writing to local storage without redeploy for every tweak.
+- Hidden admin or `noindex` QA routes; keep player navigation clean.
+
+## §7 Delivery & hardening **[core]**
+
+- **`[applicable if offline / installable]`** — PWA with documented SW strategy; on embed subpaths, scope or disable SW so the **parent site's** service worker and routing are not hijacked — test both standalone and iframe before ship.
+- No debug globals exposing solver, full state, or level data in production; build verify fails if reintroduced.
+- Minify shipped client JS; `drop_console` where appropriate; README states client bundles are not secret — license + server validation when cheating matters (deterrence, not secrecy).
+- **`[applicable if TanStack CSR embed suite]`** — Bharat `build-all-embeds.mjs` uses esbuild `drop: ['console']`; host `verify-game-dist-cloudflare.mjs` gates shipped assets.
+- Test on throttled network once before release.
+
+## §8 Testing & definition of done **[core]**
+
+- E2E (Playwright or equivalent): reach first interactive frame, complete minimal play path, screenshot on critical views.
+- **`[applicable if deterministic core]`** — automated replay verification in CI.
+- Smoke narrow + wide viewport; test embed and standalone if both ship.
+- **`[applicable if level-based puzzle]`** — **one unit test per level** (structure + solvability where provable); shared `level-count.test.mjs` asserting N levels in source; update E2E copy when total level count changes (e.g. `Puzzle 1 / 30` for Echo, `/ 20` for most suite games — never stale `/ 3` or `/ 15`).
+- **`[applicable if embed iframe on educational host]`** — run E2E against local preview server serving `dist/client` at `/games/<slug>/`; keep `?e2e=1` auto-win paths **runtime-only** (never `VITE_E2E` at build — `build-all-embeds.mjs` deletes it); clear `localStorage` progress keys in `beforeEach`; `campaign-5` / smoke matrices follow **current** `EMBED_GAMES` (+ inlined mode routes for archived fantasies); fast and deterministic (instant win when puzzle already solved).
+
+## §12 Embed puzzle suite — production learnings **[applicable if iframe embed on parent SPA]**
+
+Reference implementation: CSR games vendored to `public/games/<slug>/` on a static host SPA. Catalog single source of truth → `scripts/games/embed-registry.mjs`.
+
+### Embed inventory management
+
+- Maintain a central `EMBED_GAMES` registry as the single source of truth.
+- Soft-archived standalones live as **inlined modes** (e.g. `/modes/<name>`) rather than separate hub cards or distinct host trees.
+- Slugs must remain stable for bookmarks and CDN caching.
+
+### Viral hooks (client-only — no server leaderboards)
+
+Copy templates from `scripts/games/templates/` into each game's `src/lib/`:
+
+- `dailySeed.ts` + `?daily=1` — deterministic daily puzzle.
+- `shareResult.ts` + `shareOverlay.css` — emoji/OG share cards on win.
+- `localBest.ts` — local PB ghost replay.
+- `progress.ts` — campaign persist (`<slug>.progress` in `localStorage`).
+- **Percentiles over Raw Ranks** — For daily or global modes, use math-based percentile distributions (e.g. "You beat 84% of players") rather than live leaderboards, as low-traffic live leaderboards look like "empty rooms".
+
+### Theme switcher integration
+
+- Import theme CSS templates **before** framework base utilities so CSS variables take precedence.
+- Ensure theme switcher controls do not overlap interactive play area trays or bottom navigation bars.
+
+### Host site integration
+
+Vendored static bundles live under `public/games/<slug>/`.
+
+#### Outer iframe shell (host)
+
+- **Width:** Responsive cap on the games column (`60vw`, `max-w-[900px]`, centered).
+- **Height:** Stable block so in-iframe CTAs / mode lobbies are not clipped. Prefer `h-[clamp(…)]` / `100dvh` floors; tune per title after screenshot testing on mobile viewports.
+- **`iframeSrc` — lobby roots only:** Always use `'/games/<slug>/'` (trailing slash). Never point hub iframe to deep client routes like `/play` or `/campaign`.
+
+#### Tutorial UX inside the iframe (game-side)
+
+- Detect iframe early: `window.self !== window.top` → add compact class on `<html>` to adapt layout for smaller viewports.
+- Primary CTAs (Next, Start, Retry) must remain reachable above the fold.
+
+### Audio: SFX vs BGM
+
+- **SFX** — WebAudio oscillators, haptics, slow-mo on solve. Call `unlockSfx()` on first user gesture.
+- **BGM** — Separate from SFX. Use looping HTML Audio or procedural step-sequencer loops.
+- `duckBgm()` on win overlay; `stopBgm()` on route unmount.
+
+### Generic Game Feel & Logic Learnings
+
+- **Win celebrate vs `prefers-reduced-motion`:** If reduced-motion dwell equals (or is shorter than) the solve-hold before chrome mounts, the win overlay never paints. Keep celebrate visibility (≥ ~2–4s) independent of reduced motion settings.
+- **Web Share API (`navigator.share`) vs Clipboard:** Avoid silent fallbacks to clipboard. If native share isn't supported, provide explicit, separate "Copy Link" and "Share" buttons.
+- **Physics-Based CPU Opponents:** Use **Monte-Carlo simulation** during CPU turns (running the deterministic loop headlessly 50-100 times with random variation) rather than complex analytical math.
+- **Difficulty budgets with flat penalties:** Use a hybrid formula `(Cost * Multiplier) + Flat Armor` so short levels aren't instantly failed by a single flat penalty.
+
+| Tag | Topics |
+|-----|--------|
+| **`[applicable if online multiplayer]`** | Lock rating/replay-diff model; async ladder via verified replays when deterministic |
+| **`[applicable if cloud save]`** | Schema migration, conflict resolution, backend ADR before UI |
+| **`[applicable if Android native shell]`** | → `convert-web-to-mobile.mdc` (WebView/Capacitor, themes, Gradle) and `play-store-assets-generation.mdc` (Play Store graphics/ASO) |
+| **`[applicable if iOS shell]`** | WKWebView bundle parity; safe areas |
+| **`[applicable if hot-seat local multiplayer]`** | Shared keyboard/gamepad; no netcode |
+| **`[applicable if CPU opponents]`** | AI module; difficulty tiers from local telemetry when possible |
+
+## §10 Roadmap hygiene **[core]**
+
+- Public `ROADMAP.md` with status: shipped / in progress / next / parked — and **why parked**.
+- Tier 0 = playable loop; tier 1 = polish; tier 2 = content; tier 3 = multiplayer/cloud/port — do not block ship on tier 3.
+
+## §11 Android shell **[applicable if Android native shell]**
+
+WebView/Capacitor packaging, five-theme checklist, Gradle sync, signing, and common WebView errors → **`convert-web-to-mobile.mdc`**.
+For Play Store graphics (icons, feature graphics, promo videos) and ASO → **`play-store-assets-generation.mdc`**.

@@ -1,0 +1,166 @@
+---
+description: Brand strategy — positioning, values, market segmentation, tone of voice, creative direction, rebrand, consumer behavior. Use when launching or revamping a brand, defining who you serve, or aligning messaging across channels.
+globs: "**/product_spec.md,**/*brand*,**/*positioning*,docs/**/*.md,**/marketing/**/*,src/**/*.{tsx,jsx}"
+alwaysApply: false
+---
+
+# Brand Strategy (Consumer Behavior & Positioning)
+
+**Intent:** Define *who* the brand is for, *why* it matters, and *how* it should sound and look — rooted in consumer behavior and segmentation. Not UI polish (`steve-jobs.mdc` Mode A), not go/no-go product critique (`product-council.mdc`), not page copy (`marketing-copy.mdc`).
+
+**Archetype:** Brand strategist with a psychology-informed lens — people hire brands to solve emotional and functional jobs; resonance beats decoration.
+
+**When to run:** new brand launch, rebrand, "brand not resonating," positioning, tone of voice, market segmentation, creative direction, campaign strategy purpose.
+
+**Keywords:** brand positioning, tone of voice, market segmentation, creative direction, rebrand, brand values, consumer behavior, messaging pillars, anti-persona
+
+Tagging matches sibling rules: **[core]** in the active mode; **[applicable if …]** when the condition holds.
+
+---
+
+## Before you start **[core]**
+
+1. Read `.agents/product-marketing.md` if it exists — use as baseline; only ask for gaps.
+2. If no context doc, run `product-marketing-context.mdc` first or gather: business type (B2B/B2C/personal brand), stage (startup/SMB/enterprise), industry, primary conversion goal.
+3. Do not conflate **product scope** (what to build) with **brand strategy** (how to be perceived). Scope → `product-council.mdc` or `steve-jobs.mdc`.
+
+---
+
+## When to use — and when not to **[core]**
+
+| Use this rule | Use something else |
+|---------------|-------------------|
+| Launch positioning + values for a new brand | Mode A |
+| Revamp when messaging feels flat or misaligned | Mode B |
+| Tone matrix + visual/verbal creative brief | Mode C |
+| Write homepage headlines or CTAs | `marketing-copy.mdc` |
+| Visual UI polish without messaging change | `steve-jobs.mdc` Mode A |
+| Feature prioritization or architecture | `product-council.mdc`, `system-design.mdc` |
+
+---
+
+## Shared frameworks **[core — all modes]**
+
+### Jobs to be done
+People don't buy categories — they hire your brand for an outcome. Frame every pillar around the job, not feature lists.
+
+### Switching forces (JTBD Four Forces)
+| Force | Question |
+|-------|----------|
+| **Push** | What frustrations drive them away from the status quo? |
+| **Pull** | What attracts them to your promise? |
+| **Habit** | What keeps them stuck with the current approach? |
+| **Anxiety** | What worries them about switching to you? |
+
+Address anxiety explicitly in messaging — unspoken fear kills conversion.
+
+### Segment grid **[applicable if multiple audiences]**
+
+Capture at least: business type × stage × industry × primary decision-maker. Pick **one primary segment** per campaign or launch; secondary segments get adapted messaging, not a generic middle.
+
+| Dimension | Examples |
+|-----------|----------|
+| Business type | B2B, B2C, personal brand |
+| Stage | Startup, SMB, mid-market, enterprise |
+| Industry | Education, food & beverage, gaming, lifestyle, etc. |
+| Strategy purpose | Company/brand strategy, campaign, product launch |
+
+### Ethical persuasion **[core]**
+Use psychology to clarify and reduce friction — not to manipulate. Social proof, specificity, and loss framing are fair when honest. Dark patterns, fake scarcity, and fabricated stats are out of scope.
+
+---
+
+## Mode A — Brand Launch **[core when starting a new brand]**
+
+**Goal:** Ship a coherent brand foundation before copy or campaigns.
+
+**Process:**
+1. **Comprehend** — one-sentence category + the job customers hire you for.
+2. **Segment** — primary audience, anti-persona (who you are *not* for).
+3. **Position** — for [primary segment] who [job/pain], [brand] is the [category] that [unique outcome] because [proof/differentiator].
+4. **Values** — who we are, why we exist, what we do, how we behave (4-value frame).
+5. **Messaging pillars** — 3–5 themes; each ties to a customer pain and proof point.
+6. **Voice sketch** — tone adjectives, words to use/avoid (draft for Mode C).
+
+**Output format:**
+```text
+## Brand foundation
+- Positioning statement: …
+- Primary segment / anti-persona: …
+- Values (who / why / what / how): …
+- Messaging pillars: numbered with pain → promise → proof
+- Switching forces: push / pull / habit / anxiety (1 line each)
+- Next: Mode C for tone matrix, or marketing-copy for first pages
+```
+
+---
+
+## Mode B — Brand Revamp **[core when "not resonating"]**
+
+**Goal:** Diagnose misalignment and prescribe repositioning moves — not a full rebrand for its own sake.
+
+**Audit dimensions:**
+| Check | Failure signal |
+|-------|----------------|
+| Audience fit | Traffic/engagement from wrong segment; high bounce on hero |
+| Differentiation | Interchangeable with competitors in blind copy test |
+| Consistency | Tone/visual drift across site, social, email, product |
+| Emotional job | Copy lists features; customers can't state why they chose you |
+| Proof | Claims without evidence; no customer language in copy |
+
+**Process:**
+1. Compare live copy + positioning to primary segment's jobs and language.
+2. List gaps: message | evidence | fix | priority (H/M/L).
+3. Recommend **minimum** repositioning moves (often 1–2 pillars, not full rename).
+
+**Output format:**
+```text
+## Revamp diagnosis
+- Resonance verdict: 1 paragraph (what's broken and for whom)
+- Gap table: Dimension | Issue | Evidence | Fix | Priority
+- Repositioning moves: 3–5 concrete changes (messaging, segment focus, proof)
+- Defer / do not change: explicit nos
+```
+
+---
+
+## Mode C — Creative Direction **[applicable if verbal + visual alignment needed]**
+
+**Goal:** Actionable brand standards a contractor could follow — condensed identity brief, not a 50-page style guide.
+
+**Deliver:**
+1. **Voice attributes** — 3–5 adjectives (e.g. direct, warm, expert-not-academic).
+2. **Tone matrix** — voice × context (homepage, support, social, crisis) with example phrases.
+3. **Verbal rules** — sentence length, jargon policy, humor yes/no, CTA style.
+4. **Visual principles** — color role (not hex unless provided), typography hierarchy, imagery style, logo usage rules (clear space, don'ts).
+5. **Quick audit checklist** — colors, fonts, logo, contrast, imagery, tone, prohibited uses.
+
+**Output format:**
+```text
+## Creative direction brief
+- Voice attributes: …
+- Tone matrix: table (context × tone × example phrase)
+- Verbal do / don't: bullets
+- Visual principles: bullets (no brand-specific vendor content)
+- Audit checklist: checkboxes
+```
+
+Pair with `universal-product.mdc` §1b when UI must reflect the verbal brand.
+
+---
+
+## What this rule does not cover
+
+| Need | Use instead |
+|------|-------------|
+| Bootstrap `.agents/product-marketing.md` | `product-marketing-context.mdc` |
+| Homepage/landing page text | `marketing-copy.mdc` |
+| SEO titles, meta, keyword maps | `on-page-seo.mdc` |
+| Scaled SEO page programs | `programmatic-seo.mdc` |
+| Site-wide ranking diagnosis | `seo-audit.mdc` |
+
+## Related rules
+
+- Foundation doc → `product-marketing-context.mdc`
+- Page copy after voice is locked → `marketing-copy.mdc`
+- Centralize strings in code → `website-building.mdc` § Copy source of truth

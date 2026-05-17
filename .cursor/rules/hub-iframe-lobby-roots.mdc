@@ -1,0 +1,42 @@
+---
+description: Hub iframeSrc / iframePath must be lobby roots only — deep routes load parent SPA in-frame
+alwaysApply: true
+---
+
+# Hub iframe = lobby roots only
+
+**Incident:** Hub `iframeSrc` used `/play`, `/campaign`, `/rush/blitz`. On SPA hosts those paths are not static files → SPA fallthrough served the **parent website** inside the iframe.
+
+## Hard rule
+
+| Surface | Allowed `src` / `iframePath` |
+|---------|--------------------------------|
+| Hub `GamesSection` `iframeSrc` | `/games/<slug>/` only (or static `/games/<slug>/index.html`) |
+| Embed registry `iframePath` | Same lobby root — never deep client routes |
+
+```text
+✅ /games/<slug>/
+❌ /games/<slug>/play
+❌ /games/<slug>/campaign
+❌ /games/<slug>/rush/blitz
+```
+
+**First emotion** = lobby CTAs *inside* the game after lobby loads — not hub iframe deep-links.
+
+## Contracts that must stay green
+
+- Fleet Hub Tests: `tests/games/fleet-hub-fixes.test.mjs` — lobby-root only
+- Host Metadata Tests: `tests/hub-iframe-titles.test.mjs` — forbids `/play|/rush/|/campaign` in hub iframeSrc
+
+## Playtest / ship gate
+
+Before claiming games hub OK: open `#games/<slug>`, assert iframe `src` is lobby root **and** iframe document is the game shell (brand in title/body), not parent site chrome.
+
+## Do not
+
+- “Fix first emotion” by pointing hub iframe at `/play` or `/campaign`
+- Let host hub tests assert deep links while registry asserts lobby roots
+- Playtest only `/games/<slug>/` and skip hub `#games/<slug>` iframe checks
+- Treat display-name direct URLs as hub `iframeSrc` when they are aliases rather than canonical lobby roots.
+
+Details → `create-web-game.mdc` §12.

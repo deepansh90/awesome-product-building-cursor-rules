@@ -1,0 +1,151 @@
+---
+description: Play Store Assets — Icons, Feature Graphics, Promo Videos, Screenshots, ASO Text
+alwaysApply: true
+---
+
+# Complete Prompt & Settings Kit — Play Store Assets
+
+Here's the full spec for reproducing every asset type (promo video, icon, feature graphic, screenshots) for any game.
+
+## 1. Promo Video (Remotion, 1080×1920, 17.5s)
+
+Per-game composition data (`promos.data.ts`)
+
+```ts
+{
+  id: "promo-<slug>",
+  title: "<GAME NAME>",            // ALL CAPS display title
+  tagline: "<verb>. <verb>. <payoff>.",  // 3-word rhythm
+  clip: "clips/clip-<slug>.mp4",   // 2-5s real gameplay MP4
+  clipCaption: "<MECHANIC · PAYOFF>",    // e.g. "TAP · NEIGHBORS +1"
+  clipFrames: 60,                  // 60=2s, 90=3s, 150=5s
+  primary: "#<hex>",               // brand hero color
+  accent:  "#<hex>",               // secondary accent
+  bgFrom:  "#0c0a09",              // dark gradient start
+  bgTo:    "#<dark-hex>",          // dark gradient end (tinted toward primary)
+  shots: [
+    { src: "shots/<slug>-1.png", caption: "<HOOK line>",       badge: "HOOK" },
+    { src: "shots/<slug>-2.png", caption: "<CORE RULE>",       badge: "RULE" },
+    { src: "shots/<slug>-3.png", caption: "<WIN/COMBO>",       badge: "WIN"  },
+    { src: "shots/<slug>-4.png", caption: "<REPLAY/OFFLINE>",  badge: "ANYTIME" },
+  ],
+  outro: "<GAME NAME>",
+}
+```
+
+Timeline (525 frames @ 30fps)
+| Beat | Frames | Time | Content |
+|---|---|---|---|
+| Hook title | 0–45 | 1.5s | Tagline + game title, spring in |
+| Live clip | 45–105 | 2.0s | Real gameplay MP4 in device frame |
+| Beat 1 | 105–195 | 3.0s | Screenshot + HOOK caption, Ken Burns |
+| Beat 2 | 195–285 | 3.0s | Screenshot + RULE caption |
+| Beat 3 | 285–375 | 3.0s | Screenshot + WIN caption |
+| Beat 4 | 375–465 | 3.0s | Screenshot + ANYTIME caption |
+| Outro | 465–525 | 2.0s | Big title + "Play free on Android" |
+
+Visual system (constants across all promos)
+- Fonts: Sora (display/badges/title), Inter (body/captions)
+- Entrance motion: `spring({ damping: 18–22, stiffness: 130–140 })`
+- Ken Burns: `interpolate(frame, [0, 90], [1.04, 1.14])` on screenshots
+- Device frame: 720×1280 rounded shell, 56px radius, 3px `primary` border, colored drop-shadow `0 40px 80px ${primary}55`
+- Background: Radial gradients drifting via `Math.sin(frame/60)` for parallax
+- Caption pill: bottom-center, `linear-gradient(90deg, primary, accent)`, 999px radius, Sora 700 uppercase
+- Badge (top-right): small dark pill with `primary` text, Sora 600
+- Outro CTA: `Play free on Android` — Inter 500, 60% opacity
+
+Gameplay clip capture (Playwright)
+```python
+context = await browser.new_context(
+    viewport={"width": 1080, "height": 1920},
+    device_scale_factor=1,
+    record_video_dir="/tmp/clips/raw",
+    record_video_size={"width": 1080, "height": 1920},
+)
+await page.add_style_tag(content="* { cursor: none !important; }")
+await page.goto(f"https://<domain>/games/{slug}/{slug}.html")
+# ...scripted deterministic solve to reach payoff frame...
+```
+Then ffmpeg trim + 1.15× speed for snappy feel:
+```bash
+ffmpeg -i raw.webm -ss 0 -t 2.2 -filter:v "setpts=0.87*PTS" -an clip-<slug>.mp4
+```
+
+## 2. App Icon (512×512 PNG)
+
+Image-gen prompt template:
+```
+A 512x512 Google Play Store app icon for "<GAME NAME>", a <one-line genre>.
+Solid <primary hex> background with a subtle radial gradient toward <accent hex>
+in the top-left. Centered symbol: <ONE bold geometric mark that represents
+the core mechanic — e.g. "a 3x3 grid of equal squares", "a clock with two
+overlapping hands", "a chunky white arrow", "an interlocking tangram shape">.
+Symbol in flat white with a soft <accent hex> glow. No text, no gradients
+on the symbol itself, high contrast, mobile-legible at 48px. Rounded-square
+composition, no border. Modern, minimal, premium — Duolingo/Monument Valley
+aesthetic, not generic mobile-game.
+```
+Settings: `model: "premium"`, `1024×1024` → downsample to 512. Always use EasyAppIcon (never AppIcon.co / MakeAppIcon) for final packaging.
+
+## 3. Feature Graphic (1024×500 PNG)
+
+Prompt template:
+```
+A 1024x500 Google Play Store feature graphic for "<GAME NAME>".
+Left 40%: bold ALL-CAPS wordmark "<GAME NAME>" in Sora 800, white, plus
+one-line tagline "<tagline>" in Inter 500, 70% white, below it.
+Right 60%: a 3D-ish tilted phone mockup showing the game's core board /
+gameplay state. Background: dark gradient from <bgFrom hex> to <bgTo hex>
+with a soft <primary hex> radial glow behind the phone. Subtle floating
+geometric accents in <accent hex> at 20% opacity. Landscape composition,
+no border, no Play Store badge (Google adds it), text-legible at 50%
+scale, premium editorial feel.
+```
+Settings: `model: "premium"`, `1920×938` → crop/scale to 1024×500.
+
+## 4. Screenshots (1080×1920 PNG, ×4–8)
+
+Capture real gameplay via Playwright at 1080×1920, then post-process:
+
+```python
+from PIL import Image, ImageEnhance, ImageDraw, ImageFont
+img = Image.open(raw)
+img = ImageEnhance.Color(img).enhance(1.15)      # +15% saturation
+img = ImageEnhance.Contrast(img).enhance(1.08)   # +8% contrast
+# Bottom 22% gradient band for caption:
+band = Image.new("RGBA", (1080, 420), (0,0,0,0))
+# ... linear gradient 0→220 alpha ...
+# Caption: Sora 700 72px white, top line = HOOK, second line = detail
+# Badge top-right: primary-color pill, Sora 600 32px uppercase
+```
+
+Caption structure per screenshot (pattern)
+| # | Badge | Line 1 (72px Sora 700) | Line 2 (40px Inter 500, 80% white) |
+|---|---|---|---|
+| 1 | HOOK | Core mechanic verb | Payoff in one sentence |
+| 2 | RULE | The one rule | How the loop works |
+| 3 | WIN / COMBO | Satisfying moment | Progression hook |
+| 4 | ANYTIME | Play offline / Daily | Session length claim |
+
+## 5. ASO Text Kit (per game)
+
+```
+Title (max 30):      "<Name> — <2-word hook>"
+Short desc (max 80): "<Verb>. <Verb>. <Payoff>. <Session claim>."
+Long desc structure:
+  Line 1: One-sentence hook (same as tagline, capitalized)
+  Para 1: Core mechanic in plain English (2–3 sentences)
+  Para 2: Modes / progression (bulleted, 3–5 bullets, one per shipped feature)
+  Para 3: Why it's different (1 sentence, differentiator)
+  Para 4: Play claims — offline, no-ads-in-solve, session length
+  Tags line: #puzzle #<genre> #<mechanic> #brain #offline
+```
+
+## Reuse checklist for a new game
+
+1. Fill `promos.data.ts` block (10 fields)
+2. Capture 1 gameplay clip → `public/clips/clip-<slug>.mp4`
+3. Capture 4 raw screenshots → run PIL enhance script → `public/shots/<slug>-N.png`
+4. Icon prompt → imagegen premium → 512×512
+5. Feature prompt → imagegen premium → 1024×500
+6. `bunx remotion render src/index.ts promo-<slug> /mnt/documents/promo-<slug>-v2.mp4`

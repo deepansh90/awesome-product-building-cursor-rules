@@ -1,0 +1,90 @@
+---
+description: Universal startup incubation framework — 14 core universal lessons, 10-step evaluation gate, 10 ideation commandments, and high-impact wedge ideation repository
+globs: "**/*idea*.md,**/*startup*.md,**/*incubation*.md,**/product_spec.md,**/tech_spec.md,**/roadmap.md,**/ROADMAP.md,docs/**/*.md,**/*prd*.md,**/*PRD*.md"
+alwaysApply: false
+---
+
+# Universal Startup Incubation & Idea Framework
+
+**Intent:** Evaluate, stress-test, and generate high-impact, non-company-specific startup ideas and product wedges before code implementation. Focuses on **pain, workflow persistence, trust infrastructure, and distribution moats**.
+
+**When to run [core]:** When brainstorming new startup concepts, evaluating a product pitch, finding a sharp wedge for an existing technology, or running structured pre-build incubation. Can be invoked alongside `product-council.mdc` or `steve-jobs.mdc`.
+
+---
+
+## 1. The 14 Core Universal Lessons (Non-Company Specific) **[core]**
+
+When evaluating or generating product concepts, apply these 14 universal principles of product wedges and defensibility:
+
+1. **The Compliance & Firewall Wedge:** Find a high-value customer segment that urgently wants a modern technology (like cloud AI), but is blocked from adopting it due to compliance, privacy, or firewall constraints. Build the secure, local/sovereign bridge for them.
+2. **The Persistent Memory Graph:** Professionals rarely lack scattered notes or data; they lack automatic connection across fragmented tools. Great ideas turn isolated signals (chats, docs, commits, tickets) into a unified, self-building relationship graph.
+3. **Move Upstream to Strategy:** Instead of building another tool that helps users execute (`"help me do X"`), build an intelligence layer that tells them *what* to do (`"what should I build/post/price next?"`). Strategy and decision-making command higher willingness to pay than manual execution.
+4. **Solve Narrow Workflow Blockers:** When a broad technology struggles with a narrow consistency issue (e.g., character persistence, deterministic layout), fixing that single bottleneck for a high-frequency professional workflow creates a massive wedge.
+5. **Layer Over Existing Surfaces:** Add a monetizable, interactive layer directly on top of where users already consume content or do work (video streams, product pages, chat UIs), rather than forcing them to migrate to a new destination app.
+6. **Compounding Identity & Asset Models:** Build tools that create durable personal or organizational models (voice, style, code history, operational cadence). The longer the model learns directly from the user's workflow, the higher the switching cost.
+7. **Prediction + Action Loop:** Analytics dashboards that only show metrics are commodities. Combine predictive scoring (*"this creative/code has a 70% chance of failing"*) with immediate automated fixes (*"click here to apply the AI patch and deploy"*).
+8. **Multi-Stakeholder Economic Alignment:** The most scalable ideas improve unit economics for every participant in the ecosystem (e.g., platforms get retention, sellers get conversion, buyers get personalized value, and creators get fair revenue).
+9. **Trust Infrastructure in the Synthetic Era:** Whenever new technology creates new fraud, ambiguity, or security vectors (deepfakes, AI-generated bugs, unauthorized scraping), building the cryptographic verification and trust layer becomes a critical new category.
+10. **Human Authorship & Control as a Moat:** In creative and engineering workflows, full black-box automation often creates anxiety and legal risk. Designing tools where humans retain explicit authorship, fine-grained control, and auditability builds a deeper moat than raw generation speed.
+11. **Compress Idea-to-Execution Time:** In timing-sensitive or trend-driven markets, the winner is often not the most feature-heavy tool, but the one that radically compresses the time required to go from raw idea to published/shipped output.
+12. **AI-Enabled Verticalization:** Horizontal platforms eventually get displaced by specialized vertical suites tailored to specific industries (e.g., AEC, e-commerce, devops). AI now dramatically reduces the engineering cost required to build vertical-specific workflows and domain models.
+13. **Emotional & Recurring Human Needs:** Not every massive market requires enterprise B2B buyers. Products that serve high-frequency, emotionally resonant family or personal needs (legacy vaults, health reminders, personal safety) can achieve viral distribution and strong retention.
+14. **Channel-Native Distribution for Next-Billion Users:** For emerging markets or non-technical SMBs, feature depth is secondary to distribution friction. Bring the entire software experience directly into the communication channels they already live in (WhatsApp, SMS, Telegram).
+
+---
+
+## 2. The 10-Step Generic Incubation Framework **[core gate]**
+
+Use this structured checklist to evaluate any new startup hypothesis or wedge before approving engineering effort:
+
+| Step | Gate | Key Question & Validation Criteria |
+|---|---|---|
+| **1** | **User** | Who specifically feels the pain, what is their exact role/job title, and how often do they encounter it? |
+| **2** | **Pain** | What is broken, slow, expensive, risky, inaccessible, or emotionally frustrating right now? |
+| **3** | **Existing Behavior** | What hacks, spreadsheets, manual copy-pasting, or poorly stitched legacy tools are they currently using? |
+| **4** | **Why Now** | What exact catalyst changed recently in technology capabilities, regulation, cloud billing costs, or distribution channels? |
+| **5** | **Solution** | What precise workflow or capability becomes possible today that was impossible or economically unfeasible 2 years ago? |
+| **6** | **Wedge** | What narrow, underserved beachhead segment can you dominate first before expanding? |
+| **7** | **Moat** | What asset compounds over time as usage scales: data gravity, workflow memory, trust/audit logs, integrations, or distribution networks? |
+| **8** | **Business Model** | Who signs the check, how is pricing metered (per seat, per transaction, per infrastructure saving), and what drives expansion? |
+| **9** | **Validation** | What concrete evidence validates willingness to pay: pre-orders, LOIs, active manual prototypes, or high churn/complaints on existing alternatives? |
+| **10** | **Scale Path** | How does winning the initial narrow wedge naturally unlock adjacent product categories or horizontal TAM expansion? |
+
+---
+
+## 3. Ten Commandments for Startup Ideation **[mindset]**
+
+1. Start with a painful user truth, never with a solution searching for a problem.
+2. Make the problem description specific enough that the target user instantly feels seen.
+3. Articulate precisely why existing tools structurally fail, not just why your feature list is longer.
+4. Claim and win a sharp, narrow beachhead before boasting about a multi-billion-dollar TAM.
+5. Build smoothly around an existing, habitual user workflow instead of demanding behavior change.
+6. Use AI specifically to eliminate bottlenecks: institutional memory, complex decisions, verification, speed, or skill gaps.
+7. Always design for a compounding asset: an evolving graph, cryptographic audit trail, custom fine-tuned model, or historical benchmark.
+8. Make the **"Why Now?"** undeniable; market timing and technical feasibility catalysts are the ultimate multipliers.
+9. Demonstrate a believable, high-margin path to monetization, not just vanity metrics or engagement.
+10. Anchor the concept with a crisp founder insight: why you see the market shift before others, and why your technical background makes you uniquely qualified to build it.
+
+---
+
+## 4. Canonical Reference Concepts (Domain-Mapped Idea Repository)
+
+Reference these canonical concepts when applying the framework to specific technical domains (`Agentic AI`, `SRE/Observability`, `Chrome Extensions`, `Web-to-Mobile Architectures`):
+
+### A. Agentic AI & Sovereign Compute
+* **Sentinel-AI (Sovereign SRE Agent):** Air-gapped, local Agentic AI debugging tool running entirely inside enterprise VPC/firewall (`Lesson 1 - Compliance & Firewall Wedge`).
+* **AgentGuardian (Safety & Reversibility Wrapper):** Deterministic pre-flight simulation and human-in-the-loop approval wrapper for autonomous web-action agents (`Lesson 10 - Control as a Moat`).
+* **PlayTest Zero (Upstream Mechanics Oracle):** Pre-code predictive intelligence platform that scores raw gameplay/mechanic videos for viral retention before coding begins (`Lesson 3 - Upstream Strategy`).
+
+### B. SRE, Observability & Developer Tools
+* **ContextThread (Engineering Memory Graph):** Autonomous semantic graph linking codebase PRs to historical Slack debates and Jira decisions, surfaced via IDE/browser overlays (`Lesson 2 - Memory Graph`).
+* **TraceWeave (Observability & Cost Sampling Firewall):** AI-driven OpenTelemetry proxy that drops verbose logs during normal traffic and switches to 100% trace capture during anomalies (`Lesson 7 - Prediction + Action Loop`).
+* **CodeArmour (Codebase Provenance & Trust Layer):** Cryptographic attestation and audit pipeline proving human authorship vs. AI generation across enterprise repositories (`Lesson 9 - Trust Infrastructure`).
+
+### C. Chrome Extensions & Web Overlays
+* **HaggleLayer (E-Commerce Agentic Overlay):** Lightweight JS/Extension overlay that adds an autonomous, conversational haggling concierge to D2C product pages to close exit-intent shoppers (`Lesson 5 - Layer Over Surfaces`).
+* **ExtensionForge (Conversational Ops Automation):** Conversational Chrome Extension generator that turns natural language ops requirements into custom, locally deployed Manifest V3 extensions (`Lesson 11 - Compress Execution Time`).
+
+### D. Web-to-Mobile & Channel-Native Architectures
+* **ChatERP (Channel-Native Business OS):** Full business ledger, invoicing, and inventory suite operating entirely within WhatsApp/Telegram voice notes and chats (`Lesson 14 - Channel-Native Distribution`).
+* **PocketNode (Offline/Edge Field Operations Suite):** Offline-first React/Capacitor mobile suite powered by local Small Language Models (SLMs) and WebGPU for field defect reporting and data capture (`Lesson 12 - Verticalization`).

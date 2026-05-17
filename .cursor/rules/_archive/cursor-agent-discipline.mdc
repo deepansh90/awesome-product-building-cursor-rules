@@ -1,0 +1,59 @@
+---
+description: Cursor agent discipline — full edits, git safety, context hygiene, research-first workflow, clean code
+alwaysApply: true
+---
+
+# Cursor / Lovable Agent Discipline
+
+**Intent:** How AI coding agents should edit any repository safely and completely — not what product to build (see domain rules).
+
+## CRITICAL edit rules
+
+- Prefer **partial edits** (search-and-replace, targeted patches) over rewriting whole files — preserves git history.
+- When a full-file replacement is required, output the **complete** file — never placeholders such as `// ... existing code ...` or `# previous implementation`.
+- Do not invent changes beyond what the user requested; preserve unrelated code and structure.
+- Verify claims against the codebase; cite `file:line` or command output — never claim "tests pass" without running them. Use `@Files` for 2–3 relevant files instead of bloated `@Codebase` context.
+- On multi-file work: prefer **one file per commit** when practical; review each diff before stacking the next.
+
+## Tool boundaries (UI generator + IDE)
+
+| Own in UI generators (Lovable, etc.) | Own in Cursor / IDE |
+|--------------------------------------|---------------------|
+| Layout, components, styling iterations | Auth, database, payments, webhooks |
+| Visual feedback loops | Tests, CI, migrations |
+| Marketing pages, dashboards (UI) | Complex business logic, security hardening |
+
+Sync via Git: UI tool pushes layout; IDE pushes logic and tests. Use `product_spec.md` and `tech_spec.md` (or equivalent) before large agent sessions.
+
+**Nearest-product UI (Lovable / UI generators):** Before generating screens, state which existing product’s look and feel is the anchor (e.g. WhatsApp for a chat scheduler, CodingPlatform for a CodingPlatform extension, 2048 for a tile puzzle, Spotify for a music player). Follow `universal-product.mdc` §2d — familiar patterns beat generic templates.
+
+## Research-first workflow
+
+1. **Discover** — map how the target area is used before changing it.
+2. **Plan** — list files to touch; get approval on non-trivial refactors.
+3. **Execute** — implement the approved plan only.
+4. **Audit** — review `git diff` line by line before claiming done.
+
+## Git & session hygiene
+
+- **Always take latest remote code before merge/rebase/push** to a shared branch — `git fetch` then pull/ff-only (or rebase onto) the updated base so local work does not overwrite newer remote commits. See `git-sync-before-merge.mdc`.
+- Commit (or stash) before long autonomous agent runs.
+- **Conventional Commits:** `type(scope): description` — types `feat|fix|docs|refactor|test|chore|ci|perf|build`; optional body explains *why*; `BREAKING CHANGE:` footer or `feat!` when APIs break.
+- **PR body must include:** purpose, implementation notes, tests run (exact commands), rollout/rollback note if relevant, linked issue/ticket.
+- Fresh chat after ~20 failed debug turns; paste a 3–4 sentence summary + current error.
+- Stick to **one model** per task; switch models in a new chat if needed.
+- Set API spend limits; require confirmation for destructive terminal commands when available.
+
+## Clean code (any language)
+
+- Named constants over magic numbers.
+- Meaningful names; single responsibility per function.
+- DRY — one source of truth for shared logic.
+- Handle edge cases; consider security on every change.
+- Add or update tests for new behaviour at trust boundaries.
+
+## What this rule does not cover
+
+- System design documents → `system-design.mdc`
+- Product, UI, security policy → `universal-product.mdc`
+- Stack-specific patterns → `python-web-backend.mdc`, `java-spring-end-to-end.mdc`, etc.

@@ -1,0 +1,78 @@
+---
+description: Play Store Asset Generation Rules (Promo Videos, Icons, Feature Graphics, Screenshots)
+globs: "**/android/app/src/main/res/**","**/*.png","**/*.jpg","**/*.mp4","**/assets/**","**/store/**"
+alwaysApply: false
+---
+
+# Play Store Asset Generation Rules
+
+**Intent:** Provide a durable set of rules for generating high-conversion Play Store assets (icons, feature graphics, screenshots, promo videos) across all games. Apply these automatically when asked to generate or review store assets.
+
+## 📹 Promo Video Rules
+
+| # | Rule | Why it matters |
+|---|------|---------------|
+| 1 | Minimum 5s of REAL gameplay — never pad with stills or slideshows | Viewers smell fake gameplay instantly; real clips convert 2-3× higher |
+| 2 | Verify the score/state actually moves before accepting the clip | A "gameplay" clip with no visible change is a failure, not a deliverable |
+| 3 | Locked structure: Hook (2s) → Gameplay (6.5s) → 3 Beats (1.5s each) → CTA (2s) = 15.0s | Consistency across the fleet reads as a studio, not random apps |
+| 4 | Hook tagline describes the core mechanic, not a generic promise | "Make all 9 numbers equal" > "Solve puzzles" |
+| 5 | Feature beats = concrete game rules, not marketing fluff | "One tap, +1" / "Neighbours rise with you" / "Every level has a par" |
+| 6 | CTA is minimal: app icon + name + "Free on Google Play" | Videos have no clicks — don't fake buttons |
+| 7 | One accent hue drives the entire video (glow, cards, highlights) | Matches icon + screenshots = brand consistency |
+| 8 | Canvas-based games (Arrow Rush) reject Playwright synthetic events — attempt keyboard handlers, if that fails, flag as uncapturable headlessly | Honest failure > fake clip. Recommend manual device recording |
+| 9 | Always verify final duration with ffprobe before delivering | A concat bug can inflate duration to 300s+ silently |
+| 10 | `muted: true` is mandatory in Remotion/ffmpeg (sandbox lacks libfdk_aac) | Audio encoding fails without it |
+
+## 🎨 Icon Rules
+
+| # | Rule | Why it matters |
+|---|------|---------------|
+| 1 | Near-black rounded-square field (dark gradient, not pure black) | Pure black flattens on OLED; gradient adds depth |
+| 2 | One oversized hero glyph centered (~60% canvas) = game's core primitive | Arrow→Arrow Rush, pipe elbow→Pipe Connect, equals→Equal Nine |
+| 3 | Bloom halo behind glyph in the accent hue, soft radial falloff | The glow is what makes it read as "neon-minimalist," not flat |
+| 4 | Thin neon border on the field edge (1-2px, accent hue) | Subtle frame ties the icon to the feature graphic style |
+| 5 | Only hue + glyph change per game — template is identical across fleet | Template consistency IS the brand |
+| 6 | Generate 2 variants when the hero glyph is ambiguous | Deliver both, let the user choose |
+| 7 | No trademarked elements: no 2048 numbers, no Tetris blocks, no Flow Free dots | 2026 Play Store compliance — TM infringement = takedown |
+| 8 | Style = SayGames hyper-casual neon, NOT cartoon 3D, NOT flat material | Matches reference icons the user approved |
+
+## 📐 Feature Graphic Rules
+
+| # | Rule | Why it matters |
+|---|------|---------------|
+| 1 | Generate at 1024×512, crop to 1024×500 | Exact Play spec; avoids off-by-one rejection |
+| 2 | Right third kept clear of critical detail | Play overlays play buttons, ratings, and install CTAs there |
+| 3 | Title = heavy condensed uppercase, left-aligned | Hierarchy: title > tagline > benefits > phone mock |
+| 4 | Phone mock at right showing the real board with accent glow spill | Proves it's a real game, not a static ad |
+| 5 | Three bulleted benefit lines — each a concrete feature, not marketing speak | "60-second brain snack" > "Fun for everyone!" |
+| 6 | Accent hue matches icon and promo video | Cross-asset consistency = brand trust |
+
+## 📱 Screenshot Rules
+
+| # | Rule | Why it matters |
+|---|------|---------------|
+| 1 | Capture live via Playwright at 390×844, DPR 3 | Real device dimensions, not arbitrary sizes |
+| 2 | Crop board-only — no site chrome, nav, iframe frame, or browser UI | Must read as a native phone screenshot, not a web page |
+| 3 | Enhancement pass: contrast +15-20%, saturation +10-15% | Matches neon icon style; flat raw capture looks dull |
+| 4 | One short benefit caption per frame (accent pill, bottom third) | Caption describes the beat shown, not a generic feature |
+| 5 | The 5 beats: opening board → mid-solve → combo moment → win screen → level map | Tells the gameplay story in 5 frames — #1 conversion driver |
+| 6 | Never reuse the same screenshot twice | Each beat must be visually distinct |
+| 7 | If a game lacks all 5 screens, substitute closest equivalent and note it | Honest gap > forced screenshot |
+
+## 🔄 Cross-Cutting Rules
+
+| # | Rule | Why it matters |
+|---|------|---------------|
+| 1 | One accent hue per game across ALL assets (icon, banner, screenshots, video) | Consistency = brand. 5 games with identical template = studio |
+| 2 | No trademarked terms in any asset text | 2026 Play Store: "2048", "Tetris", "Flow Free", "Flappy" = takedown risk |
+| 3 | Rename sensitive game names (Tank Wars → Tank Duel, Attack the Army → Last Line) | War framing triggers content policy review |
+| 4 | Title ≤ 30 chars, Short ≤ 80 chars, Long ≤ 4000 chars | Play Store hard limits |
+| 5 | Standardized delivery: `icon_512.png`, `feature_graphic_1024x500.png`, `screenshots/01..05.png`, `promo_15s.mp4` | Predictable structure for batch processing |
+| 6 | Always verify dimensions + duration before claiming done | `ffprobe` for video, `PIL.Image.open().size` for images |
+
+### Accent Hue Assignments
+
+Define your project's specific accent hues here locally, or refer to your brand guidelines.
+| Game/App | Hue Name | Hex Code |
+|---|---|---|
+| Example App | Neon green | `#39FF14` |

@@ -1,0 +1,180 @@
+---
+description: Programmatic SEO — scaled landing pages, template pages, directory/location/comparison pages, pSEO playbooks, data-driven page generation. Use when building many SEO pages from templates and data, not single-page tweaks.
+globs: "public/data/**/*,**/seo*,**/sitemap*,docs/**/*seo*,**/*.{jsx,tsx,js,ts}"
+alwaysApply: false
+---
+
+# Programmatic SEO
+
+**Intent:** Design SEO page programs at scale (templates + data) that rank without thin-content penalties. Not single-page optimization (`on-page-seo.mdc`), not site-wide diagnosis (`seo-audit.mdc`), not editorial blog strategy.
+
+---
+
+## Before you design **[core]**
+
+1. Read `.agents/product-marketing.md` if present — ICP, conversion goal, category.
+2. Answer the **fit gate** below honestly. If most gates fail, recommend a smaller editorial or on-page approach instead.
+
+---
+
+## Fit gate — is pSEO the right answer? **[core]**
+
+pSEO works when **all** are true:
+
+| Gate | Requirement |
+|------|-------------|
+| Real data | Structured source with depth (10+ fields/record ideal); not shallow scrape + AI filler |
+| Volume | Aggregate long-tail demand exists; individual queries need not be huge |
+| Queryable intent | User question answerable from structured data — not narrative judgment |
+| Refresh budget | Update cadence matches query volatility (listings daily vs "best X 2026" annually) |
+| QC capacity | Team can sample-audit, fix failures, and maintain quality as set grows |
+
+**Probably not pSEO when:** shallow data, illusory keyword lists nobody searches, no QC budget, scaling AI thin pages without unique data.
+
+---
+
+## Data moat hierarchy **[core]**
+
+| Rank | Source | Defensibility |
+|------|--------|---------------|
+| 1 | Proprietary / first-party | You created it; competitors can't copy |
+| 2 | Product-derived | From your users/transactions |
+| 3 | User-generated | Community reviews, submissions |
+| 4 | Licensed | Exclusive or integrated feeds |
+| 5 | Public / scraped | Weakest — easy to copy; thin-content risk |
+
+**Moat test:** Could a competitor replicate your data source in 90 days? If yes, pSEO has no lasting edge.
+
+---
+
+## Core principles **[core]**
+
+1. **Unique value per page** — not swapped city names in identical prose.
+2. **Subfolders, not subdomains** — `yoursite.com/templates/resume/` not `templates.yoursite.com`.
+3. **Genuine intent match** — page answers what people actually search.
+4. **Quality over quantity** — 100 great pages beat 10,000 thin ones.
+5. **Avoid penalties** — no doorway pages, keyword stuffing, duplicate clusters.
+
+---
+
+## 12 playbooks **[core]**
+
+| Playbook | Pattern | Example |
+|----------|---------|---------|
+| Templates | `[type] template` | resume template |
+| Curation | `best [category]` | best website builders |
+| Conversions | `[X] to [Y]` | $10 USD to GBP |
+| Comparisons | `[X] vs [Y]` | webflow vs wordpress |
+| Examples | `[type] examples` | landing page examples |
+| Locations | `[service] in [location]` | dentists in austin |
+| Personas | `[product] for [audience]` | crm for real estate |
+| Integrations | `[A] [B] integration` | slack asana integration |
+| Glossary | `what is [term]` | what is pSEO |
+| Translations | Localized content | multi-language sets |
+| Directory | `[category] tools` | ai copywriting tools |
+| Profiles | `[entity name]` | company or person profile |
+
+**Choosing:**
+
+| If you have… | Consider… |
+|--------------|-----------|
+| Proprietary data | Directory, Profiles |
+| Many integrations | Integrations |
+| Multi-segment audience | Personas |
+| Local presence | Locations |
+| Tool/utility product | Conversions |
+| Expertise content | Glossary, Curation |
+| Competitor landscape | Comparisons |
+
+Layer playbooks when natural (e.g. "Best coworking spaces in San Diego").
+
+---
+
+## Implementation framework **[core]**
+
+### 1. Keyword pattern research
+- Repeating structure + variables + combinatorial count
+- Validate aggregate volume and trend; head vs long-tail distribution
+
+### 2. Data requirements
+- Fields per record; required vs optional; computed fields; cross-record links for internal linking
+- Update-frequency tags (static vs volatile fields)
+
+### 3. Template design
+- **Above-the-fold answer** in first ~200 words (human + extractable)
+- **Variable density** — graceful fallbacks for sparse records; progressive disclosure for dense
+- **Heading hierarchy** maps to data sections, not decoration
+- **Schema in template** — JSON-LD at scale per page type
+- **Internal link slots** — 5–15 related/parent/sibling links per page
+- Unique title + meta per URL
+
+### 4. Internal linking
+- Hub-and-spoke: category hub → spokes → cross-links
+- No orphan pages; breadcrumbs + sitemap; keyword → canonical URL table
+
+### 5. Indexation strategy
+- Prioritize high-volume patterns first
+- `noindex` very thin variations
+- Separate sitemaps by page type when large
+- Manage crawl budget on 500+ page sets
+
+---
+
+## Quality control **[core]**
+
+### Pre-launch checklist
+
+- [ ] Random sample page answers query competently in isolation
+- [ ] Unique value vs parent/sibling pages
+- [ ] Unique titles, metas, H1s
+- [ ] Schema validates (Rich Results Test)
+- [ ] Connected in site architecture; no orphans
+- [ ] In XML sitemap; crawlable; no conflicting noindex
+
+### Post-launch monitoring
+
+Track: indexation rate, rankings, traffic, engagement, conversion.
+
+Watch: thin-content warnings, ranking drops, manual actions, crawl errors.
+
+Define metrics and review cadence **before** launch.
+
+---
+
+## Common mistakes **[core]**
+
+- Thin templates (city/name swap only)
+- Keyword cannibalization across generated URLs
+- Over-generation with no search demand
+- Stale or wrong data
+- Pages built for crawlers, not users
+
+---
+
+## Output formats **[core]**
+
+**Opportunity analysis** — table: pattern | est. pages | aggregate volume | data source | difficulty
+
+**Strategy doc** — playbook choice, implementation plan, content uniqueness rules
+
+**Page template spec** — URL pattern, title/meta templates, content blocks, schema type, linking rules
+
+**Pre-launch checklist** — checkboxes as above
+
+---
+
+## What this rule does not cover
+
+| Need | Use instead |
+|------|-------------|
+| Per-page title/H1/meta ship patterns | `on-page-seo.mdc` |
+| "Why is my site not ranking?" | `seo-audit.mdc` |
+| Single editorial articles | content strategy / `marketing-copy.mdc` |
+| Backlinks and directories outreach | `off-page-seo.mdc` (archive) |
+
+## Related rules
+
+- Context + conversion goals → `product-marketing-context.mdc`
+- Per-URL optimization at ship → `on-page-seo.mdc`
+- Live set underperforming → `seo-audit.mdc`
+- SPA prerender + sitemap → `website-building.mdc`

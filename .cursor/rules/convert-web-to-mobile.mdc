@@ -1,0 +1,620 @@
+---
+description: Convert web apps/games to Android — WebView/Capacitor shells, Gradle sync, themes, graphics, mobile UX, pre-ship verification
+globs: "**/android/**","capacitor.config.*","**/app/build.gradle*","**/README_ANDROID.md"
+alwaysApply: false
+---
+
+# Convert Web App to Mobile
+
+**Intent:** Ship a **web-first** product to Google Play with correct graphics, themes, and a thin native shell — without duplicating logic in Kotlin. Reference implementations: **Thin WebView shell** (static HTML) and **Capacitor wrapper** (portal SPA).
+
+**Cross-refs:** Game embed/PWA rules → `create-web-game.mdc`. Host site vendoring → `create-web-game.mdc`. UI/a11y baseline → `product-excellence.mdc` §2a.
+
+---
+
+
+## §1 Architecture — web owns the product **[core]**
+
+| Concern | Owner |
+|---------|--------|
+| Game/App logic, UI, levels, themes, copy | Web (`*.html`, React/Vite `dist/`, inline JS) |
+| Splash, launcher icons, signing, Play packaging | Android shell |
+| Back navigation | Web stack (`GameBack` / history handler + History API) + Android `OnBackPressedCallback` |
+| Timer pause on background | Web (`visibilitychange`) + Android `onPause`/`onResume` |
+| Release hardening (strip debug globals) | Gradle pipeline |
+| Offline first launch | Bundled `file:///android_asset/…` or Capacitor `webDir` |
+
+**Do not** duplicate gameplay, levels, colors, or dashboard behavior in native Kotlin.
+
+### Three shells we use
+
+| Pattern | When | Sync |
+|---------|------|------|
+| **Thin WebView shell** | Single HTML app/game | Gradle `sync*WebAssets` copies curated files into `app/build/generated/…` on asset merge |
+| **TanStack SPA WebView** | Vite/Nitro CSR app | Build output → `dist/android-client/` → Gradle sync |
+| **Capacitor** | Full React/Vite portal SPA | `npm run build` → `npx cap copy android` (or `cap sync android` after native config changes) |
+
+Pick one per product. Do not mix Capacitor plugins into a hand-rolled WebView shell without an ADR.
+
+### WebView shell constraints
+
+- **Static HTML:** load bundled entry via `WebViewAssetLoader` or `file:///android_asset/<entry>.html` — **no network** on first launch in release.
+- **TanStack SPA:** load `https://appassets.androidplatform.net/assets/` (trailing slash) via `WebViewAssetLoader` + custom `SpaAssetsPathHandler` (§14). Do **not** use `…/assets/index.html` as `game_url` without SPA fallback — empty path must map to `index.html`.
+- **Skip service worker** on `file://` / offline bundles (register only on HTTP/HTTPS hosts).
+- **No `INTERNET` permission** if fonts and assets are self-hosted in the bundle.
+- `allowBackup="false"` when local scores/progress must not cloud-restore (anti-tamper).
+- Release builds **strip** debug globals (`window.*Debug`, `?e2e=1` shortcuts) via Gradle — never ship auto-win hooks in release AABs.
+- Use `WebViewAssetLoader` for same-origin asset paths; block external navigation in `shouldOverrideUrlLoading`.
+- Disable zoom controls; enable `domStorageEnabled` for `localStorage`.
+- Generic back bridge: expose `window.GameBack.handle()` (returns `true` if web consumed back); Kotlin calls it before `finish()`.
+
+---
+
+
+## §11 Mobile UX & Input Conversion **[core]**
+
+When porting a web game to Android, Cursor MUST automatically audit and refactor the UX for mobile constraints:
+
+- **Input Refactoring:** Strip all Keyboard (`WASD`/Arrow keys) and `hover`-state event listeners. Replace them with single-tap, swipe-to-move, or virtual floating joystick logic using touch events (`touchstart`, `touchmove`).
+- **Kill On-Screen D-Pads:** Do NOT implement visible on-screen directional buttons unless explicitly requested. Prioritize frictionless gesture-based mechanics.
+- **Mobile Safe Areas:** Ensure all Canvas and DOM elements respect Android safe areas. Critical UI (scores, back buttons) MUST NOT render in the top 40px (notches/status bar) or bottom 40px (gesture bar).
+- **Instant Restart Loop:** Remove multi-step 'Game Over' modals. On failure, implement a maximum **0.5-second reset loop** to allow instant, frictionless replayability.
+
+---
+
+
+## §2 Standard in-app themes **[core]**
+
+**Scope:** Applies when shipping an **in-app theme switcher**. If there is no switcher, do **not** claim theme count in store metadata.
+
+Persist player theme choice in `localStorage` (e.g. `app_theme`). Update `<meta name="theme-color">` on switch for Android status-bar harmony.
+
+| ID | Label | `data-theme` | Background / mood | Notes |
+|----|-------|--------------|-------------------|-------|
+| **balance** | ⚖️ Balance | `balance` | `#0A0A0A` black, purple/crimson/gold | **Default for Play Store** — dark, premium |
+| **ember** | 🔥 Ember | `ember` | `#1A0A0A` warm dark, orange accents | High contrast on dark |
+| **zen** | ☀️ Zen Sand | `zen` | `#F5F0E8` cream paper | **Light theme** — audit all tutorial text (see §6) |
+| **midnight** | 🌙 Midnight | *(remove `data-theme`)* | `#1A1A2E` indigo night | High contrast dark mode |
+| **ocean** | 🌊 Ocean | `ocean` | `#0A1628` deep blue | Cool palette |
+
+Cycle order in UI: `balance → ember → zen → midnight → ocean`.
+
+**Screenshot / Play Store rule:** Capture store screenshots in the default theme shown in the app icon so listing matches first launch.
+
+---
+
+
+## §3 Generating Android-ready graphics **[core]**
+
+> **CRITICAL:** For all Play Store asset design rules (colors, composition, video durations, ASO naming), you MUST strictly follow `play-store-assets-generation.mdc`. The guidelines below cover only the technical Android implementation (sizes, formats, tooling).
+
+### Play Store asset spec
+
+| Asset | Size | Format | Rules |
+|-------|------|--------|-------|
+| **App icon (listing)** | **512×512** | **32-bit PNG ONLY** | **CRITICAL: No JPEGs.** Must include alpha channel. Flat 2D graphic only (no device photos). **ASO Rule:** Icon must be hyper-literal and physically show the core mechanic (e.g., a 3x3 grid of 1s). Avoid purely abstract branding logos. Keep core art inside a **15% padding safe zone** to account for Google's automatic 30% squircle mask. |
+| **Feature graphic** | **1024×500** | PNG/JPEG | Exact dimensions required (1023x500 will fail). No transparency. No misleading text (“#1”, “Free money”). |
+| **Phone screenshots** | min 2; long side **1080+** | PNG/JPEG | **9:16** or **16:9**. Must depict **real in-app UI**. **ASO Rule:** Use "Hook, Rule, Win" structure. Top 20% of image must be a text-heavy banner with a bold value prop and active verbs (e.g., "SWIPE TO WIN", "COMPETE GLOBALLY"). |
+| **Adaptive launcher** | foreground **432×432** | PNG in `mipmap-*` | Must visually match the 512x512 Store Icon to prevent Misleading Claims policy violations. |
+
+### Launcher icon — density table
+
+Generate from one **1024×1024** master (keep safe zone ~66% center for adaptive crop):
+
+| Folder | px |
+|--------|-----|
+| `mipmap-mdpi` | 48 |
+| `mipmap-hdpi` | 72 |
+| `mipmap-xhdpi` | 96 |
+| `mipmap-xxhdpi` | 144 |
+| `mipmap-xxxhdpi` | 192 |
+
+**Adaptive icon:** `mipmap-anydpi-v26/ic_launcher.xml` — separate **background color** (`values/colors.xml`) and **foreground** PNG. Match Balance default: background `#0A0A0A`, foreground = brand mark (e.g. gold cairn / 3×3 grid motif).
+
+### How we generate images & apply icon packages (workflow)
+
+1. **Design brief** — one sentence: subject, background color, flat vs gradient, **no text** on launcher icon unless it exists in-app.
+2. **Master art** — Cursor **GenerateImage** or Figma export at 1024×1024 (icon) and 1024×500 (feature graphic).
+   - **App Icons (always):** Use [https://easyappicon.com/](https://easyappicon.com/) only — upload square master art → export Play **512×512** + adaptive/mipmap packs. **Never** AppIcon.co, MakeAppIcon, or other icon-pack sites.
+   - **Applying Icon Zips via Script:** Use `./scripts/apply-icon-zip.sh "<Game Name>" <zip_or_dir_path>`. The script auto-detects Homebrew OpenJDK 17 (`JAVA_HOME`), unzips/rsyncs launcher mipmaps into `android/app/src/main/res/`, cleans up background XML conflicts, and builds `./gradlew assembleDebug` automatically.
+   - **Feature Graphics**: Use [screenshot-maker.appinstitute.com](https://screenshot-maker.appinstitute.com/feature-graphic) or custom SVG Node scripts (`sharp`) to generate exactly 1024×500 Feature Graphics.
+   - **SVG & Sharp Generator Safety:** When writing SVG generator scripts with Node + `sharp`, escape all ampersands (`&` → `&amp;` or `and`) and replace unescaped dots (`·` → `-`) to prevent `xmlParseEntityRef` crashes in `librsvg`.
+3. **Resize / density export**
+   - **Play listing icon:** Export **512×512 32-bit PNG** with alpha — verify with `file play-store-icon-512.png` (must say "PNG image data, 512 x 512, 8-bit/color RGBA"). **Never upload JPEG.**
+   - **Android Studio:** Right-click `res` → **New → Image Asset** → Launcher Icons (Adaptive and Legacy) → import master PNG.
+   - **CLI (macOS):** `sips -z 512 512 master.png --out play-store-icon-512.png`; loop sizes for mipmaps.
+4. **Store screenshots (AAA ASO Framework)** — 9:16 portrait (1080×1920 or 1080×2400). Top 25% = massive bold value proposition header in heavy sans-serif typography; Bottom 75% = 3D device mockup showing active gameplay or product UI:
+   - **Screenshot 1 (HOOK):** Core product hook & primary value proposition.
+   - **Screenshot 2 (RULE / VERB):** Intuitive core mechanic or primary interaction breakdown.
+   - **Screenshot 3 (WIN / REWARD):** Success state, celebration, or primary output display.
+   - **Screenshot 4 (MODES / META):** Progression, modes, offline capability, or stats dashboard.
+5. **Sanity check** — Side-by-side: **launcher icon ↔ first screen ↔ Play listing icon**. Google **Misleading Claims** rejections often come from icons/screenshots that promise UI the app does not show (wrong colors, fake “Level 100”, unrelated logos on a puzzle game, etc.).
+
+### Play Store listing honesty & ASO checklist
+
+- **ASO Naming Strategy:** Retain descriptive search keywords in the app title (e.g., `BrandName: Descriptive Keyword Subtitle`) to capture organic search volume.
+- **Hyper-Literal Icons:** App icons MUST physically depict the core verb or primary interaction on a clean, high-contrast background. Avoid purely abstract logos.
+- **Verb-First Descriptions:** Start the listing description with punchy, action-verb bullets rather than generic marketing prose.
+- Icon = what users see after install (same palette and motif).
+- Screenshots = **default theme** (document which one), not one-off marketing mocks or obsolete UI (e.g. removed “START GAME” splash).
+- Short/full description matches **actual** features — level counts from source data (`LEVELS.length`, `levels.json`, etc.), not guesses.
+- Feature graphic: app name + real in-app art; avoid stock clip art unrelated to the product.
+- **Every bullet** in short + full description must pass the **120-second discoverability test** (§13).
+- Standalone Play apps must not borrow parent-portal branding in listing copy (§13).
+
+---
+
+
+## §4 Build & sync pipeline **[core]**
+
+### Capacitor (full site)
+
+```bash
+# From web repo root — NOT android/
+npm run build
+npx cap copy android          # assets only
+# npx cap sync android        # after new Capacitor plugins / native config
+```
+
+Open `android/` in Android Studio → Run.
+
+### WebView shell (single HTML game)
+
+1. Identify the **canonical web source** Gradle copies from (read `app/build.gradle(.kts)` — `from(...)` path). Edit **that** tree, not a vendored mirror in another repo unless you sync back.
+2. Gradle asset-sync task runs on `preBuild` / before `merge*Assets` — copies into `app/build/generated/gameAssets` (see §14 for path pitfalls).
+3. **Debug** keeps test hooks; **Release** strips debug globals (`window.*Debug`, solver hooks, `?e2e=1` shortcuts if policy requires).
+4. Increment **`versionCode`** (+1 every upload) and **`versionName`** in `app/build.gradle(.kts)` before every Play upload.
+5. Build the **AAB from the game’s `android/` shell directory**, not from a different product’s Capacitor folder.
+
+```bash
+# WebView shell — from games/<Name>/android/ (JDK 17 required — §7)
+export JAVA_HOME="/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home"
+node scripts/games/build-android-standalone.mjs <slug>   # TanStack SPA only
+cd games/<Name>/android
+./gradlew :app:bundleRelease
+```
+
+### TanStack SPA WebView
+
+- **Do not** ship embed builds (`EMBED_BUILD=1`, `dist/client` with `*-embed` HTML class) to Play — use `dist/android-client/` from `build-android-standalone.mjs` (§14).
+- Shell lives at `games/<Name>/android/`; sync source is `games/<Name>/dist/android-client/`.
+- Full pipeline + verification: `node scripts/games/test-android-standalone.mjs <slug>` (after JDK 17 + emulator for device tests).
+
+### Version bump discipline
+
+| Field | Rule |
+|-------|------|
+| `versionCode` | +1 every Play Console upload |
+| `versionName` | Semver string users see (e.g. `2.0.2`) |
+| Web + Android | Bump Android when **web assets** shipped to Play change materially (tutorial, levels, themes) |
+
+---
+
+
+## §5 Native polish **[core]**
+
+- **Splash:** `Theme.SplashScreen` with `windowSplashScreenBackground` = default theme bg (`#0A0A0A` for Balance).
+- **Status / nav bar:** Match `theme-color` / Balance black in `themes.xml`.
+- **Orientation:** Test portrait, landscape, tablet, notch — especially tutorial grid and embed-style short viewports.
+- **Preserve DOM hooks:** Do not rename IDs/classes used by game-over, restart, or E2E (`btn-gameover-home`, `.btn-pri`, etc.) without updating WebView tests.
+- **Haptic Feedback (Juice):** Whenever a core interaction occurs (e.g., placing a tile, connecting a wire, or failing a level), trigger tactile feedback using `navigator.vibrate([15])` (light tap) or `navigator.vibrate([50, 50, 50])` (heavy crash).
+- **60FPS Lock:** Ensure the `requestAnimationFrame` or tick loop is tightly locked to 60Hz or higher. Physics calculations must be decoupled from framerate to prevent jittering on 120Hz mobile displays.
+
+---
+
+
+## §6 Theme contrast on Android (common bug) **[core]**
+
+Light themes break tutorial copy if overrides are missing.
+
+**Symptom:** `.tut-goal-line`, `.tut-rule-line`, `.dot` stay white on Zen Sand cream → invisible.
+
+**Fix pattern:**
+
+```css
+[data-theme="zen"] .tut-goal-line { color: #4527A0; }
+[data-theme="zen"] .tut-rule-line { color: #5A4D3E; }
+[data-theme="zen"] .dot { background: rgba(61,46,31,.2); }
+[data-theme="zen"] .dot.on { background: #3D2E1F; }
+```
+
+**Before Play release:** cycle all five themes on device; verify tutorial, pager dots, headers, and win overlays.
+
+---
+
+
+## §7 Common Android errors & fixes **[core]**
+
+1. **EDT blocking in Android Studio**
+   - *Error:* `IllegalStateException: This method is forbidden on EDT…`
+   - *Fix:* Run `./gradlew` from terminal; use Studio’s background sync modal — do not run heavy Gradle tasks on the UI thread.
+
+2. **WebView game-over / buttons dead**
+   - *Cause:* Renamed element IDs or classes that JS listeners target.
+   - *Fix:* Preserve core interactive IDs; run Espresso/WebView tests before publish.
+
+3. **Stale bundled web assets**
+   - *Symptom:* Android shows old tutorial/UI after web fix.
+   - *Fix:* Rebuild web → `cap copy` or trigger Gradle asset sync → **Clean Project** in Studio → reinstall APK.
+
+4. **Play “Misleading Claims” rejection**
+   - *Cause:* Listing or screenshots claim features that are missing, hidden, or mean something else in-app (e.g. “game modes” = themes only; leaderboard only inside game-over).
+   - *Fix:* Follow §13 — rewrite listing, add discoverable UI for any claimed feature, sync all tracks/locales, rebuild AAB from canonical web source.
+
+5. **Gradle fails immediately on JDK 21+ / 25**
+   - *Symptom:* `What went wrong: 25.0.2` with no stack trace.
+   - *Fix:* Use **JDK 17** for Gradle 8.13 / AGP 8.x: `brew install openjdk@17` and set `JAVA_HOME` before `./gradlew`. Android Studio’s bundled JDK also works in IDE.
+
+6. **APK has no bundled game assets (blank WebView)**
+   - *Cause:* Gradle sync path wrong — `layout.projectDirectory` in `app/build.gradle.kts` is the **`app/` module**, so `../dist/android-client` resolves to `android/dist/`, not `games/<Name>/dist/`. Using `debug`/`release` **sourceSets** for assets may not merge on AGP 8.13.
+   - *Fix:* Sync from `../../dist/android-client`; attach synced dir to **`main`** assets via `preBuild` (§14).
+
+7. **TanStack SPA deep links break under wrong `<base>` (`/assets/modes/…` blank)**
+   - *Cause:* Relative `<base href="./"/>` makes `/assets/modes/ghost/` resolve JS/CSS under `/assets/modes/ghost/assets/…`.
+   - *Fix:* Standalone `index.html` uses `<base href="/assets/"/>` (matches router basepath); restore literal `basepath:"/assets/"` after `rewriteAssetUrls`; **no** `*-embed` HTML class (§14).
+
+8. **`WebViewAssetLoader: Error opening asset path:` (empty path)**
+   - *Cause:* `game_url` is `https://appassets.androidplatform.net/assets/` (trailing slash) — initial request path is empty.
+   - *Fix:* `SpaAssetsPathHandler` maps empty/`/` path → `index.html` (no leading slash in `AssetsPathHandler.handle`).
+
+9. **Release build fails signing / unsigned APK**
+   - *Cause:* Missing `release-key.keystore` or keytool password shorter than 6 characters.
+   - *Fix:* Generate keystore with `keyAlias=release` and passwords ≥6 chars; match `signingConfigs` in `app/build.gradle.kts`. **Never commit** keystore to git.
+
+---
+
+
+## §9 Verification before ship **[core]**
+
+**Prerequisites:** JDK **17** (`JAVA_HOME`), Android SDK (`local.properties` → `sdk.dir`), valid `gradle-wrapper.jar`.
+
+```bash
+# TanStack SPA WebView (Bharat Brawlers)
+export JAVA_HOME="/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home"
+node scripts/games/build-android-standalone.mjs <slug>
+cd games/<Name>/android
+./gradlew :app:assembleDebug :app:assembleRelease :app:bundleRelease
+./gradlew :app:connectedDebugAndroidTest    # Espresso + WebView JS polls
+
+# Or full scripted pass (build + emulator smoke):
+node scripts/games/test-android-standalone.mjs
+
+# Static HTML WebView
+./gradlew :app:assembleDebug :app:assembleDebugAndroidTest
+./gradlew :app:connectedDebugAndroidTest
+
+# Capacitor site
+npm run build && npx cap copy android
+```
+
+Manual on device:
+
+- [ ] Cold start offline (airplane mode)
+- [ ] All shipped themes readable (especially any **light** theme tutorial text — §6)
+- [ ] Back button exits overlays → game → tutorial → app
+- [ ] Launcher icon matches Play listing 512×512 **32-bit PNG** (same art, adaptive foreground aligned)
+- [ ] Screenshots match **default theme** UI on the **exact AAB** being uploaded
+- [ ] No keyboard/hover-only controls; touch and safe-area layout verified
+- [ ] Haptic feedback on core interactions (where supported)
+- [ ] **§13 listing matrix** — every store bullet verified in ≤120s on a clean install
+- [ ] Daily Challenge + share (§12) only if shipped **and** mentioned in listing
+
+---
+
+
+## §10 Distribution channels (keep in sync) **[core]**
+
+| Channel | Entry | Sync |
+|---------|-------|------|
+| GitHub Pages / canonical web | `index.html` | Git push |
+| Educational embed (iframe) | `public/games/<id>/` | Manual vendor copy + CDN purge |
+| Android (TanStack SPA) | `dist/android-client` | `build-android-standalone.mjs` + Gradle sync |
+| Android (static HTML) | WebView assets | Gradle sync |
+| Android (portal) | Capacitor `webDir` | `cap copy` |
+
+Web repo is **source of truth**. Android is a packaging layer — never fork gameplay in Kotlin.
+
+---
+
+
+## §12 Viral & Meta-Layer Architecture **[growth]**
+
+Optional retention hooks for puzzle/logic games — **do not** mention Daily Challenge or share in the Play listing unless implemented and discoverable (§13):
+
+- **Daily seed mode:** Deterministic level from `YYYYMMDD` so all players share one puzzle per day.
+- **Share loop:** `navigator.share` with emoji grid or score text after a win.
+
+If listed on Play, the mode must be reachable from the main UI without finishing the full campaign.
+
+---
+
+
+## §14 TanStack SPA → standalone WebView **[core]**
+
+When porting TanStack Start / Vite / Nitro games into per-game Play shells (`games/<Name>/android/`), follow this pipeline. **Embed builds are not Play builds.**
+
+### Framework CLI
+
+Registry: `scripts/games/android/registry.mjs`.
+
+```bash
+# One command — default: patch, web build, Gradle, icons
+node scripts/games/android/run.mjs <slug|--all> [--scaffold] [--screenshots] [--smoke]
+
+npm run android:all
+node scripts/games/android/audit-parity.mjs
+```
+
+| Module | Role |
+|--------|------|
+| `run.mjs` | Orchestrator |
+| `patch-web.mjs` | `ANDROID_STANDALONE` vite/router/`__root` |
+| `apply-theme-parity.mjs` | 5-theme `ThemeSwitcher` (§13 discoverability) |
+| `build-web.mjs` | `dist/android-client/` (`.output/public` or `dist/client`) |
+| `capture-screenshots.mjs` | 1080×2400 via `screenshot-scenes.mjs` |
+
+Legacy shims: `build-android-standalone.mjs` → `run.mjs`.
+
+### Canonical output chain
+
+```
+games/<Name>/src  →  build-android-standalone.mjs  →  dist/android-client/  →  Gradle sync  →  AAB
+```
+
+| Output | Purpose | Play? |
+|--------|---------|-------|
+| `dist/client` + embed `index.html` | Host iframe (`EMBED_BUILD=1`, `*-embed` HTML class) | **No** |
+| `dist/android-client` | Offline WebView bundle (`ANDROID_STANDALONE=1`, no embed class) | **Yes** |
+
+### Web build env (`build-android-standalone.mjs`)
+
+```bash
+ANDROID_STANDALONE=1
+VITE_ANDROID_STANDALONE=1
+VITE_ANDROID_BASE=/assets/
+# Unset: EMBED_BUILD, VITE_EMBED_SLUG, GAME_SLUG
+```
+
+**`vite.config.ts`:** when `ANDROID_STANDALONE=1`, set `base: '/assets/'` and Nitro `baseURL: '/assets/'` (mirror embed branch).
+
+**`router.tsx`:** `routerBasepath()` prefers `import.meta.env.VITE_ANDROID_BASE`, then embed slug, then `BASE_URL`.
+
+**`__root.tsx`:** omit `*-embed` HTML class when `VITE_ANDROID_STANDALONE=1` so home/leaderboard routes stay reachable.
+
+**`gameBack.ts`:** register `window.GameBack.handle()` — router back if possible, else return `false` for Kotlin `finish()`.
+
+### Post-build patches (do not skip)
+
+1. **`patch-android-client.mjs`** — TanStack CSR hydrate/bootstrap fixes; set router `basepath:"/assets/"`. **Critical:** `rewriteAssetUrls` also rewrites `basepath` to `./assets/` — restore literal `basepath:"/assets/"` after that pass or WebView lands on `/assets/assets` → 404.
+2. **`generate-android-index.mjs`** — static CSR shell: `<base href="/assets/"/>`, `start_url: "./"`, **no** `*-embed` class on `<html>`, strip `/index.html` from pathname via inline script. Absolute `/assets/` base keeps deep links (`/assets/modes/ghost/`) loading JS/CSS correctly.
+3. **Offline verify** — grep bundle for CDN hosts (`fonts.googleapis.com`, etc.).
+
+### Gradle asset sync (common failure)
+
+In `app/build.gradle.kts`:
+
+```kotlin
+// projectDirectory = games/<Name>/android/app  →  use ../../dist/android-client
+val webClientDir = layout.projectDirectory.dir("../../dist/android-client")
+val syncedGameAssets = layout.buildDirectory.dir("generated/gameAssets")
+
+val syncGameWebAssets by tasks.registering(Sync::class) {
+    from(webClientDir)
+    into(syncedGameAssets)
+}
+
+android {
+    sourceSets {
+        getByName("main") {
+            assets.srcDir(syncedGameAssets)   // NOT debug/release sourceSets (AGP 8.13)
+        }
+    }
+}
+
+tasks.named("preBuild").configure { dependsOn(syncGameWebAssets) }
+```
+
+**`strings.xml`:** `game_url` = `https://appassets.androidplatform.net/assets/` (trailing slash, not `index.html`).
+
+### `SpaAssetsPathHandler` (SPA fallback + empty path)
+
+TanStack routes (`/play`, `/leaderboard`) and trailing-slash entry URLs need `index.html` fallback. **Use paths without a leading slash** for `AssetsPathHandler.handle`.
+
+```kotlin
+class SpaAssetsPathHandler(context: Context) : WebViewAssetLoader.PathHandler {
+    private val assetsHandler = WebViewAssetLoader.AssetsPathHandler(context)
+
+    override fun handle(path: String): WebResourceResponse? {
+        val assetPath = when {
+            path.isEmpty() || path == "/" -> "index.html"
+            path.startsWith("/") -> path.removePrefix("/")
+            else -> path
+        }
+        assetsHandler.handle(assetPath)?.let { return it }
+        val leaf = assetPath.substringAfterLast('/')
+        val hasExtension = leaf.contains('.') && !leaf.startsWith('.')
+        if (!hasExtension) return assetsHandler.handle("index.html")
+        return null
+    }
+}
+```
+
+Register: `.addPathHandler("/assets/", SpaAssetsPathHandler(this))`.
+
+### Repo hygiene
+
+Gitignore per shell: `**/android/.gradle/`, `**/android/local.properties`, `**/android/app/release-key.keystore`, `**/android/app/*.jks`, `**/android/app/upload_certificate.pem`, `**/android/**/build/`.
+
+**Launcher icons:** resize `playstore-icon.png` per mipmap density (`resize-launcher-icons.mjs` / `sips`) — do not copy one 500KB PNG into every `mipmap-*` folder.
+
+**`gradle-wrapper.jar`:** must be a valid wrapper JAR (`no main manifest attribute` = corrupt copy). Copy from a known-good Android project if needed.
+
+### Espresso / WebView tests
+
+- Assert bundled `index.html` / `manifest.webmanifest` via `targetContext.assets.open(...)`.
+- Poll `evaluateJavascript` until content appears (`pollUntilJs`, ~45s) — single-shot checks flake on cold WebView + React hydrate.
+- Use `data-testid` + router navigation; avoid assumed globals (`renderLeaderboard`, etc.).
+
+### E2E flags in minified release bundles
+
+When `esbuild: { drop: ["console"] }` strips `if (isE2eMode()) { console.log(...) }` entirely, preserve checks via side effects:
+
+```typescript
+useEffect(() => {
+  if (typeof window !== "undefined") {
+    (window as any).__e2e_active = isE2eMode();
+  }
+}, []);
+```
+
+Gate **release** Play builds: strip `?e2e=1` auto-win paths in Gradle `stripReleaseAssets`; do not list e2e-only flows on Play.
+
+### Screenshot automation
+
+`capture-android-screenshots.mjs` + `android-preview-server.mjs` serve `dist/android-client` at `/assets/` (1080×2400). Use `?e2e=1` and `addInitScript` for deep routes. **Final Play screenshots** must come from **release AAB** on emulator (§13), not preview server alone.
+
+### Build & release mistakes to avoid
+
+| Mistake | Prevention |
+|---------|------------|
+| Sync from wrong repo / Capacitor `android/` | Gradle `from` = `../../dist/android-client` only |
+| Ship embed bundle to Play | Separate `android-client` pipeline; no `*-embed` class |
+| Listing “modes” / themes / leaderboard | §13 matrix from code; omit if no switcher or hidden UI |
+| `game_url` → `index.html` without empty-path handler | Trailing-slash URL + `SpaAssetsPathHandler` normalize |
+| Fake / composited screenshots | Emulator from release APK/AAB only |
+| Generic `applicationId` on standalone game | Use explicit per-game `applicationId` (e.g. `com.brand.appname`) |
+| Android registry out of sync with embed registry | centralize `EMBED_GAMES` registry as source of truth |
+| Patch only host `public/games/` for Android bugs | Fix upstream game source → rebuild web client → rebuild AAB |
+
+### Portfolio consolidation **[applicable if multi-game Android fleet]**
+
+When web portfolio merges secondary titles into flagship **modes**:
+
+1. Remove archived slugs from registry and preview assertions.
+2. Keep Gradle shells under `games/<Archived>/android/` only if still useful for mode-source builds — do **not** list them for Play release.
+3. Listing copy for flagships may mention the mode — never claim a separate app ID for the archived slug.
+4. Commit intentional manifest/source changes; whitespace-only Gradle churn is fine to include if the pipeline regenerated it.
+
+### Phase 8 — Native shell & Play Vitals hardening **[applicable if Android native shell]**
+
+Patterns from modern WebView wrappers (`shiaho777/web-to-app`, `Jipok/website-to-apk`, `Drjacky/claude-android-ninja`). Bharat Brawlers enforces via `apply-native-hardening.mjs` + `audit-native-hardening.mjs`.
+
+| Concern | Requirement |
+|---------|-------------|
+| **Predictive back (API 33+)** | `onBackPressedDispatcher.addCallback` — never override deprecated `Activity.onBackPressed()` |
+| **Play Vitals ANR** | No blocking disk I/O in `onCreate`; defer `webView.loadUrl` with `webView.post { }` to keep start-to-interactive under ~2s |
+| **16 KB page size (API 35+)** | If adding NDK `.so` libs, link with `-Wl,-z,max-page-size=16384` (CMake: `ANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON`) |
+| **WebView immersion** | Double-back exit, `Intent.ACTION_VIEW` for external schemes, `mediaPlaybackRequiresUserGesture = false`, hardware acceleration, portrait lock, `shortEdges` cutout |
+| **Intent redirection security** | Strip `component`/`selector` from parsed intents; sanitize with `androidx.core.content.IntentSanitizer` before `startActivity()` |
+| **IME soft input** | `android:windowSoftInputMode="adjustResize"` on `<activity>` so keyboards resize the canvas on Android 15+ edge-to-edge |
+| **AGP 9 future-proofing** | `preBuild` → `Sync` into `layout.buildDirectory.dir("generated/gameAssets")` — not deprecated per-variant `assets` sourceSet hacks |
+
+Canonical Kotlin/manifest snippets: `Bharat Brawlers/scripts/games/android/native-hardening-template.mjs`.
+
+---
+
+
+
+---
+
+## Native / cross-platform product UX (when not a thin WebView)
+
+# Mobile Applications (Native + Cross-platform)
+
+**Intent:** Build high-quality mobile apps with platform-correct UX, predictable state, and production-ready release gates.
+
+## Scope
+
+- iOS (`SwiftUI`)
+- Android (`Jetpack Compose`)
+- Cross-platform (`React Native`, `Flutter`)
+- Mobile-first PWAs that behave like app shells
+
+## Build order
+
+1. Define one primary job-to-be-done per screen.
+2. Sketch navigation model (tabs, stack, modal, deep links).
+3. Define semantic design tokens (color, type, spacing, radius, elevation).
+4. Build core screens with accessibility + loading/error/empty states.
+5. Add analytics, crash reporting, and release checks.
+
+## UI system baseline
+
+- Keep one source of truth for tokens.
+- Prefer semantic tokens over hardcoded values.
+- Keep touch targets >=44pt iOS / >=48dp Android.
+- Do not rely on color only for status.
+- Respect reduced motion and dynamic type / font scaling.
+
+## Platform behavior rules
+
+- Follow native patterns before custom patterns.
+- iOS: prioritize tab + stack clarity, swipe-back compatibility.
+- Android: preserve system back and predictable top app bar behavior.
+- Cross-platform: match platform conventions where users expect them.
+
+## Reliability and state
+
+- Define explicit offline, loading, error, and success states.
+- Persist user-critical drafts locally when flows are multi-step.
+- Prevent duplicate submits with disabled/loading button states.
+- Use optimistic updates only when rollback is defined.
+
+## Performance gate
+
+- Keep startup lightweight; lazy-load heavy features.
+- Virtualize long lists.
+- Avoid layout thrash and unnecessary rerenders/rebuilds.
+- Compress and size media assets for mobile network constraints.
+
+## Security and privacy
+
+- Never hardcode credentials or secrets.
+- Store sensitive data in secure storage/keychain equivalents.
+- Minimize permissions to what the feature actually needs.
+- Add clear copy for data collection and camera/location usage.
+
+## Testing and release checklist
+
+- Unit tests for core business logic.
+- Integration tests for critical flows (auth, payment, upload, checkout).
+- Device coverage: small phone, large phone, and tablet (if supported).
+- Verify deep links, push notification routes, and back-stack behavior.
+- Verify dark mode, accessibility labels, and keyboard/voice support where applicable.
+
+## Design source options
+
+- For style anchoring, you may use a `DESIGN.md` file from `awesome-design-md`.
+- For fast UI system recommendations, use `ui-ux-pro-max-skill` design system patterns.
+- Keep brand adaptation explicit: cite chosen style family and why.
+
+
+## Related books
+
+| Need | Rule |
+|------|------|
+| Web/game source product | `create-web-game.mdc` |
+| UI/a11y baseline | `product-excellence.mdc` |
+| Signed AAB, Play listing, Studio publish, ASO | `publish-mobile.mdc` |
+
+## Android Keystore Best Practices
+
+### Production Play Upload Key Configuration
+
+| Property | Value |
+|----------|-------|
+| **Keystore path** | Environment variable or secret vault (`KEYSTORE_PATH`) |
+| **Repo-relative** | `android/app/release-key.keystore` (gitignored) |
+| **Key alias** | Configured release alias (`KEY_ALIAS`) |
+| **Passwords** | Never commit — environment variables only (`KEYSTORE_PASSWORD`, `KEY_PASSWORD`) |
+
+Export PEM for Play upload-key reset:
+
+```bash
+cd android/app
+keytool -export -rfc -keystore release-key.keystore -alias <your_alias> -file upload_certificate.pem
+```
+
+- **Gitignore** `*.jks`, `*.keystore`, `upload_certificate.pem`, `release-key.keystore` under `android/app/`.
+- **Local/CI fallback:** Use environment variables to pass keystore paths during automated builds.
+- **build.gradle.kts:** `keyAlias = System.getenv("KEY_ALIAS") ?: "release_alias"`; configure `signingConfigs` via environment variables.

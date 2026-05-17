@@ -1,0 +1,186 @@
+---
+description: Universal Product Excellence — philosophy, multi-device UI, security, privacy, Definition of Done (stack-agnostic)
+alwaysApply: false
+---
+
+# Universal Product Excellence
+
+**Intent:** Single owner for product philosophy, cross-surface UI and accessibility (§2a–2c), security, privacy, and Definition of Done — not HLD diagrams, web deploy, game engines, or browser bots.
+
+A generic engineering + design + security rule applicable to any product (static site, CLI, web, mobile, full-stack, embedded), any tech stack, any team. Items are tagged by applicability:
+
+- **[core]** — applies to every product.
+- **[applicable if …]** — applies only when the product matches the listed condition (UI, mobile, multi-tenant, etc.). Skip otherwise.
+
+If a tag does not apply to your product, drop the whole bullet — do not water it down. **Do not** force enterprise CI, SAST, observability, or analytics patterns onto static brochure sites or privacy-first tools.
+
+## 1. Product Philosophy **[core]**
+
+Articulate the **one real user job** in one sentence before writing code. Ruthlessly say *no* to features that do not serve that job. Obsess over first-run experience; make the default path the right path. Prefer **one clear primary action** per screen, predictable affordances, no dark patterns, no jargon. Measure success by *time-to-value* and *task completion rate*, not feature count. For scope cuts and essentialism before build → `steve-jobs.mdc` Mode C or `product-council.mdc` **Cut** step.
+
+## 1b. Dieter Rams — ten principles (digital products) **[applicable if you ship any UI]**
+
+Industrial design principles (Braun, Vitsœ) apply directly to software UI: clarity over ornament, function over decoration. Use this checklist when reviewing layouts, components, or flows.
+
+| Principle | What to enforce in UI/code |
+|-----------|----------------------------|
+| **Innovative** | Novel patterns only when they improve the user job; do not innovate for showcase effect. |
+| **Useful** | Every control earns its place; remove chrome that does not help completion. |
+| **Aesthetic** | Restrained typography and color; calm hierarchy — beauty from order, not noise. |
+| **Understandable** | Labels match mental models; icons have text or tooltips; errors say what to do next. |
+| **Unobtrusive** | UI defers to content; avoid modal stacks, interruptive banners, and competing CTAs. |
+| **Honest** | UI state matches reality (loading, empty, errors); no fake urgency, counts, or disabled faux affordances. |
+| **Long-lasting** | Design tokens and shared components over one-off styles; avoid trend skins that date in a year. |
+| **Thorough** | Align pixels *and* edge cases — focus rings, truncation, RTL, slow network, small screens. |
+| **Environmentally friendly** | Lean assets, lazy load, respect reduced motion and battery; avoid shipping MB of unused CSS/JS. |
+| **As little design as possible** | Flat, legible surfaces by default; add decoration only when it teaches or delights without clutter. |
+
+**Purposeful delight [applicable if UI]:** Personality, micro-interactions, and whimsy are allowed when they teach, reduce friction, or reward completion — never when they fight *as little design as possible*, compete with the primary action, or ignore `prefers-reduced-motion`.
+
+**Skeuomorphism vs flat [applicable if visual UI]:** Use real-world metaphor only for unfamiliar controls; otherwise prefer flat hierarchy (type, spacing, contrast). Decorative skeuomorphism violates *honest* and *as little design as possible*.
+
+**Design responsibility [core with UI]:** Align UI with privacy and ethics (§6); reject patterns that fail *honest* or *unobtrusive*.
+
+## 2a. Cross-Surface Product Principles **[applicable if you ship any UI]**
+
+The same user job must complete on every surface; layout and chrome may differ.
+
+- **Input modalities [applicable if UI]:** support whichever of pointer / touch / keyboard / assistive tech the surface actually receives; visible focus on every interactive element.
+  - **[applicable if touch UI]** meet or exceed platform minimum touch targets (~44–48 density-independent units — 44 pt iOS HIG, 48 dp Android Material) with adequate spacing.
+  - **[applicable if desktop/web UI]** full keyboard-only path for every primary task.
+- **Accessibility [applicable if consumer-facing UI, regulated industry, or public-sector product]:** meet **WCAG 2.2 AA** — logical focus order, accessible name + description for custom controls, sufficient colour contrast, errors announced and linked inline (not modal-only on small screens). Use **`aria-live="polite"`** for inline form errors; **focus trap** in modals with focus restored on close; **skip-to-main** link for keyboard users; **`aria-current`** on active nav items. Internal admin tools may scope to keyboard + screen-reader smoke checks only.
+- **Motion & vision [applicable if UI has animations or theming]:** respect `prefers-reduced-motion`; never convey state through motion alone. Honour **system font scaling / Dynamic Type**, high-contrast modes, and `prefers-color-scheme`.
+- **Layout beyond width [applicable if UI on phones/tablets]:** mobile-first, container queries where supported, **safe areas / notches**, **RTL** via CSS logical properties / platform RTL APIs. Decide explicit **content vs navigation priority** at narrow widths — truncate, reflow, or "more" pattern.
+- **Network reality [applicable if UI hits a network]:** every screen has explicit **loading, empty, error, and partial-data** states that work on slow or flaky links. Skeletons over spinners; retry affordances; never blank-screen on failure.
+- **Offline / degraded behaviour [applicable if mobile or field-use product]:** define which flows must work offline; queue mutations with idempotency keys; reconcile on reconnect.
+
+## 2b. Design System Across Surfaces **[applicable if 2+ client surfaces share a brand]**
+
+Share **design tokens** (spacing, type, colour, radius, elevation, motion). Use shared **component semantics** (same labels, roles, behaviour for the same job on every client). Design **APIs that don't assume desktop**: pagination sized for mobile, optional/sparse field sets, attachment-size limits.
+
+### Premium Reference Color Schemas (Themes) **[optional — skip if the product already has brand tokens]**
+
+Reference palettes only when starting from scratch. Do **not** replace an existing design system or client brand guide.
+
+| Token | 🌙 Midnight (Dark Tech) | ☀️ Zen Sand (Tactile Calm) | 🌊 Ocean (Cool Fresh) | 🔥 Ember (Dark Lava) |
+|---|---|---|---|---|
+| **Background (`--bg`)** | `#1A1A2E` | `#F5F0E8` (Light Paper) | `#0A1628` | `#1A0A0A` |
+| **Container (`--board-bg`)** | `#16213E` | `#E8DFD0` (Warm Cream) | `#0E2240` | `#2A1210` |
+| **Surface/Card (`--surface`)** | `#1F2B47` or `#252F4A` | `#D6CABC` or `#F0E8D8` | `#142E52` | `#3A1A15` |
+| **Text High (`--txt-hi`)** | `#F1F5F9` (Light Slate) | `#2C2419` (Dark Charcoal) | `#E0F0FF` | `#FFE8E0` |
+| **Text Mid (`--txt-mid`)** | `#94A3B8` | `#6B5D4E` | `#7AA4CC` | `#CC8A78` |
+| **Text Low (`--txt-lo`)** | `#3D4A6A` | `#A89882` | `#2A4A6A` | `#5A3028` |
+| **Primary Gradient** | `linear-gradient(135deg,#6D28D9,#2563EB)` | `linear-gradient(135deg,#4527A0,#1565C0)` | `linear-gradient(135deg,#1A3A8A,#3A5ADA)` | `linear-gradient(135deg,#CA4A2A,#EA7A2A)` |
+
+#### Accessibility & Contrast Rules:
+* **Dark Themes (Midnight, Ocean, Ember)**: Default light foregrounds (`#DDD6FE` / `#E2E8F0` / `#F8FAFC`) have high readability against dark surfaces.
+* **Light Theme (Zen Sand) Overrides**: Default light colors fail WCAG AA contrast against warm cream backgrounds. Explicitly override text and state indicator colors to preserve contrast:
+  * **Header/Goal Text**: `#4527A0` (deep purple)
+  * **Body/Supporting Text**: `#5A4D3E` (medium warm brown)
+  * **State Indicators (Page Dots)**: Inactive = `rgba(61,46,31,0.2)`; Active = `#3D2E1F`
+  * **Emphasis / Best Score Badge**: `#7B5B00` (warm gold)
+  * **Success Ring / Borders**: `#2E7D32` (deep green)
+
+## 2c. Internationalization & Localization **[applicable if shipped outside one locale]**
+
+- Externalize all user-visible strings; use ICU MessageFormat-style placeholders for plurals/gender — no concatenation.
+- **Locale-aware formats** for dates, numbers, currency, units, addresses, names.
+- **RTL** mirroring of layout, icons, and gestures **[applicable if any RTL locale is supported]**.
+- **Timezone discipline:** store UTC, render in user's zone; one-off events → UTC instant; scheduled events → wall-clock + IANA zone (DST-safe); recurring events → **RRULE + IANA zone [applicable if calendar/scheduling product]**.
+- Pseudo-localize in CI to catch hard-coded strings and truncation early.
+
+## 2d. Nearest-product UI (familiarity) **[applicable if you ship any UI]**
+
+When the product sits in a **known category** or **extends a familiar product**, anchor layout, typography, color, density, and interaction patterns to the **nearest reference users already know** — not a generic AI dashboard or unrelated SaaS template. Users should feel *at home* on first open. This is about **structure and feel**, not copying trademarks (use original assets, icons, and copy; study patterns, spacing, and hierarchy).
+
+**When building with Lovable or similar UI generators:** name the nearest reference product explicitly in the prompt or `product_spec.md` *before* the first generation pass.
+
+| What you are building | Nearest UI / feel to study (examples) |
+|-----------------------|----------------------------------------|
+| Scheduler or tooling **inside** a messenger ecosystem | That messenger itself (e.g. WhatsApp scheduler → WhatsApp chat list, bubbles, greens, bottom nav) |
+| Browser extension for a **specific site** | That site’s panels, typography, and chrome (e.g. CodingPlatform extension → CodingPlatform layout, monospace blocks, tab styling) |
+| **Tile / merge puzzle** (e.g. SampleGame, 2048-family) | Classic minimal board games (e.g. 2048 — grid, tile motion, score strip, restrained palette) |
+| **Side-view fighting / brawler** (e.g. ArcadeGame) | Genre peers (e.g. Little Fighter — roster strip, health bars, compact HUD, arcade density) |
+| **Affirmations / wellness copy** | Leading affirmation apps *or* editorial calm from known creators (e.g. Louise Hay–style sites — soft type, generous whitespace, gentle CTAs) |
+| **Music / audio playback** | Dominant players in that niche (e.g. Spotify — now playing, queue, library tabs, dark-first chrome) |
+
+If no single product fits, pick the **closest category leader** and document the choice in the spec. For games, also apply `games-building.mdc` §1 (visual direction lock) and keep HUD minimal per §5.
+
+## 3. Architecture Principles
+
+**[core]** Apply **SOLID, DRY, KISS, YAGNI, twelve-factor**, and clean/hexagonal layering. **Structured logs with correlation IDs** for anything that runs. Never trust user IDs from request bodies — derive from the auth token.
+
+**[applicable if the product serves traffic or runs a service]** RED metrics (Rate, Errors, Duration) with p50/p95/p99.
+**[applicable if client UI]** Define and enforce a global client-side performance budget (e.g., "Interactive within 2 seconds on a 3G/mid-tier device").
+
+**[applicable if the product makes network calls, has async work, or runs multi-instance]** Idempotent APIs with idempotency keys; retry + exponential backoff + jitter; circuit breakers; timeouts at every hop; DLQs for poison messages; at-least-once delivery with idempotent processing (never claim *exactly-once*).
+
+**[applicable if 2+ services or > 1 deploy environment]** Distributed tracing, SLOs with error budgets, feature flags, canary/blue-green deploys with one-click rollback.
+
+## 4. Testing Discipline
+
+Bar is **behavioural tests at trust boundaries**, not a line-coverage number. Each repo declares its own minimum (e.g., "changed lines covered" or "critical paths covered") in its README/ADR.
+
+- **Unit / component tests [core]:** in whatever framework the language uses. Test behaviour, not implementation.
+- **Accessibility automation [applicable if consumer-facing UI or regulated industry]:** axe-core (web), ESLint a11y rules, XCTest accessibility APIs (iOS), Compose UI / Espresso accessibility checks (Android), or equivalent in CI.
+- **Integration tests [applicable if you have a DB, queue, or external service]:** real dependencies via Testcontainers/Docker; mock only at the network boundary.
+- **Contract tests [applicable if 2+ services talk]:** Pact or OpenAPI schema tests.
+- **E2E tests [applicable if you ship a UI with critical multi-step flows]:** Playwright / Cypress / Maestro / XCUITest / Espresso on a real device + browser matrix. Use **test data factories** and parameterized boundary cases; **Page Object** helpers when the same locators appear in 3+ tests.
+- **Visual regression [applicable if brand-critical UI or high design churn]:** snapshot only **stable, low-churn chrome** (headers, nav) — not volatile content or gameplay frames.
+- **Load tests [applicable if you have SLOs or significant concurrency]:** k6/Locust/JMeter.
+
+CI blocks merge on red **[applicable if the repo has CI]**.
+
+## 5. Security Non-Negotiables
+
+Threat-model every feature.
+
+**[core, every product]**
+- **Zero secrets in code/repos** — use a vault; push protection + pre-commit secret scanning when feasible; rotate on schedule and on suspicion.
+- **Validate every input at trust boundaries.**
+- **Dependency scanning [applicable if package manifest exists]** — keep dependencies patched; address known CVEs on production paths.
+- **Least-privilege IAM [applicable if cloud/IAM exists]**; encrypt in transit (TLS); mask sensitive values in logs.
+
+**[applicable if CI pipeline or production service with deploy gate]**
+- **SAST / DAST** where tooling fits the stack — do not block a static brochure site on missing enterprise scanners.
+
+**[applicable only if the listed component exists]**
+- **Security headers for web [applicable if web surface]** — CSP, HSTS, and cookie flags **matched to your bundler and auth**; avoid copy-pasting "strict" CSP that breaks Vite/React unless you have nonce/hash workflow.
+- **Parameterised queries / ORMs [applicable if SQL DB]** — no string-concatenated SQL.
+- **Row-Level Security [applicable if multi-tenant DB].**
+- **Webhook signing** — HMAC + timestamp + short replay window, constant-time verify **[applicable if you send or receive webhooks]**.
+- **Account takeover defences** — MFA, breached-password checks, auth rate-limit + lockout, device fingerprinting, session rotation on privilege change **[applicable if user accounts]**.
+- **Supply-chain hardening** — SLSA levels, signed artifacts, SBOMs **[applicable if you publish binaries/images]**.
+- **Mobile platform hardening** — certificate pinning, jailbreak/root detection where the threat model demands, keystore/keychain for secrets, no PII in app logs **[applicable if native mobile app]**.
+
+## 6. Privacy & Product Ethics **[applicable if you handle personal data or AI]**
+
+- **Data classification:** label every field as public / internal / PII / regulated, so IAM, encryption, retention, and audit policies line up consistently.
+- **Data minimization:** collect only what the user's job requires.
+- **Purpose limitation:** use data only for what was disclosed; no silent repurposing.
+- **Retention:** define and enforce TTLs; honour GDPR/CCPA delete/export; keep audit trails **[applicable if regulated jurisdiction]**.
+- **Consent & Telemetry Ethics `[applicable if regulated jurisdiction, EU/UK users, or non-essential tracking]`:** obtain opt-in before non-essential analytics/marketing tags where law requires it; use Consent Mode where applicable. Privacy-first products with enum-only, no-PII telemetry may omit third-party trackers entirely.
+- **AI Transparency & Ethics:** Provide clear, user-facing indicators when content is AI-generated, when decisions are AI-driven, or when a user is interacting with an AI agent. Never pass off AI artifacts as human-generated.
+- **User-visible honesty:** plain-language explanations of what is collected and why; no dark patterns in consent.
+
+## 7. Definition of Done **[core]**
+
+A change ships only when: it serves one clear user job; the simplest design was chosen; behavioural tests pass **[applicable if tests exist]**; threat model reviewed for applicable risks; docs/runbooks updated when behaviour or ops change.
+
+**[applicable if production service, queue, or multi-instance deploy]**
+- Observability wired (logs/metrics/traces as appropriate); rollback path documented.
+
+**[applicable if static SPA or client-only deploy]**
+- Verify build output, hosting rewrites, and CDN/cache behaviour — rollback = redeploy previous artifact.
+
+- **[applicable if UI]** verified on smallest + largest supported viewport, keyboard-only, and one representative mobile profile; spot-check against Rams §1b (especially *understandable*, *honest*, *as little design as possible*). Optional design-only polish pass (no feature changes) → `steve-jobs.mdc` Mode A.
+- **[applicable if accessibility scope applies]** reduced-motion and high-contrast spot-checked; screen-reader smoke test on primary flow.
+- **[applicable if i18n scope applies]** critical flows spot-checked in a secondary locale, and in RTL if any RTL locale is supported.
+- **[applicable if native mobile app]** tested on min-supported OS and current OS; light + dark mode; Dynamic Type / font scaling.
+
+| Before / after ship… | See |
+|---------------------|-----|
+| Architecture sign-off | `system-design.mdc` §4 |
+| UI ultrathink (design only) | `steve-jobs.mdc` Mode A |
+| Idea expansion or Jobs vision Q&A | `steve-jobs.mdc` Modes B/C |
+| Go/no-go council | `product-council.mdc` |

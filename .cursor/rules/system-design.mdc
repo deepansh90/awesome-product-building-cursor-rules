@@ -1,0 +1,92 @@
+---
+description: System design HLD/LLD — problem, NFRs, diagrams, traceability, pitfalls, Definition of Design Done
+alwaysApply: false
+---
+
+# System Design (HLD + LLD)
+
+**Intent:** Produce reviewable architecture and design-done criteria before implementation — not runtime product rules or stack-specific code.
+
+A generic rule for producing useful **High-Level** and **Low-Level** designs for any product (web, Android, iOS, backend service, full-stack feature, embedded). Same applicability tagging as the universal product rule: **[core]** applies always; **[applicable if …]** applies only when the condition holds.
+
+## 0. Frame the Problem Before Designing **[core]**
+
+Spend the first 10–15 minutes clarifying, not drawing (implementation workflow → `agent-ops.mdc`). Emerge with a one-line problem statement, written requirements, and scale numbers.
+
+- **Functional requirements:** what the system *does*. List as user-visible jobs and APIs. Reject ambiguity in writing.
+- **Non-functional requirements (NFRs):** **availability** target (99.9 ≈ 1.5 min/day, 99.99 ≈ 8.6 s/day, 99.999 ≈ 0.86 s/day downtime), **consistency** (strong vs eventual — CAP framing), **latency** budget (e.g., p99 < 200 ms), **scale** (DAU, QPS, storage, bandwidth), **security/compliance** scope.
+- **Back-of-the-envelope estimate [applicable if the system serves traffic or stores data]:** DAU → QPS average → peak QPS (×2–10), storage per day × retention, bandwidth in/out, cache working-set size. Round aggressively; label units; write assumptions down. If the answer is "10s of servers" vs "10,000s," the architecture diverges immediately.
+- **Predicted bottlenecks [applicable if back-of-envelope done]:** from the numbers, name the 1–2 components most likely to break first (DB write QPS, hot partition, cache stampede, egress bandwidth, queue depth, mobile cold-start) and pin the next deep dive to them.
+- **Physics sanity check [applicable if latency-sensitive or global]:** compare the hot path against datacenter RTT (~0.5 ms), RAM (~100 ns) vs SSD (~1 ms) vs HDD (~20 ms), and cross-region RTT (~70–150 ms) so the design isn't fighting physics. Pick **p95** for user-facing latency budgets, **p99** for internal SLOs.
+- **Open assumptions + rejected alternatives [core]:** write both down in HLD. Implicit assumptions are how designs rot; rejected paths are how reviewers learn the reasoning.
+- **Inputs / downstream consumers [core for non-trivial]:** at the top of the HLD list inputs (PRD link, ticket with technical context + dependencies + test considerations, discovery docs) and consumers (LLD, runbooks, feature flags, alerts) so the doc is reproducible.
+- **Acceptance criteria [applicable if product-facing]:** optional **Given–When–Then** scenarios linked from the traceability table.
+- **Out of scope:** name explicitly what you will *not* design — anti-feature list is half the value.
+
+## 1. High-Level Design (HLD) **[core, depth scales with change class]**
+
+**Match HLD depth to the change [core]:** typo / one-line config / dependency bump → "HLD-light" stub with one paragraph + explicit "no DAG because single-file change"; targeted feature → trimmed HLD (diagram + traceability + 1–3 work units); substantial / cross-repo / greenfield → full HLD below. Do not over-HLD a trivial fix; do not under-HLD a multi-service change.
+
+Goal: a shared architectural blueprint reviewers can sign off on before any code. Keep it visual and traceable.
+
+**Required artefacts (in `docs/HLD.md` or equivalent):**
+
+1. **Architecture diagrams** — before / after as **mermaid** (or any text-based diagram). Show major components (client, gateway, service, cache, DB, queue, object store, CDN, third parties) and data flow for the primary use cases. **[applicable if greenfield or major scale change]** caption the current "generation" of the architecture (e.g. *single server → app + DB split → LB + stateless tier → read replicas + cache → CDN → sharded → multi-region*) so reviewers see the migration path, not only the end state.
+2. **Requirement traceability table** — every functional + NFR requirement → which component/change satisfies it. No orphan requirements; no orphan components.
+3. **Dependency graph** — valid DAG of work units, no cycles. Group into **execution layers** so independent units can run in parallel.
+4. **Work-unit decomposition** — each unit has owner/repo, acceptance criteria, test type, and rough estimate.
+5. **Interface contracts** — API shapes (OpenAPI / gRPC proto / GraphQL schema), event payloads, DB-level interface, error codes. Specify versioning + backwards-compatibility stance.
+6. **Risk register** — top 5 risks with mitigation and a trigger to escalate. Call out the top 3 trade-offs proactively.
+7. **Read/write paths** — explicit hot-path narrative for the dominant use case (e.g., "write: client → LB → API → queue → worker → DB; read: client → CDN → cache → API → read-replica").
+8. **Reviewer checkpoint [core if HLD has > 3 work units]** — after diagrams + primary flows are drafted, pause and get explicit architect/peer sign-off (sync review or async PR comment) *before* writing LLD or starting any deep dive. Skipping this is the single highest source of rework.
+
+**Mandatory 9-category pitfall audit [core]** — produce a table; mark `N/A` only with a reason:
+
+| # | Category | Specific techniques |
+|---|---|---|
+| 1 | Distribution & concurrency | sharding key (never `created_at`), consistent hashing, leader election; **[applicable if replicated storage / distributed KV]** document explicit **N/W/R quorum** (or equivalent consistency rule) — no hand-waving "replicated" |
+| 2 | Memory / I/O at scale | streaming, pagination, bounded queues, backpressure |
+| 3 | Reliability primitives | timeout, retry + exponential backoff + jitter, idempotency key, circuit breaker, DLQ |
+| 4 | Validation / input safety | schema validation at trust boundary, derive user from auth token |
+| 5 | Edge cases / fairness | empty/partial/duplicate input, hot keys, noisy neighbours |
+| 6 | Observability | RED signals, **p95 for user-facing latency, p99 for internal SLOs**, distributed traces, structured logs + correlation IDs |
+| 7 | Caching / TTL / expiry | read-through vs write-through, stampede control, atomic replacement |
+| 8 | Real-time concurrency **[applicable if collaborative or stateful real-time]** | OT/CRDT, locks, sticky sessions, polling vs SSE vs WebSocket |
+| 9 | Anti-abuse / security | rate limit, signed webhooks, MFA, RLS, OWASP Top 10 |
+
+**[applicable if mobile client]** Add a *Mobile clients* pitfall row: lifecycle, background limits, offline, store size/SDK matrix — platform details in `apple-mobile-swiftui.mdc` or Android project rules.
+
+**HLD style rules [core]:** changes first, rationale later; tables and diagrams over prose; no code snippets (that's LLD); aim for ≤ 600 words of prose plus diagrams + tables.
+
+## 2. Low-Level Design (LLD) **[applicable if HLD has > 3 work units or > 1 contributor]**
+
+Goal: each implementer can code without re-deriving decisions. Translate HLD work units into file-level specs.
+
+**Required artefacts (in `docs/LLD.md` or equivalent):**
+
+- **Per-work-unit spec** — one section per HLD work unit. No orphan specs; full HLD traceability.
+- **File map** — new vs modified files, with the public functions/classes added per file.
+- **Function signatures** — typed, one-line each, no bodies. Show inputs, outputs, error types, side effects. Pick the language the repo uses (TypeScript, Kotlin, Swift, Scala, Python, Go, …).
+- **Data model / schema deltas [applicable if data layer touched]** — table or document schema with field types, indexes, partition key, migration direction (forward + rollback), backfill plan.
+- **API + event payloads [applicable if service interface touched]** — request/response shapes, status codes, error codes, idempotency-key handling, pagination tokens.
+- **State machines [applicable if entity has > 2 meaningful states]** — explicit ADT/enum, allowed transitions, terminal states.
+- **Config + flags** — new config keys (typed), defaults, feature-flag names and rollout plan.
+- **Test specification** — per work unit: happy path, edge cases, failure modes, test type (unit / integration / contract / E2E), expected coverage on changed code.
+- **UI component spec [applicable if UI work unit]** — props/state, accessibility name + role, responsive behaviour, loading/empty/error states (per `product-excellence.mdc` §1b Rams checklist where relevant), platform notes for Android (Compose) / iOS (SwiftUI) / web.
+
+**LLD style rules [core]:** table format, no code blocks longer than a signature line, 300–600 lines total, deterministic enough that two implementers would produce equivalent code.
+
+## 3. Deep Dive & Wrap-Up **[core]**
+
+After HLD + LLD, pick the 1–2 highest-risk components — usually the ones flagged in the bottleneck callout in §0 — and go deeper: sharding strategy, cache topology, queue ordering guarantees, mobile sync conflict resolution, auth/session storage. End every design with:
+
+- **Top 3 trade-offs** explicitly named.
+- **Two future deep-dive directions** for whoever picks this up next.
+- **Known remaining weaknesses** — no design is perfect; list the gaps you *accepted* with reasoning. Distinct from §1's risk register (which tracks risks we are mitigating).
+- **Rollout + rollback plan** — feature flag, canary %, success metric, abort criteria.
+
+## 4. Definition of Design Done **[core]**
+
+A design is ready to implement only when: problem + NFRs + scale are written; HLD diagrams + traceability + DAG + pitfall audit exist; LLD signatures + schemas + test specs are filled in for every work unit; risks have mitigations; rollback is one click; and a peer who didn't write the doc can answer "what changes, why, in what order, and how do we know it worked."
+
+For product ship criteria (tests, observability, privacy), see `product-excellence.mdc` §7.
