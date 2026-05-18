@@ -25,6 +25,8 @@ alwaysApply: true
 
 Sync via Git: UI tool pushes layout; IDE pushes logic and tests. Use `product_spec.md` and `tech_spec.md` (or equivalent) before large agent sessions.
 
+**Nearest-product UI (Lovable / UI generators):** Before generating screens, state which existing product’s look and feel is the anchor (e.g. WhatsApp for a chat scheduler, LeetCode for a LeetCode extension, 2048 for a tile puzzle, Spotify for a music player). Follow `universal-product.mdc` §2d — familiar patterns beat generic templates.
+
 ## Research-first workflow
 
 1. **Discover** — map how the target area is used before changing it.

@@ -12,7 +12,7 @@ alwaysApply: false
 
 ## §1 Product locks before scale **[core]**
 
-- Lock **visual direction**, **monetization ethics** (e.g. cosmetics-only, no pay-to-win), and **renderer/runtime** early.
+- Lock **visual direction**, **monetization ethics** (e.g. cosmetics-only, no pay-to-win), and **renderer/runtime** early. Name the **nearest genre reference** for UI/HUD (e.g. 2048 for tile puzzles, classic brawlers for fighters) — see `universal-product.mdc` §2d.
 - Record **ADRs** in `docs/decisions/` so future agents know *why*, not only *what*.
 - **`[applicable if public roster / real-world names]`** — legal/name checklist before scaling content (trademark, slurs, restricted names).
 - **`[applicable if freemium]`** — document DLC scope; never sell gameplay power.

@@ -64,6 +64,23 @@ Share **design tokens** (spacing, type, colour, radius, elevation, motion). Use 
 - **Timezone discipline:** store UTC, render in user's zone; one-off events → UTC instant; scheduled events → wall-clock + IANA zone (DST-safe); recurring events → **RRULE + IANA zone [applicable if calendar/scheduling product]**.
 - Pseudo-localize in CI to catch hard-coded strings and truncation early.
 
+## 2d. Nearest-product UI (familiarity) **[applicable if you ship any UI]**
+
+When the product sits in a **known category** or **extends a familiar product**, anchor layout, typography, color, density, and interaction patterns to the **nearest reference users already know** — not a generic AI dashboard or unrelated SaaS template. Users should feel *at home* on first open. This is about **structure and feel**, not copying trademarks (use original assets, icons, and copy; study patterns, spacing, and hierarchy).
+
+**When building with Lovable or similar UI generators:** name the nearest reference product explicitly in the prompt or `product_spec.md` *before* the first generation pass.
+
+| What you are building | Nearest UI / feel to study (examples) |
+|-----------------------|----------------------------------------|
+| Scheduler or tooling **inside** a messenger ecosystem | That messenger itself (e.g. WhatsApp scheduler → WhatsApp chat list, bubbles, greens, bottom nav) |
+| Browser extension for a **specific site** | That site’s panels, typography, and chrome (e.g. LeetCode extension → LeetCode layout, monospace blocks, tab styling) |
+| **Tile / merge puzzle** (e.g. Equalize, 2048-family) | Classic minimal board games (e.g. 2048 — grid, tile motion, score strip, restrained palette) |
+| **Side-view fighting / brawler** (e.g. Ranbhoomi) | Genre peers (e.g. Little Fighter — roster strip, health bars, compact HUD, arcade density) |
+| **Affirmations / wellness copy** | Leading affirmation apps *or* editorial calm from known creators (e.g. Louise Hay–style sites — soft type, generous whitespace, gentle CTAs) |
+| **Music / audio playback** | Dominant players in that niche (e.g. Spotify — now playing, queue, library tabs, dark-first chrome) |
+
+If no single product fits, pick the **closest category leader** and document the choice in the spec. For games, also apply `games-building.mdc` §1 (visual direction lock) and keep HUD minimal per §5.
+
 ## 3. Architecture Principles
 
 **[core]** Apply **SOLID, DRY, KISS, YAGNI, twelve-factor**, and clean/hexagonal layering. **Structured logs with correlation IDs** for anything that runs. Never trust user IDs from request bodies — derive from the auth token.

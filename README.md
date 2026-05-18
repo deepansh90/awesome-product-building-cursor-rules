@@ -13,7 +13,7 @@ cp -r awesome-product-building-cursor-rules/.cursor/rules /path/to/your-project/
 
 Or cherry-pick individual `.mdc` files from [`.cursor/rules/`](.cursor/rules/).
 
-**Lovable:** connect this GitHub repo (or sync after pull). For UI-heavy work, use `universal-product.mdc` (§2a–2c covers multi-device UI). Use Cursor for backend, tests, and deploy.
+**Lovable:** connect this GitHub repo (or sync after pull). For UI-heavy work, use `universal-product.mdc` (§2a–2d covers multi-device UI and nearest-product familiarity). Use Cursor for backend, tests, and deploy.
 
 ## Rule catalog
 
