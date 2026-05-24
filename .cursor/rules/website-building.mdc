@@ -34,6 +34,7 @@ Visual and accessibility policy → `universal-product.mdc` §1b (Rams) and §2a
 - **Error boundaries:** route- or section-level fallback UI with retry/home — never a blank screen on render failure.
 - **Code splitting:** lazy-load heavy routes (games, admin, charts) via dynamic `import()` or framework equivalent.
 - **SEO (per route):** unique `<title>`, meta description, canonical URL, Open Graph tags — even for hash routes, set document title on navigation.
+- **Analytics & CSP:** When adding Google Analytics (or other external trackers), place scripts in the `<head>` of `index.html` and update Content Security Policy `<meta>` directives to allow script execution from `https://www.googletagmanager.com` and connection dispatches to `https://*.google-analytics.com` / `https://*.analytics.google.com`.
 - **`[applicable if TypeScript]`** enable `strict`; prefer `unknown` over `any`; explicit return types on exported functions.
 
 ## SPA hosting **[core]**

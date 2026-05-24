@@ -103,3 +103,55 @@ Host routing details → `website-building.mdc` (vendored folder only).
 
 - Public `ROADMAP.md` with status: shipped / in progress / next / parked — and **why parked**.
 - Tier 0 = playable loop; tier 1 = polish; tier 2 = content; tier 3 = multiplayer/cloud/port — do not block ship on tier 3.
+
+## §11 Android Specific Errors & Steps **[applicable if Android native shell]**
+
+### Common Errors & Resolutions
+
+1. **EDT (Event Dispatch Thread) Blocking Exception**
+   * *Error:* `java.lang.IllegalStateException: This method is forbidden on EDT because it does not pump the event queue...`
+   * *Cause:* Heavy Gradle background/JVM processes or sync utilities running on the main Android Studio UI thread.
+   * *Resolution:* Run sync tasks on a background worker thread (`BGT`) using Kotlin Coroutines / Studio's progress-blocking modal runner (`runWithModalProgressBlocking`). For local dev, execute tasks via command-line `./gradlew` to keep terminal actions decoupled from the main IDE thread.
+
+2. **Webview Game Over Loop / Broken Event Listeners**
+   * *Error:* On score 0, game does not trigger a game over modal or allows the user to keep moving/costing undo without displaying game over options.
+   * *Cause:* Breaking changes to game element IDs/classes that E2E tests or click event handlers target (e.g., removing/renaming `btn-gameover-home` or `.btn-ghost`).
+   * *Resolution:* Always preserve core interactive element IDs and class hooks. Verify that JS event listeners bound to game end/restart states have corresponding IDs in the DOM before publishing.
+
+3. **Theme Text and Pager Dot Contrast Issues (e.g. Zen/Light Themes)**
+   * *Error:* Tutorial description lines (`.tut-goal-line`, `.tut-rule-line`) and page dots (`.dot`) are white/light-colored and completely invisible when the active theme overrides the container to a light cream background (like Zen Sand).
+   * *Resolution:* Always check contrast for all active themes. Ensure the light theme block has specific overrides for text and pager dots:
+     ```css
+     [data-theme="zen"] .tut-goal-line { color: #4527A0; }
+     [data-theme="zen"] .tut-rule-line { color: #5A4D3E; }
+     [data-theme="zen"] .dot { background: rgba(61,46,31,.2); }
+     [data-theme="zen"] .dot.on { background: #3D2E1F; }
+     ```
+
+### Generating the Signed Android App Bundle (.aab)
+
+For publishing apps to the Google Play Store:
+
+1. **Prepare Build Configuration**:
+   * Open `app/build.gradle.kts` and verify `applicationId` (e.g., `io.dsapatterns.equalize`).
+   * Increment `versionCode` by 1 and update `versionName` (e.g., `"2.0"`).
+   * Ensure launcher icons are placed in the `res/mipmap-*` resource folders.
+
+2. **Build via Android Studio Wizard**:
+   * Go to **Build** → **Generate Signed Bundle / APK...**.
+   * Choose **Android App Bundle** and click **Next**.
+   * Provide path to your keystore file. If you don't have one, click **Create new...**, save it securely, and note the alias & password.
+   * Select **release** variant and click **Finish**.
+   * Find the compiled `app-release.aab` bundle in your build directory and upload it to Google Play Console.
+
+3. **Build via Command Line (Alternative)**:
+   * Export the keystore credentials:
+     ```bash
+     export KEYSTORE_PASSWORD="your_password"
+     export KEY_ALIAS="your_alias"
+     export KEY_PASSWORD="your_key_password"
+     ```
+   * Run the build task:
+     ```bash
+     ./gradlew :app:bundleRelease
+     ```

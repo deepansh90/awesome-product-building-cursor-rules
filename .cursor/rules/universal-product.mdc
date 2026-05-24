@@ -56,6 +56,29 @@ The same user job must complete on every surface; layout and chrome may differ.
 
 Share **design tokens** (spacing, type, colour, radius, elevation, motion). Use shared **component semantics** (same labels, roles, behaviour for the same job on every client). Design **APIs that don't assume desktop**: pagination sized for mobile, optional/sparse field sets, attachment-size limits.
 
+### Premium Reference Color Schemas (Themes)
+
+These 4 premium color palettes provide baseline design tokens for high-aesthetic websites, games, and mobile applications:
+
+| Token | 🌙 Midnight (Dark Tech) | ☀️ Zen Sand (Tactile Calm) | 🌊 Ocean (Cool Fresh) | 🔥 Ember (Dark Lava) |
+|---|---|---|---|---|
+| **Background (`--bg`)** | `#1A1A2E` | `#F5F0E8` (Light Paper) | `#0A1628` | `#1A0A0A` |
+| **Container (`--board-bg`)** | `#16213E` | `#E8DFD0` (Warm Cream) | `#0E2240` | `#2A1210` |
+| **Surface/Card (`--surface`)** | `#1F2B47` or `#252F4A` | `#D6CABC` or `#F0E8D8` | `#142E52` | `#3A1A15` |
+| **Text High (`--txt-hi`)** | `#F1F5F9` (Light Slate) | `#2C2419` (Dark Charcoal) | `#E0F0FF` | `#FFE8E0` |
+| **Text Mid (`--txt-mid`)** | `#94A3B8` | `#6B5D4E` | `#7AA4CC` | `#CC8A78` |
+| **Text Low (`--txt-lo`)** | `#3D4A6A` | `#A89882` | `#2A4A6A` | `#5A3028` |
+| **Primary Gradient** | `linear-gradient(135deg,#6D28D9,#2563EB)` | `linear-gradient(135deg,#4527A0,#1565C0)` | `linear-gradient(135deg,#1A3A8A,#3A5ADA)` | `linear-gradient(135deg,#CA4A2A,#EA7A2A)` |
+
+#### Accessibility & Contrast Rules:
+* **Dark Themes (Midnight, Ocean, Ember)**: Default light foregrounds (`#DDD6FE` / `#E2E8F0` / `#F8FAFC`) have high readability against dark surfaces.
+* **Light Theme (Zen Sand) Overrides**: Default light colors fail WCAG AA contrast against warm cream backgrounds. Explicitly override text and state indicator colors to preserve contrast:
+  * **Header/Goal Text**: `#4527A0` (deep purple)
+  * **Body/Supporting Text**: `#5A4D3E` (medium warm brown)
+  * **State Indicators (Page Dots)**: Inactive = `rgba(61,46,31,0.2)`; Active = `#3D2E1F`
+  * **Emphasis / Best Score Badge**: `#7B5B00` (warm gold)
+  * **Success Ring / Borders**: `#2E7D32` (deep green)
+
 ## 2c. Internationalization & Localization **[applicable if shipped outside one locale]**
 
 - Externalize all user-visible strings; use ICU MessageFormat-style placeholders for plurals/gender — no concatenation.

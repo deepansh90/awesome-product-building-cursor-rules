@@ -1,0 +1,56 @@
+---
+description: GitHub Actions & Dependabot — standard configurations, package-ecosystem mappings, and workflow bloat prevention
+globs: ".github/**/*.yml",".github/**/*.yaml"
+alwaysApply: false
+---
+
+# GitHub Actions & Dependabot Setup
+
+**Intent:** Establish standard, valid configuration policies for Dependabot and clean guidelines for repository automation workflows. Prevent configuration errors and workflow bloat (unnecessary automations for solo or small personal projects).
+
+## 1. Dependabot Configuration **[core]**
+
+Always configure Dependabot with the correct `package-ecosystem` type, root directory, and update schedule. Save the configuration in `.github/dependabot.yml`.
+
+### Valid Configuration Template
+
+```yaml
+version: 2
+updates:
+  # Maintain GitHub Actions dependencies
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+
+  # Maintain package-specific dependencies (enable only if used)
+  - package-ecosystem: "npm" # Use "npm" for package.json / Node projects
+    directory: "/"
+    schedule:
+      interval: "weekly"
+```
+
+### Supported Package Ecosystem Mappings
+
+Ensure the `package-ecosystem` value matches one of the official types:
+- **Web / Node.js**: `npm`
+- **Android / Java**: `gradle` or `maven`
+- **Python**: `pip` or `pipenv` or `poetry`
+- **GitHub Actions**: `github-actions`
+- **Docker**: `docker`
+- **iOS / Swift**: `swift` (for Swift Package Manager) or `cocoapods` (not natively supported by Dependabot; SPM preferred)
+
+---
+
+## 2. Workflow Bloat Prevention **[core]**
+
+Keep repository workflows lightweight. Only introduce automations that serve active development goals.
+
+### Do NOT Enable (for Solo/Personal Repositories):
+- **Stale Issue/PR Managers (`stale.yml`)**: Unnecessary overhead that creates visual noise and automated notifications on inactive archives.
+- **AI Issue Summarizers / GPT Autorepliers**: Increases API token costs and runs unnecessarily on private or single-developer repos.
+- **Auto-Labeling Workflows**: Standard git branches and single-developer workflows do not need automated categorization overhead.
+
+### Recommended Workflows (if needed):
+- **Continuous Integration (CI)**: Running tests and building the production package on PR or push to `main` (e.g. `npm run test` and `npm run build`).
+- **Deployments (CD)**: Deploying to staging or production (e.g., Cloudflare Pages, Vercel, Firebase App Hosting) on merge.
