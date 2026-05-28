@@ -1,0 +1,88 @@
+---
+description: On-page SEO — meta tags, titles, headings, internal linking, keyword mapping, thin content, cannibalization, page audits. Use when optimizing a page, fixing rankings, or pre-shipping content.
+globs: "**/*.{html,jsx,tsx,vue,md}",public/**/*,**/content/**/*
+alwaysApply: false
+---
+
+# On-Page SEO
+
+**Intent:** Optimize individual pages to rank and convert — titles, content, structure, internal links. Skip for off-page/backlinks (`off-page-seo.mdc`) or AI citation strategy (`ai-seo.mdc`).
+
+## Before you optimize
+
+1. Pick **one primary keyword** + search intent (informational, commercial, transactional).
+2. Run `site:yourdomain.com "keyword"` — if multiple pages compete, fix cannibalization first (merge, redirect, or retarget).
+3. Confirm page is **indexable** in Google Search Console (not blocked, not noindex, in sitemap).
+4. If diagnosing a drop, audit in order: **crawlability → speed → on-page → content quality → links**. Don't tweak titles if Google can't index the page.
+
+## Page elements checklist
+
+| Element | Rule |
+|---------|------|
+| Title | Unique, 50–60 chars, primary keyword near start, compelling |
+| Meta description | Unique, 150–160 chars, value prop + CTA |
+| H1 | Exactly one; matches title/URL intent |
+| H2/H3 | Logical hierarchy; no skipped levels for styling only |
+| Opening | Primary topic in first ~100 words; no keyword stuffing |
+| URL | Short, readable, hyphens, lowercase; keyword where natural |
+| Images | Descriptive alt text, WebP where possible, lazy-load below fold |
+| Canonical | Self-referencing on unique pages; HTTPS + www consistency |
+
+## SPA & SSR patterns (production lessons)
+
+From shipping [dsapatterns.io](https://dsapatterns.io) keyword landings and Inner Healer (TanStack Start):
+
+| Situation | Do this |
+|-----------|---------|
+| **Hash routes** (`#page`) | Google often indexes one URL — **path URLs** for keyword landings; client-side redirect legacy hashes to paths |
+| **SPA without SSR** | Static defaults in `index.html` + runtime `applyPageSeo()`; **post-build prerender** per path with unique title/meta/canonical in `dist/<path>/index.html` |
+| **SSR / TanStack / Next** | Per-route `head()` / metadata API — no prerender needed if HTML ships unique tags server-side |
+| **Single source of truth** | Central `seo.js` / `seo.ts`: `PAGE_SEO`, `LANDING_SEO`, keyword map — routes and sitemap import from it |
+| **Sitemap** | List **path** canonicals only — never `#fragments` for landing pages |
+| **JSON-LD** | `WebSite` + `Organization` sitewide; `FAQPage` on hub; `Article` / `WebApplication` on tools — verify in Rich Results Test, not `curl` alone |
+| **Visible copy** | Keyword H1 + H2 hub blocks + FAQ on home/hub — not meta-only; one keyword → one canonical page |
+| **Utility pages** | `noindex` favorites, reminders, account — keep out of sitemap |
+| **Tests** | Unit: canonical paths, sitemap entries, seo module exports; E2E: path loads, legacy redirect, no `pageerror` |
+| **Post-deploy** | GSC sitemap resubmit, cache purge (CDN shell), Rich Results spot-check |
+
+**Cannibalization rule:** maintain a keyword → canonical URL table; strengthen assigned page instead of duplicating.
+
+## Content quality
+
+- Answer the query **above the fold** — then add depth.
+- Beat top 3 competitors on usefulness, not word count alone.
+- **E-E-A-T:** named author, cited sources, visible "last updated" date, about/contact pages.
+- Avoid doorway pages, thin tag/category pages, duplicate/near-duplicate content.
+- For scaled/programmatic pages: every URL needs **unique value**, not swapped variables only.
+
+## Internal linking
+
+- No orphan pages — every important URL reachable from nav or hub pages within **3 clicks** of home.
+- Use **descriptive anchor text**; avoid exact-match spam.
+- Hub-and-spoke for page sets: category hub → spoke pages → cross-links between related spokes.
+- Link high-priority pages from higher-traffic pages.
+
+## Schema caveat
+
+Static HTML fetch and `curl` often **miss JS-injected JSON-LD** (Yoast, RankMath, etc.). Verify schema with [Rich Results Test](https://search.google.com/test/rich-results) or rendered DOM — never report "no schema" from fetch alone.
+
+## Output formats
+
+**Pre-ship checklist** — emit as checkboxes before publishing any new/updated page.
+
+**Audit findings** — table columns: Issue | Impact (H/M/L) | Evidence | Fix | Priority (1–5).
+
+## Your routine
+
+- **Weekly:** GSC → Performance → queries with impressions but low CTR → rewrite titles/metas.
+- **Monthly:** Refresh top 10 pages; re-check cannibalization; fix broken internal links.
+
+## Free tools
+
+Google Search Console, PageSpeed Insights, Rich Results Test, Mobile-Friendly Test.
+
+## Related rules
+
+- SPA title/meta on route change → `website-building.mdc`
+- AI citation structure → `ai-seo.mdc`
+- Backlinks and authority → `off-page-seo.mdc`

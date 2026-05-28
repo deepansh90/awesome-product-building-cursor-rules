@@ -1,0 +1,82 @@
+---
+description: AI SEO — AEO, GEO, LLMO, AI Overviews, ChatGPT/Perplexity/Claude citations, llms.txt, AI visibility, zero-click search. Use when optimizing to be cited in AI-generated answers.
+globs: "**/*.{html,jsx,tsx,vue,md}",public/**/*,**/content/**/*
+alwaysApply: false
+---
+
+# AI SEO (AEO / GEO / LLMO)
+
+**Intent:** Get **cited** in AI-generated answers — not just ranked. Skip for traditional technical audits (`on-page-seo.mdc`) or backlink campaigns (`off-page-seo.mdc`).
+
+## Goal shift
+
+Traditional SEO → rank on page 1. AI SEO → be selected as a **source** in Google AI Overviews, ChatGPT, Perplexity, Claude, Copilot. A well-structured page can be cited even outside top organic positions.
+
+## Google vs other engines
+
+| Engine | Optimize for |
+|--------|----------------|
+| **Google AI Overviews** | People-first content, core Search quality, E-E-A-T — **no separate "AI-only" pages** (scaled content abuse risk) |
+| **ChatGPT, Perplexity, Claude, Copilot** | Extractable structure + optional machine-readable files (`llms.txt`, `/pricing.md`) |
+
+Default: **write for people, organize for clarity** — satisfies both.
+
+## Three pillars
+
+1. **Structure** — make content extractable (see patterns below).
+2. **Authority** — stats with sources (+37–40% citation lift), expert quotes with name/title, freshness dates.
+3. **Presence** — Wikipedia accuracy, Reddit/forums, G2/Capterra, YouTube, industry roundups (brands are often cited via third parties).
+
+## Content patterns
+
+- **40–60 word answer** directly under each query-matched H2/H3.
+- Block types: definition, numbered steps, comparison **table**, FAQ Q&A, stat-with-source.
+- Cover **topical clusters** (5–10 related questions) — Google AI fans out to related queries.
+- Semantic HTML: `<article>`, `<section>`, proper heading hierarchy, `alt` on images.
+- Tables beat prose for "X vs Y"; numbered lists beat paragraphs for "how to."
+
+## Machine-readable (optional, non-Google)
+
+- `/llms.txt` — product summary + links to key pages ([llmstxt.org](https://llmstxt.org))
+- `/pricing.md` — plain-text tiers, limits, prices (parseable by AI shopping agents)
+
+## AI crawler access
+
+Audit `robots.txt` — blocking = no citation on that platform:
+
+| Bot | Platform |
+|-----|----------|
+| GPTBot, ChatGPT-User | OpenAI |
+| PerplexityBot | Perplexity |
+| ClaudeBot, anthropic-ai | Anthropic |
+| Google-Extended | Gemini / AI Overviews training opt-out |
+| Bingbot | Copilot |
+
+## Anti-patterns
+
+- Keyword stuffing (hurts AI visibility ~10%)
+- Thin scaled AI-only duplicate pages
+- Blocking all AI bots then expecting citations
+
+## DIY visibility audit
+
+Test 10–20 priority queries across platforms. Output table:
+
+| Query | Google AI Overview | ChatGPT | Perplexity | You cited? | Competitors cited |
+
+Plus **extractability checklist** per URL: definition in para 1, self-contained answer blocks, FAQ schema, stats sourced, last-updated date.
+
+## Your routine
+
+- **Monthly:** Re-run visibility matrix on top 10 queries; fix pages with Fail on extractability.
+- **Quarterly:** Refresh statistics, FAQ blocks, comparison tables.
+
+## Free tools
+
+Manual query tests, Rich Results Test, GSC, robots.txt review.
+
+## Related rules
+
+- Page-level SEO → `on-page-seo.mdc`
+- Third-party presence → `off-page-seo.mdc`
+- Semantic HTML / SPA rendering → `website-building.mdc`

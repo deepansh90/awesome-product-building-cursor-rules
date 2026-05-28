@@ -1,0 +1,79 @@
+---
+description: Off-page SEO — backlinks, link building, digital PR, directory submissions, brand mentions, review sites, domain authority. Use when building links or off-site credibility.
+globs: "**/marketing/**/*",docs/**/*.md,**/product-marketing*.md
+alwaysApply: false
+---
+
+# Off-Page SEO
+
+**Intent:** Earn credibility signals Google can't infer from on-page alone — backlinks, mentions, reviews, entity presence. Skip for on-page fixes (`on-page-seo.mdc`) or paid search (`google-ads.mdc`).
+
+## Rule zero: destinations before outreach
+
+Never pitch links to a weak landing page. Ship and index first:
+
+- [ ] Pricing page live (even "free during beta")
+- [ ] Privacy policy + terms
+- [ ] 3+ competitor alternative pages (`/alternatives/[competitor]`)
+- [ ] 3+ use-case or persona pages
+- [ ] FAQ schema on key landing pages (`FAQPage` JSON-LD)
+
+Directories and outreach pass **link equity** to these pages — build destinations before submitting anywhere.
+
+## Channel playbook (pick 2, don't spray)
+
+| Channel | DIY action |
+|---------|------------|
+| Niche directories | Product Hunt, G2, Capterra, category-specific lists — unique blurb per site |
+| Reviews | Ask real customers; never buy reviews |
+| Community | Reddit, forums, Quora — genuine answers, no link drops |
+| Guest posts / PR | Data-led asset journalists can cite |
+| Unlinked mentions | Google `"your brand" -site:yourdomain.com` → polite reclaim email |
+| Partnerships | Co-marketing, integrations, roundup inclusion |
+
+**Positioning:** vary description by audience (founders vs buyers vs devs). Never copy-paste identical blurbs across 50 directories.
+
+## Outreach template (unlinked mention / broken link)
+
+```
+Subject: Quick fix on [Article title]
+
+Hi [Name], I enjoyed [specific detail from their post].
+
+I noticed [broken link / mention of Brand without link]. We have [relevant resource URL] that covers [topic] — happy if it's useful as a reference.
+
+Either way, thanks for the great content.
+[Your name]
+```
+
+## Avoid
+
+- Paid link packs, PBNs, link farms, irrelevant directories
+- Exact-match anchor over-optimization
+- Disavow file unless manual penalty suspected — don't disavow normal noise
+
+## Measure yourself (free)
+
+- GSC → Links → top linking sites and pages
+- GSC → branded query impressions over time
+- GA4 → referral traffic and assisted conversions
+- Judge **referring domain relevance**, not vanity DR alone
+
+## Output format
+
+**90-day plan** — table: Week | Action | Channel | Success signal (e.g., link live, referral session, branded search up).
+
+## Your routine
+
+- **Weekly:** 5 outreach emails OR 2 quality directory submissions.
+- **Monthly:** GSC Links report; prune low-quality submissions; update destination pages.
+
+## Free tools
+
+Google Search Console, Google Alerts (`"your brand"`), manual `"brand" -site:domain` search.
+
+## Related rules
+
+- On-page quality for link destinations → `on-page-seo.mdc`
+- Third-party citations in AI answers → `ai-seo.mdc`
+- Paid vs organic split → `google-ads.mdc`

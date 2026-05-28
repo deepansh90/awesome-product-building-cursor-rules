@@ -31,6 +31,10 @@ Each rule has a **title** and **intent** at the top. Only `cursor-agent-discipli
 | [`java-spring-end-to-end.mdc`](.cursor/rules/java-spring-end-to-end.mdc) | Java Spring End-to-End | Spring Boot + JPA + test pyramid |
 | [`apple-mobile-swiftui.mdc`](.cursor/rules/apple-mobile-swiftui.mdc) | Apple iOS (SwiftUI) | Native iOS apps |
 | [`product-council.mdc`](.cursor/rules/product-council.mdc) | Product Council (CIRCLES) | Idea/spec critique before build |
+| [`on-page-seo.mdc`](.cursor/rules/on-page-seo.mdc) | On-Page SEO | Titles, content, internal links, page audits |
+| [`off-page-seo.mdc`](.cursor/rules/off-page-seo.mdc) | Off-Page SEO | Backlinks, directories, brand mentions, outreach |
+| [`ai-seo.mdc`](.cursor/rules/ai-seo.mdc) | AI SEO (AEO / GEO) | Citations in AI Overviews, ChatGPT, Perplexity |
+| [`google-ads.mdc`](.cursor/rules/google-ads.mdc) | Google Ads & PPC | Search campaigns, RSAs, negatives, ROAS/CPA |
 
 ## Cherry-pick by product type
 
@@ -45,6 +49,7 @@ Each rule has a **title** and **intent** at the top. Only `cursor-agent-discipli
 | iOS / SwiftUI | + `apple-mobile-swiftui` |
 | Game (browser, embed, PWA) | + `product-council` + `games-building` |
 | Game embedded in parent site | + `games-building` + `website-building` |
+| Marketing / growth (SEO, AI search, Google Ads) | + `on-page-seo`, `off-page-seo`, `ai-seo`, `google-ads` |
 
 ## Tool boundaries
 
@@ -59,6 +64,9 @@ Patterns informed by community collections and public best-practice guides, incl
 
 - [cursor-ai-tips](https://github.com/murataslan1/cursor-ai-tips) (agent workflow, common mistakes)
 - [awesome-cursorrules](https://github.com/PatrickJS/awesome-cursorrules) (Conventional Commits, Playwright E2E, Python/Java/SwiftUI stack patterns)
+- [marketingskills](https://github.com/coreyhaines31/marketingskills) (seo-audit, ai-seo, ads, directory-submissions patterns)
+- [alirezarezvani/claude-skills](https://github.com/alirezarezvani/claude-skills) (programmatic SEO playbooks)
+- [rampstackco/claude-skills](https://github.com/rampstackco/claude-skills) (programmatic SEO quality control)
 
 - **Dieter Rams** — product/UI principles referenced in `universal-product.mdc` §1b (clarity, honesty, as little design as possible)
 - **CIRCLES** — product sense framework (Lewis C. Lin); used in `product-council.mdc`
