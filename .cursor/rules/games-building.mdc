@@ -75,7 +75,7 @@ Host routing details → `website-building.mdc` (vendored folder only).
 
 ## §7 Delivery & hardening **[core]**
 
-- **`[applicable if offline / installable]`** — PWA with documented SW strategy; scope or disable SW on embed subpaths so the parent site is not broken.
+- **`[applicable if offline / installable]`** — PWA with documented SW strategy; on embed subpaths, scope or disable SW so the **parent site's** service worker and routing are not hijacked — test both standalone and iframe before ship.
 - No debug globals exposing solver, full state, or level data in production; build verify fails if reintroduced.
 - Minify shipped client JS; `drop_console` where appropriate; README states client bundles are not secret — license + server validation when cheating matters.
 - Test on throttled network once before release.

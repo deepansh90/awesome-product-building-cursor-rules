@@ -30,6 +30,14 @@ Work through all seven steps in order. Do not skip to solutions.
 
 ---
 
+## 1b. Post-Ship Review (The Feedback Loop) **[core]**
+
+The council's job is not done at launch. 14 to 30 days post-launch, hold a brief review of the success metrics defined in the **Summarize** step.
+- Did it hit the metric without regressing others?
+- **Decision:** Keep, Tweak, or Kill. Do not leave zombie features in the codebase.
+
+---
+
 ## 2. Council lenses **[core]**
 
 After CIRCLES, run each lens below. **Skip** lenses that clearly do not apply (e.g. monetization council on a free internal tool). Each lens must produce: **(a)** top concern, **(b)** one concrete ask, **(c)** pass / revise / block.
@@ -40,6 +48,9 @@ After CIRCLES, run each lens below. **Skip** lenses that clearly do not apply (e
 | **Product manager** | Does CIRCLES hang together? Are scope and milestone realistic? What is the smallest shippable slice? |
 | **Engineer** | What is the riskiest technical assumption? Can we stub or spike it in days, not weeks? What must be decided before schema/API lock? |
 | **QA lead** | What are acceptance criteria and failure modes? What is the Day-1 test matrix (browsers, offline, accessibility, load)? |
+| **Data/Analytics lead** `[applicable if you ship telemetry]` | How are we measuring success? Are events mapped before implementation? Privacy-first products may use enum-only, no-PII counters — skip third-party analytics unless product requires it. |
+| **Security/Privacy reviewer** | Does this introduce new PII collection or trust boundaries? Do we need new consent flows? |
+| **Global/Localization lead** | Does this design support text-expansion for German or RTL mirroring? Are date/time assumptions safe? |
 | **Platform / console director** `[applicable if console, store, or publisher path]` | Certification, age rating, platform policies, SKU/entitlement model, certification timeline. |
 | **Game developer** `[applicable if game or interactive sim]` | Core loop fun before polish? Determinism/replay needs? Renderer and fallback path real, not hand-waved? |
 | **Game player** `[applicable if game]` | 30-second hook? Fairness, readability, couch vs solo? Why return next week? |

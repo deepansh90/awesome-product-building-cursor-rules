@@ -12,7 +12,7 @@ A generic engineering + design + security rule applicable to any product (static
 - **[core]** — applies to every product.
 - **[applicable if …]** — applies only when the product matches the listed condition (UI, mobile, multi-tenant, etc.). Skip otherwise.
 
-If a tag does not apply to your product, drop the whole bullet — do not water it down.
+If a tag does not apply to your product, drop the whole bullet — do not water it down. **Do not** force enterprise CI, SAST, observability, or analytics patterns onto static brochure sites or privacy-first tools.
 
 ## 1. Product Philosophy **[core]**
 
@@ -56,9 +56,9 @@ The same user job must complete on every surface; layout and chrome may differ.
 
 Share **design tokens** (spacing, type, colour, radius, elevation, motion). Use shared **component semantics** (same labels, roles, behaviour for the same job on every client). Design **APIs that don't assume desktop**: pagination sized for mobile, optional/sparse field sets, attachment-size limits.
 
-### Premium Reference Color Schemas (Themes)
+### Premium Reference Color Schemas (Themes) **[optional — skip if the product already has brand tokens]**
 
-These 4 premium color palettes provide baseline design tokens for high-aesthetic websites, games, and mobile applications:
+Reference palettes only when starting from scratch. Do **not** replace an existing design system or client brand guide.
 
 | Token | 🌙 Midnight (Dark Tech) | ☀️ Zen Sand (Tactile Calm) | 🌊 Ocean (Cool Fresh) | 🔥 Ember (Dark Lava) |
 |---|---|---|---|---|
@@ -109,6 +109,7 @@ If no single product fits, pick the **closest category leader** and document the
 **[core]** Apply **SOLID, DRY, KISS, YAGNI, twelve-factor**, and clean/hexagonal layering. **Structured logs with correlation IDs** for anything that runs. Never trust user IDs from request bodies — derive from the auth token.
 
 **[applicable if the product serves traffic or runs a service]** RED metrics (Rate, Errors, Duration) with p50/p95/p99.
+**[applicable if client UI]** Define and enforce a global client-side performance budget (e.g., "Interactive within 2 seconds on a 3G/mid-tier device").
 
 **[applicable if the product makes network calls, has async work, or runs multi-instance]** Idempotent APIs with idempotency keys; retry + exponential backoff + jitter; circuit breakers; timeouts at every hop; DLQs for poison messages; at-least-once delivery with idempotent processing (never claim *exactly-once*).
 
@@ -126,20 +127,23 @@ Bar is **behavioural tests at trust boundaries**, not a line-coverage number. Ea
 - **Visual regression [applicable if brand-critical UI or high design churn]:** snapshot only **stable, low-churn chrome** (headers, nav) — not volatile content or gameplay frames.
 - **Load tests [applicable if you have SLOs or significant concurrency]:** k6/Locust/JMeter.
 
-CI blocks merge on red **[core]**.
+CI blocks merge on red **[applicable if the repo has CI]**.
 
 ## 5. Security Non-Negotiables
 
 Threat-model every feature.
 
 **[core, every product]**
-- **Zero secrets in code/repos** — use a vault; push protection + pre-commit `gitleaks`/`trufflehog`; rotate on schedule and on suspicion.
+- **Zero secrets in code/repos** — use a vault; push protection + pre-commit secret scanning when feasible; rotate on schedule and on suspicion.
 - **Validate every input at trust boundaries.**
-- **SAST + DAST + dependency scanning** in CI; follow OWASP Top 10.
-- **Least-privilege IAM**; encrypt at rest and in transit (TLS 1.3); mask sensitive values in logs.
+- **Dependency scanning [applicable if package manifest exists]** — keep dependencies patched; address known CVEs on production paths.
+- **Least-privilege IAM [applicable if cloud/IAM exists]**; encrypt in transit (TLS); mask sensitive values in logs.
+
+**[applicable if CI pipeline or production service with deploy gate]**
+- **SAST / DAST** where tooling fits the stack — do not block a static brochure site on missing enterprise scanners.
 
 **[applicable only if the listed component exists]**
-- **Strict CSP, HSTS, SameSite cookies [applicable if web surface].**
+- **Security headers for web [applicable if web surface]** — CSP, HSTS, and cookie flags **matched to your bundler and auth**; avoid copy-pasting "strict" CSP that breaks Vite/React unless you have nonce/hash workflow.
 - **Parameterised queries / ORMs [applicable if SQL DB]** — no string-concatenated SQL.
 - **Row-Level Security [applicable if multi-tenant DB].**
 - **Webhook signing** — HMAC + timestamp + short replay window, constant-time verify **[applicable if you send or receive webhooks]**.
@@ -147,17 +151,25 @@ Threat-model every feature.
 - **Supply-chain hardening** — SLSA levels, signed artifacts, SBOMs **[applicable if you publish binaries/images]**.
 - **Mobile platform hardening** — certificate pinning, jailbreak/root detection where the threat model demands, keystore/keychain for secrets, no PII in app logs **[applicable if native mobile app]**.
 
-## 6. Privacy & Product Ethics **[applicable if you handle personal data]**
+## 6. Privacy & Product Ethics **[applicable if you handle personal data or AI]**
 
 - **Data classification:** label every field as public / internal / PII / regulated, so IAM, encryption, retention, and audit policies line up consistently.
 - **Data minimization:** collect only what the user's job requires.
 - **Purpose limitation:** use data only for what was disclosed; no silent repurposing.
 - **Retention:** define and enforce TTLs; honour GDPR/CCPA delete/export; keep audit trails **[applicable if regulated jurisdiction]**.
+- **Consent & Telemetry Ethics `[applicable if regulated jurisdiction, EU/UK users, or non-essential tracking]`:** obtain opt-in before non-essential analytics/marketing tags where law requires it; use Consent Mode where applicable. Privacy-first products with enum-only, no-PII telemetry may omit third-party trackers entirely.
+- **AI Transparency & Ethics:** Provide clear, user-facing indicators when content is AI-generated, when decisions are AI-driven, or when a user is interacting with an AI agent. Never pass off AI artifacts as human-generated.
 - **User-visible honesty:** plain-language explanations of what is collected and why; no dark patterns in consent.
 
 ## 7. Definition of Done **[core]**
 
-A change ships only when: it serves one clear user job; the simplest design was chosen; behavioural tests pass; observability is wired for any component running in production; threat model reviewed for applicable risks; docs/runbooks updated; rollback is one click away.
+A change ships only when: it serves one clear user job; the simplest design was chosen; behavioural tests pass **[applicable if tests exist]**; threat model reviewed for applicable risks; docs/runbooks updated when behaviour or ops change.
+
+**[applicable if production service, queue, or multi-instance deploy]**
+- Observability wired (logs/metrics/traces as appropriate); rollback path documented.
+
+**[applicable if static SPA or client-only deploy]**
+- Verify build output, hosting rewrites, and CDN/cache behaviour — rollback = redeploy previous artifact.
 
 - **[applicable if UI]** verified on smallest + largest supported viewport, keyboard-only, and one representative mobile profile; spot-check against Rams §1b (especially *understandable*, *honest*, *as little design as possible*).
 - **[applicable if accessibility scope applies]** reduced-motion and high-contrast spot-checked; screen-reader smoke test on primary flow.

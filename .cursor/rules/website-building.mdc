@@ -8,6 +8,8 @@ alwaysApply: false
 
 **Intent:** Ship, test, and host marketing or product web apps and **host vendored client bundles** (e.g. games). Cross-surface UI policy lives in `universal-product.mdc` §2a. Game engines and replay logic live in `games-building.mdc`.
 
+**Applicability:** If a section's `[applicable if …]` does not match your product, **skip the entire section** — do not copy proxy, editor, or ingest patterns onto simple marketing sites.
+
 ## Docs map **[core]**
 
 | Doc | Purpose |
@@ -33,9 +35,16 @@ Visual and accessibility policy → `universal-product.mdc` §1b (Rams) and §2a
 
 - **Error boundaries:** route- or section-level fallback UI with retry/home — never a blank screen on render failure.
 - **Code splitting:** lazy-load heavy routes (games, admin, charts) via dynamic `import()` or framework equivalent.
+- **Shareable UI state `[applicable if filters/tabs/search should be linkable]`:** put bookmarkable state in URL hash or query params — not ephemeral UI (modals, scroll, drafts) or sensitive values.
 - **SEO (per route):** unique `<title>`, meta description, canonical URL, Open Graph tags — even for hash routes, set document title on navigation.
-- **Analytics & CSP:** When adding Google Analytics (or other external trackers), place scripts in the `<head>` of `index.html` and update Content Security Policy `<meta>` directives to allow script execution from `https://www.googletagmanager.com` and connection dispatches to `https://*.google-analytics.com` / `https://*.analytics.google.com`.
-- **`[applicable if TypeScript]`** enable `strict`; prefer `unknown` over `any`; explicit return types on exported functions.
+- **Third-party scripts & CSP `[applicable if you add external trackers/widgets]`:** update CSP to match what you actually load — do not add analytics by default; if you do add a tracker, allowlist its domains explicitly (avoid `'unsafe-inline'` / `'unsafe-eval'` unless your bundler requires them).
+- **`[applicable if TypeScript]`** enable `strict`; prefer `unknown` over `any`.
+
+## Performance & Optimization **[core]**
+
+- **Core Web Vitals (CWV):** Monitor and optimize for LCP (Largest Contentful Paint), INP (Interaction to Next Paint), and CLS (Cumulative Layout Shift).
+- **Asset & Image Optimization:** Use modern image formats (WebP/AVIF), provide responsive `srcset`, and use `loading="lazy"` for off-screen media.
+- **Progressive Web App (PWA):** `[applicable if offline capable]` Implement Service Workers using reliable caching strategies (e.g., stale-while-revalidate for assets, network-first for data) to provide resilient offline/flaky-network experiences.
 
 ## SPA hosting **[core]**
 
@@ -43,6 +52,42 @@ Visual and accessibility policy → `universal-product.mdc` §1b (Rams) and §2a
 - **Cloudflare Workers / static assets:** `assets.directory` → `./dist`, `not_found_handling: single-page-application` so unknown paths fall back to `index.html`.
 - **Vercel / Netlify:** equivalent SPA rewrite rules in host config.
 - **Dev server:** if you vend a nested client SPA under `public/<app>/`, mirror SPA fallback in Vite (or host) preview so deep links work locally — not only in production.
+
+## Thin server on static apps **[applicable if Workers/API routes proxy third-party URLs or ingest user links]**
+
+Static-first does not mean zero server logic. When you add a **fetch proxy** or **link-ingest** handler (Drive folders, OG images, etc.), treat it as a shared resource every user hits.
+
+- **Allowlist upstream hosts** — HTTPS only; validate hostname *and* path pattern before `fetch`; re-check after redirects.
+- **Upstream timeout** — every outbound `fetch` gets `AbortController` + a strict deadline (e.g. 10s); return **504** on abort; `clearTimeout` in `finally` so hung calls cannot exhaust the connection pool.
+- **Rate limit by real client IP** — extract IP in order: `cf-connecting-ip` → first `x-forwarded-for` → `x-real-ip` → `"unknown"`. If deploy omits all headers, every user shares one bucket — document required proxy/CDN headers in README.
+- **Same-origin gate for browser proxies `[applicable if open relay abuse is a concern]`** — prefer matching `Origin` or `Referer`; know that strict deny-when-both-missing breaks some privacy browsers and non-browser clients — weigh abuse vs compatibility.
+- **Response hygiene** — enforce expected `content-type`, cap body size, use `cache-control: private` for user-specific bytes; generic error messages to clients (log upstream bodies server-side only).
+- **Server-side validation mirrors UI** — client regex is UX, not security; reject hostname bypass (e.g. `evil.com/folders/{id}`) in the handler before parsing IDs.
+- **Privacy-aligned defaults `[applicable if handling user media/links]`** — prefer client-side export over uploading user media when feasible; avoid PII in telemetry; do not persist user content server-side without a threat model (localStorage/session for prefs, auth, or cart is fine).
+
+Extract shared helpers (`getClientIp`, URL allowlist) into `src/lib/` and unit-test them.
+- **Proxied media URLs** — wrap third-party image URLs through one helper (e.g. `proxiedXUrl()`); keep helper and server allowlist in the **same module** with unit tests. When upstream changes hostname/path (e.g. `drive.google.com/thumbnail` vs `lh3.googleusercontent.com`), update both together or thumbnails break silently.
+
+## External link ingest **[applicable if users paste third-party folder/file URLs]**
+
+- **Primary + fallback paths** — API key (full listing) + best-effort fallback (smaller cap); log fallback server-side; toast honest limits to users (~60 vs 500+).
+- **Hard caps in code and tests** — max items ingested, folder depth, export batch size; constants referenced in unit tests and `product_spec.md`.
+- **Abort long ingest** — server handler timeout (e.g. 60s) separate from per-fetch proxy timeout.
+
+## Editor / workspace routes **[applicable if marketing landing + heavy tool on same site]**
+
+- **Progressive disclosure** — marketing chrome (header, footer, samples) before first success; after success, compact workspace header; reduce chrome only when it helps focus — **keep** escape hatches (home, privacy, account) reachable.
+- **One primary action per workspace** — batch secondary controls into a dialog or panel; header = context + stats + primary submit/export + one “edit source” escape hatch.
+- **Contextual inspector `[applicable if complex editor]`** — sidebar shows tools relevant to current selection, not every panel at once.
+- **Mobile tool nav `[applicable if editor has a side rail]`** — consider vertical rail → bottom filmstrip; pad main content so nothing hides under fixed nav.
+- **Human labels** — map internal enums to plain language; hide empty groups when it reduces noise.
+
+## Trust UX for user-supplied input **[applicable if users paste links or run client-heavy export]**
+
+- **Process modal `[applicable if server reads user links/files]`** — what the server touches vs what stays in the browser; link to `/privacy`.
+- **Inline errors** — map domain failures (private link, timeout, rate limit) via a formatter; never stack traces.
+- **Client-heavy export `[applicable if PDF/canvas/render in browser]`** — detect OOM/memory failures and suggest recovery (fewer items, close tabs, split batches).
+- **Demo/sample output `[applicable if paste-or-upload onboarding]`** — show example result before users commit real data.
 
 ## Hosting vendored sub-apps **[core]**
 
@@ -52,7 +97,8 @@ When embedding a separate client build (games, tools):
 2. Copy artifacts to `public/<app-id>/` with `index.html` at folder root.
 3. Host SPA fallback for `/public-path/*` client routes (host config + dev middleware).
 4. Optional theme overlay CSS on parent chrome for contrast when iframe'd.
-5. For game-specific iframe height, embed detection, and engine rules → `games-building.mdc`.
+5. **`[applicable if parent host is static-only]`** Static parent cannot run your Worker/API — ship embed/preview mode with mocked ingest; document that live third-party calls need full deploy + secrets. Hidden previews: `noindex`, omit from sitemap; sync script in parent repo after vendoring.
+6. For game-specific iframe height, embed detection, and engine rules → `games-building.mdc`.
 
 ## Verification gate **[core]**
 
@@ -66,8 +112,10 @@ npm run test:e2e   # when present
 
 - Structural/data tests under `tests/` when applicable.
 - **E2E smoke:** extend route list when adding hash or path pages; assert **stable copy** on each route.
-- Put **`data-testid`** (or accessible role + name) on anything E2E asserts; cap new spec files at ~3–5 scenarios; reset state in `beforeEach`.
-- **Network mocking:** use `page.route` (Playwright) or `cy.intercept` (Cypress) for flaky third parties so CI stays deterministic.
+- Prefer **accessible role + name** for E2E selectors; use `data-testid` only when roles are ambiguous; reset state in `beforeEach`.
+- **Network mocking `[applicable if third-party APIs in CI]`:** use `page.route` / `cy.intercept` or env flags so CI stays deterministic.
+- **Funnel E2E `[applicable if multi-step submit → export flow]`:** one spec for the happy path, not only per-route smoke.
+- **Manual runbook `[applicable if CI mocks external APIs]`:** optional `teste2e.md` with real credentials for pre-release QA; keep CI mocked.
 - After changing vendored assets under `public/`, run full build so `dist/` matches.
 
 ## Git & deploy **[core]**
