@@ -1,0 +1,25 @@
+node_modules/
+.DS_Store
+
+# Local-only cursor rules (moved out of tracked rules)
+.cursor/Don't include these/
+
+# Secrets, keys, and credentials
+.env
+.env.*
+!.env.example
+.dev.vars
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+*.p8
+*.mobileprovision
+**/secrets/
+**/credentials/
+*password*
+*private_key*
+encrypted_private_key.zip
+pepk.jar
