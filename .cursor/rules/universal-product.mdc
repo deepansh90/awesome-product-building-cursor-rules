@@ -16,7 +16,7 @@ If a tag does not apply to your product, drop the whole bullet — do not water 
 
 ## 1. Product Philosophy **[core]**
 
-Articulate the **one real user job** in one sentence before writing code. Ruthlessly say *no* to features that do not serve that job. Obsess over first-run experience; make the default path the right path. Prefer **one clear primary action** per screen, predictable affordances, no dark patterns, no jargon. Measure success by *time-to-value* and *task completion rate*, not feature count.
+Articulate the **one real user job** in one sentence before writing code. Ruthlessly say *no* to features that do not serve that job. Obsess over first-run experience; make the default path the right path. Prefer **one clear primary action** per screen, predictable affordances, no dark patterns, no jargon. Measure success by *time-to-value* and *task completion rate*, not feature count. For scope cuts and essentialism before build → `steve-jobs.mdc` Mode C or `product-council.mdc` **Cut** step.
 
 ## 1b. Dieter Rams — ten principles (digital products) **[applicable if you ship any UI]**
 
@@ -171,9 +171,14 @@ A change ships only when: it serves one clear user job; the simplest design was 
 **[applicable if static SPA or client-only deploy]**
 - Verify build output, hosting rewrites, and CDN/cache behaviour — rollback = redeploy previous artifact.
 
-- **[applicable if UI]** verified on smallest + largest supported viewport, keyboard-only, and one representative mobile profile; spot-check against Rams §1b (especially *understandable*, *honest*, *as little design as possible*).
+- **[applicable if UI]** verified on smallest + largest supported viewport, keyboard-only, and one representative mobile profile; spot-check against Rams §1b (especially *understandable*, *honest*, *as little design as possible*). Optional design-only polish pass (no feature changes) → `steve-jobs.mdc` Mode A.
 - **[applicable if accessibility scope applies]** reduced-motion and high-contrast spot-checked; screen-reader smoke test on primary flow.
 - **[applicable if i18n scope applies]** critical flows spot-checked in a secondary locale, and in RTL if any RTL locale is supported.
 - **[applicable if native mobile app]** tested on min-supported OS and current OS; light + dark mode; Dynamic Type / font scaling.
 
-For architecture sign-off before coding, see `system-design.mdc` §4.
+| Before / after ship… | See |
+|---------------------|-----|
+| Architecture sign-off | `system-design.mdc` §4 |
+| UI ultrathink (design only) | `steve-jobs.mdc` Mode A |
+| Idea expansion or Jobs vision Q&A | `steve-jobs.mdc` Modes B/C |
+| Go/no-go council | `product-council.mdc` |

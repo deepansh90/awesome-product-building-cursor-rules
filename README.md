@@ -27,29 +27,32 @@ Each rule has a **title** and **intent** at the top. Only `cursor-agent-discipli
 | [`automation-software.mdc`](.cursor/rules/automation-software.mdc) | Browser & Form Automation | Selenium/Playwright bots |
 | [`games-building.mdc`](.cursor/rules/games-building.mdc) | Game Development | Any genre; engine, embed, PWA |
 | [`cursor-agent-discipline.mdc`](.cursor/rules/cursor-agent-discipline.mdc) | Agent Discipline | How AI edits code (always on) |
-| [`python-web-backend.mdc`](.cursor/rules/python-web-backend.mdc) | Python Web Backends | FastAPI, Django, Flask |
+| [`agent-discipline.mdc`](.cursor/rules/agent-discipline.mdc) | Agent Discipline (minimal) | Ask-first, minimal-change behavior (always on) |
 | [`java-spring-end-to-end.mdc`](.cursor/rules/java-spring-end-to-end.mdc) | Java Spring End-to-End | Spring Boot + JPA + test pyramid |
-| [`apple-mobile-swiftui.mdc`](.cursor/rules/apple-mobile-swiftui.mdc) | Apple iOS (SwiftUI) | Native iOS apps |
 | [`product-council.mdc`](.cursor/rules/product-council.mdc) | Product Council (CIRCLES) | Idea/spec critique before build |
+| [`steve-jobs.mdc`](.cursor/rules/steve-jobs.mdc) | Steve Jobs & Mindful Essentialist | Ultrathink UI (no feature changes); vision Q&A; idea tables; essentialism |
 | [`on-page-seo.mdc`](.cursor/rules/on-page-seo.mdc) | On-Page SEO | Titles, content, internal links, page audits |
 | [`off-page-seo.mdc`](.cursor/rules/off-page-seo.mdc) | Off-Page SEO | Backlinks, directories, brand mentions, outreach |
-| [`ai-seo.mdc`](.cursor/rules/ai-seo.mdc) | AI SEO (AEO / GEO) | Citations in AI Overviews, ChatGPT, Perplexity |
 | [`google-ads.mdc`](.cursor/rules/google-ads.mdc) | Google Ads & PPC | Search campaigns, RSAs, negatives, ROAS/CPA |
+
+**Optional archive** (not in default `.cursor/rules/` copy): stack-specific drafts under [`.cursor/Don't include these/`](.cursor/Don't%20include%20these/) — e.g. `python-web-backend.mdc`, `apple-mobile-swiftui.mdc`, `ai-seo.mdc`, `github-workflows.mdc`. Cherry-pick into your project if needed.
 
 ## Cherry-pick by product type
 
 | Product type | Recommended rules |
 |--------------|-------------------|
 | Any product | `universal-product`, `cursor-agent-discipline` |
-| New idea, PRD, or major bet | + `product-council` (before `system-design`) |
+| New idea, PRD, or major bet | + `steve-jobs` Mode B/C for ideation or vision Q&A → then `product-council` → `system-design` |
+| UI polish pass (no new features) | + `steve-jobs` Mode A (with `universal-product`) |
+| Feature overload / scope cut | + `steve-jobs` Mode C essentialism probes or `product-council` **Cut** step |
 | New feature / architecture | + `system-design` |
 | Web app (React/Vite/etc.) | + `website-building` |
-| Python API / form bot | + `python-web-backend`; + `automation-software` if browser-driven |
+| Python API / form bot | + `python-web-backend` from archive; + `automation-software` if browser-driven |
 | Java / Spring full stack | + `java-spring-end-to-end` |
-| iOS / SwiftUI | + `apple-mobile-swiftui` |
+| iOS / SwiftUI | + `apple-mobile-swiftui` from archive |
 | Game (browser, embed, PWA) | + `product-council` + `games-building` |
 | Game embedded in parent site | + `games-building` + `website-building` |
-| Marketing / growth (SEO, AI search, Google Ads) | + `on-page-seo`, `off-page-seo`, `ai-seo`, `google-ads` |
+| Marketing / growth (SEO, AI search, Google Ads) | + `on-page-seo`, `off-page-seo`, `google-ads`; + `ai-seo` from archive if needed |
 
 ## Tool boundaries
 
@@ -70,6 +73,7 @@ Patterns informed by community collections and public best-practice guides, incl
 
 - **Dieter Rams** — product/UI principles referenced in `universal-product.mdc` §1b (clarity, honesty, as little design as possible)
 - **CIRCLES** — product sense framework (Lewis C. Lin); used in `product-council.mdc`
+- **Steve Jobs / Mindful Essentialist** — ultrathink design and essentialism; used in `steve-jobs.mdc`
 
 ## License
 

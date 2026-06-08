@@ -29,7 +29,7 @@ Read before large changes.
 
 ## UI expectations (web-specific) **[core]**
 
-Visual and accessibility policy → `universal-product.mdc` §1b (Rams) and §2a. Web-only: keep one global style source (`style.css` or tokens); document tokens in `design_spec.md` when used.
+Visual and accessibility policy → `universal-product.mdc` §1b (Rams) and §2a. Web-only: keep one global style source (`style.css` or tokens); document tokens in `design_spec.md` when used. Design-only polish (no new routes or behavior) → `steve-jobs.mdc` Mode A before claiming UI done.
 
 ## SPA resilience & SEO **[core]**
 
@@ -125,5 +125,6 @@ npm run test:e2e   # when present
 ## What this rule does not cover
 
 - System architecture documents → `system-design.mdc`
+- Product ideation, vision Q&A, scope essentialism → `steve-jobs.mdc`; go/no-go critique → `product-council.mdc`
 - Browser job-application bots → `automation-software.mdc`
 - Game simulation, determinism, PWA inside the game → `games-building.mdc`
