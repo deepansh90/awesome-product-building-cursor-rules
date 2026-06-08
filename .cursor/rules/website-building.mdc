@@ -1,12 +1,12 @@
 ---
-description: Static/React/Vite websites — SPA deploy, vendored embeds, testing, docs map
+description: Static/React/Vite websites — SPA deploy, simplification, vendored embeds, testing, docs map
 globs: "**/*.{jsx,tsx,vue,html,css,js,ts,mjs}",vite.config.*,wrangler.jsonc,vercel.json,e2e/**/*
 alwaysApply: false
 ---
 
 # Web Applications (Static & SPA)
 
-**Intent:** Ship, test, and host marketing or product web apps and **host vendored client bundles** (e.g. games). Cross-surface UI policy lives in `universal-product.mdc` §2a. Game engines and replay logic live in `games-building.mdc`.
+**Intent:** Ship, test, and host marketing or product web apps and **host vendored client bundles** (e.g. games). Cross-surface UI policy lives in `universal-product.mdc` §2a. Game engines and replay logic live in `games-building.mdc`. **Simplification passes** (cut copy, chrome, redundancy) → this rule § Simplification + `steve-jobs.mdc` Mode A.
 
 **Applicability:** If a section's `[applicable if …]` does not match your product, **skip the entire section** — do not copy proxy, editor, or ingest patterns onto simple marketing sites.
 
@@ -30,6 +30,150 @@ Read before large changes.
 ## UI expectations (web-specific) **[core]**
 
 Visual and accessibility policy → `universal-product.mdc` §1b (Rams) and §2a. Web-only: keep one global style source (`style.css` or tokens); document tokens in `design_spec.md` when used. Design-only polish (no new routes or behavior) → `steve-jobs.mdc` Mode A before claiming UI done.
+
+## Simplification & copy economy **[core]**
+
+One job per screen. If the user can infer it from layout, **do not label it again in prose**. Run this audit before claiming UI done (pairs with `steve-jobs.mdc` Mode A).
+
+### Copy source of truth
+
+- **Centralize visible strings** in one module (e.g. `src/lib/i18n.js`, `copy.ts`) — EN + any locale variants. Components consume `t(lang).key`; avoid hardcoded marketing paragraphs in JSX.
+- **SEO vs UI:** longer keyword copy may live in `index.html`, `seo.js`, or prerender landings — **not** duplicated in the hero, trust bar, and three-column “SEO grids” on the same viewport.
+- **Data vs display:** JSON can hold rich hints; the UI may show **caps** (max bullets, max chars) via formatters — trim at display, then shorten source data in a follow-up if still noisy.
+
+### Redundancy audit
+
+Ask for every line of text on a route:
+
+| Question | If yes → |
+|----------|----------|
+| Is this fact shown elsewhere on the same viewport? | Remove the duplicate (keep one source of truth). |
+| Is this the same pitch in hero + trust bar + footer + 3 feature cards? | **One headline + one subline** on the MDP; trust bar = one short line or logos only. |
+| Is this a collapsed/closed section with no visible payoff? | Open by default with real content, or **delete** the section. |
+| Is this geographic, aspirational, or “studio” fluff on a tool page? | Cut or move to a tertiary route — not footer chrome on the MDP. |
+| Is this engineering status dressed as user copy? | Hide when idle; show only during incomplete work (e.g. “Analyzing…”). |
+| Are there two cards for one concept (e.g. “Blueprint” + “Signals”)? | **Merge into one card** with one eyebrow label. |
+
+**Anti-patterns (seen in production):**
+
+- Hero H1 + subline + **three SEO columns** restating company tags / cheat sheet / extension (same page).
+- Same chapter name in header, sidebar tab, and main panel heading.
+- Same photo count in stats line, sidebar badge, grid header, and download button label.
+- Trust copy in hero + floating strip + footer (pick **one** surface + `/privacy` link).
+- Pattern detail: **Trigger / Constraint / Win** labels plus a separate **Signals** box with overlapping bullets.
+- Pattern detail: pattern name in page title **and** again inside the guide card.
+- Brand wordmark run together (`VIVAHALBUMS`) — use explicit word spacing in a shared `BrandLogo` component.
+- Footer with three columns repeating nav + location + taglines the header already implies.
+- List/grid cards with long descriptions when **name + count + CTA** suffices.
+
+### Hero & trust (marketing / tool MDP) **[applicable if landing + app tabs share one shell]**
+
+- **Hero:** one H1 + one subline (≤ ~12 words each when possible). No feature grid under the hero unless each card opens distinct content not visible elsewhere.
+- **Trust bar:** logos **or** one metrics line — not both repeating the hero pitch. Example shape: `3,000+ problems · 19 patterns · Free`.
+- **Tabs / primary nav:** labels only; no paragraph under every tab on first paint.
+- **Curated path cards** (e.g. Blind 75): title + **three-word** subtitle max — or title only.
+
+### Detail pages & reference content **[applicable if cheat sheets, patterns, chapters, docs]**
+
+Use **one card per concept**, identical structure across all items:
+
+```text
+[EYEBROW — one word, e.g. Pattern / Chapter]
+[optional media — GIF/diagram, sized for readability]
+[one gist line — trigger → outcome, no field labels]
+[· up to 2 cues — short bullets, not paragraphs]
+[template / code block — if applicable]
+[list of items — problems, links, etc.]
+```
+
+Rules:
+
+| Do | Don't |
+|----|--------|
+| One eyebrow (`Pattern`, `Chapter`) | Separate “Blueprint”, “Signals”, “More signals” boxes |
+| Gist: `{trigger} → {win}` in one line | Labeled rows for Trigger / Constraint / Win |
+| Show **≤ 2** cues; cap ~90 chars each in UI | Dump full `howToIdentify` arrays on page |
+| Cap gist ~140 chars in formatter | Multi-sentence intro before the list |
+| Page `<h1>`/`h2` holds the name | Repeat name inside the guide card |
+| Same component for all items | Per-pattern layout forks |
+
+Implement via a shared component + props (`blueprint`, `signals`, `visual`) and constants (`MAX_CUES`, `MAX_GIST_CHARS`). Unit-test formatters.
+
+**List pages:** grid cards = **title + metadata** (count, badge) — drop redundant descriptions when the title is self-explanatory.
+
+### FAQ, About, legal
+
+- **FAQ:** ≤ 4–6 questions; **one-line answers**. Cut overlapping questions (Premium? company tags? cheat sheet? → merge).
+- **About:** one paragraph + optional quote + stats — not three story paragraphs + disclaimer + quote.
+- **Privacy / Terms:** plain-language essentials; avoid repeating the same disclaimer in footer, about, and legal.
+
+### Free tiers & tool directories **[applicable if affiliate / resource lists]**
+
+- Section header: eyebrow + title + **one** subtitle per band (Free vs Pro).
+- Tool cards: **name + eligibility badge + CTA** — drop taglines when the name is clear; hide long “how we use it” lists on card face (link out or `<details>` if truly needed).
+- Dividers between bands: one short line (`Need paid tools →`), not a paragraph.
+
+### Header chrome (multi-tab apps)
+
+- Single row: **logo `shrink-0` · nav `flex-1 min-w-0` (scroll) · lang + theme `ml-auto shrink-0`**.
+- Avoid `absolute` controls overlapping nav on mobile.
+- Theme default: explicit in app state (e.g. `'default'`), not an aesthetic preference baked in without product reason.
+
+### Routing & blank screens **[applicable if hash + path SEO landings]**
+
+- If `maybeRedirectLegacyHash()` (or equivalent) runs **before** React mount and returns `true`, the app **never renders** — blank screen with no console error.
+- **Fix:** when `pathname` already equals the canonical path, **return false** even if the hash has sub-routes (e.g. `/patterns#dsa/pattern/sliding-window`).
+- Add E2E for canonical path + hash sub-routes after any redirect refactor.
+
+### Attribution & vendored media
+
+- Local / anonymous assets: **no** author name or article links in UI unless legally required.
+- Third-party (e.g. Wikimedia): **Commons + optional Wikipedia overview** — not personal Medium/blog attribution mixed into pattern guides.
+
+### Brand & chrome
+
+- **Wordmark:** multi-word names get visible space (`Vivah` · `Albums`), not concatenated spans. One shared component for header + footer.
+- **Header:** logo `shrink-0` left; primary CTA right; `justify-between` + explicit `gap` — nav must not crowd the mark.
+- **Footer (tool-first sites):** two columns max — brand blurb + contact email; short Explore list (Designer, How it works, Privacy). One copyright line. No location pins unless the product is *about* place.
+- **Buttons:** one geometric language per tier (e.g. primary CTAs all `rounded-full`); do not mix pill and boxy on the same funnel step.
+
+### Idle onboarding (paste / upload flows)
+
+- **Narrow reading column** (`max-w-2xl` / `max-w-3xl`) — not full-bleed empty canvas.
+- **Hero stack:** job statement → single trust line (Privacy · process modal) → form. No sixth text layer.
+- **Sample / demo output:** show real thumbnails **inline** or omit entirely. Never a closed `<details>` that only shows a headline — users read it as broken.
+- **Remove** sidebar placeholders that restate what the main panel already does.
+
+### Workspace stats (one calm line)
+
+When users ingest batches (folders, galleries), expose **numbers only** in one `role="status"` line under the title:
+
+```text
+43 in folder · 31 shown · 9 duplicates hidden · 3 blur filtered · 4 selected
+```
+
+Rules:
+
+- Always: `N in folder · M shown`.
+- Append segments **only when > 0** (duplicates, blur-filtered, excluded, selected).
+- During async work: replace with `Analyzing…` or `Layout 12/43` — not the full stats string.
+- Implement via a pure formatter (e.g. `formatWorkspaceStats()`) + unit tests; do not scatter string templates in JSX.
+- Full breakdown belongs in **settings / curation dialog**, not repeated in the grid header.
+
+### Progressive disclosure that earns its keep
+
+- **Good:** Export PDF primary; Edit folder + Curation + Analyze batch in overflow `⋯`.
+- **Good:** Advanced thresholds inside collapsed `<details>` in a dialog.
+- **Bad:** Icon tabs plus a text heading repeating the tab name plus instructional microcopy for obvious interactions (“Click to select”).
+- **Bad:** Stats line when nothing is in progress and every number is duplicated elsewhere.
+
+### Verification for simplification **[core]**
+
+- Desktop + mobile screenshot: can a new user name the **one** primary action in 3 seconds?
+- Count distinct places the same noun (chapter name, photo count, brand, “free LeetCode”) appears — **≤ 2** per viewport.
+- Pattern/detail routes: exactly **one** guide card above the list; no `Trigger:` labels in DOM.
+- E2E smoke: assert stable copy on routes you keep; **remove** assertions for deleted boilerplate; update `page-objects` hero patterns when H1 changes.
+- After copy pass: run `npm test` + spot-check `/patterns#…/pattern/…` (or equivalent deep link) for blank-screen regressions.
 
 ## SPA resilience & SEO **[core]**
 
@@ -76,18 +220,21 @@ Extract shared helpers (`getClientIp`, URL allowlist) into `src/lib/` and unit-t
 
 ## Editor / workspace routes **[applicable if marketing landing + heavy tool on same site]**
 
-- **Progressive disclosure** — marketing chrome (header, footer, samples) before first success; after success, compact workspace header; reduce chrome only when it helps focus — **keep** escape hatches (home, privacy, account) reachable.
-- **One primary action per workspace** — batch secondary controls into a dialog or panel; header = context + stats + primary submit/export + one “edit source” escape hatch.
-- **Contextual inspector `[applicable if complex editor]`** — sidebar shows tools relevant to current selection, not every panel at once.
-- **Mobile tool nav `[applicable if editor has a side rail]`** — consider vertical rail → bottom filmstrip; pad main content so nothing hides under fixed nav.
-- **Human labels** — map internal enums to plain language; hide empty groups when it reduces noise.
+- **Progressive disclosure** — marketing chrome (header, footer) before first success; after success, **hide** site header; compact workspace toolbar. Keep escape hatches (privacy, edit source) in overflow — not a second row of equal-weight buttons.
+- **One primary action per workspace** — e.g. Export PDF filled; Download only when selection &gt; 0; everything else in `⋯` menu or Curation dialog.
+- **One stats line** — see § Simplification → Workspace stats; never restate counts in sidebar, grid header, and toolbar.
+- **Sidebar vs main** — sidebar = chapter list + mode icons (spreads/photos); main = content only. No dashed placeholder in sidebar when the grid lives in main.
+- **Main panel headings** — drop redundant chapter suffix when chapter is highlighted in sidebar; photos view needs no “Photos / Chapter / N photos · click to…” block — actions only (Select all / Clear).
+- **Contextual inspector `[applicable if complex editor]`** — right rail shows one context (cover, caption); instructional paragraphs → `sr-only` or dialog.
+- **Mobile tool nav `[applicable if editor has a side rail]`** — vertical rail → bottom filmstrip; pad main content above fixed nav.
+- **Human labels** — map internal enums to plain language (`blur filtered` not `filtered`; `duplicates hidden` not internal scorer jargon).
 
 ## Trust UX for user-supplied input **[applicable if users paste links or run client-heavy export]**
 
-- **Process modal `[applicable if server reads user links/files]`** — what the server touches vs what stays in the browser; link to `/privacy`.
-- **Inline errors** — map domain failures (private link, timeout, rate limit) via a formatter; never stack traces.
+- **Process modal `[applicable if server reads user links/files]`** — deep trust dive in one modal; hero gets a single inline link (Privacy · How we process…). No third floating trust strip above the footer.
+- **Inline errors** — map domain failures (private link, timeout, rate limit) via a formatter; add one recovery hint; never stack traces.
 - **Client-heavy export `[applicable if PDF/canvas/render in browser]`** — detect OOM/memory failures and suggest recovery (fewer items, close tabs, split batches).
-- **Demo/sample output `[applicable if paste-or-upload onboarding]`** — show example result before users commit real data.
+- **Demo/sample output `[applicable if paste-or-upload onboarding]`** — optional **visible** sample row on landing; on the tool route, prefer doing the real job over sample chrome. If samples exist, they must be visible without a click — otherwise remove.
 
 ## Hosting vendored sub-apps **[core]**
 
