@@ -32,10 +32,8 @@ Each rule has a **title** and **intent** at the top. Only `cursor-agent-discipli
 | [`product-council.mdc`](.cursor/rules/product-council.mdc) | Product Council (CIRCLES) | Idea/spec critique before build |
 | [`steve-jobs.mdc`](.cursor/rules/steve-jobs.mdc) | Steve Jobs & Mindful Essentialist | Ultrathink UI (no feature changes); vision Q&A; idea tables; essentialism |
 | [`on-page-seo.mdc`](.cursor/rules/on-page-seo.mdc) | On-Page SEO | Titles, content, internal links, page audits |
-| [`off-page-seo.mdc`](.cursor/rules/off-page-seo.mdc) | Off-Page SEO | Backlinks, directories, brand mentions, outreach |
-| [`google-ads.mdc`](.cursor/rules/google-ads.mdc) | Google Ads & PPC | Search campaigns, RSAs, negatives, ROAS/CPA |
 
-**Optional archive** (not in default `.cursor/rules/` copy): stack-specific drafts under [`.cursor/Don't include these/`](.cursor/Don't%20include%20these/) — e.g. `python-web-backend.mdc`, `apple-mobile-swiftui.mdc`, `ai-seo.mdc`, `github-workflows.mdc`. Cherry-pick into your project if needed.
+**Optional archive** (not in default `.cursor/rules/` copy): drafts under [`.cursor/Don't include these/`](.cursor/Don't%20include%20these/) — e.g. `python-web-backend.mdc`, `apple-mobile-swiftui.mdc`, `ai-seo.mdc`, `off-page-seo.mdc`, `google-ads.mdc`, `github-workflows.mdc`. Cherry-pick into your project if needed.
 
 ## Cherry-pick by product type
 
@@ -52,7 +50,7 @@ Each rule has a **title** and **intent** at the top. Only `cursor-agent-discipli
 | iOS / SwiftUI | + `apple-mobile-swiftui` from archive |
 | Game (browser, embed, PWA) | + `product-council` + `games-building` |
 | Game embedded in parent site | + `games-building` + `website-building` |
-| Marketing / growth (SEO, AI search, Google Ads) | + `on-page-seo`, `off-page-seo`, `google-ads`; + `ai-seo` from archive if needed |
+| Marketing / growth (SEO, AI search, Google Ads) | + `on-page-seo`; + `off-page-seo`, `ai-seo`, `google-ads` from archive if needed |
 
 ## Tool boundaries
 
