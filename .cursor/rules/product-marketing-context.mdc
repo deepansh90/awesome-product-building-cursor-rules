@@ -1,0 +1,145 @@
+---
+description: Product marketing context — create or update .agents/product-marketing.md (ICP, positioning, voice, goals). Use at project start or when other marketing tasks need shared positioning context.
+globs: ".agents/**/*,**/product-marketing*.md,README.md,docs/**/*.md"
+alwaysApply: false
+---
+
+# Product Marketing Context
+
+**Intent:** Create and maintain `.agents/product-marketing.md` so brand, copy, and SEO rules do not re-ask basics. Not deep repositioning workshops (`brand-strategy.mdc`) or page-level copy (`marketing-copy.mdc`).
+
+**Canonical path:** `.agents/product-marketing.md`
+
+**Legacy paths to check:** `.claude/product-marketing.md`, `product-marketing-context.md` (in `.agents/` or `.claude/`). If found elsewhere, offer to move to `.agents/product-marketing.md`.
+
+---
+
+## Workflow **[core]**
+
+### Step 1 — Check existing context
+
+**If file exists:**
+- Read and summarize what's captured.
+- Ask which sections to update; only gather info for those.
+
+**If file does not exist, offer:**
+
+1. **Auto-draft from codebase** (recommended) — read README, landing pages, meta descriptions, about copy, `package.json`, existing docs; draft V1; user reviews and corrects.
+2. **Start from scratch** — walk sections conversationally, one at a time.
+
+Push for **verbatim customer language** — exact phrases beat polished marketing speak.
+
+### Step 2 — Gather or draft sections
+
+Skip sections that clearly don't apply (e.g. B2B Personas table for pure B2C).
+
+| # | Section | Capture |
+|---|---------|---------|
+| 1 | Product overview | One-liner, what it does, category, type, business model |
+| 2 | Target audience | Company/consumer type, decision-makers, primary use case, JTBD |
+| 3 | Personas | `[applicable if B2B]` User, champion, buyer — cares / challenge / value |
+| 4 | Problems & pain | Core challenge, why alternatives fail, cost, emotional tension |
+| 5 | Competitive landscape | Direct, secondary, indirect competitors — how each falls short |
+| 6 | Differentiation | Key differentiators, how you solve differently, why customers choose you |
+| 7 | Objections & anti-persona | Top 3 objections + responses; who is NOT a fit |
+| 8 | Switching dynamics | Push, pull, habit, anxiety |
+| 9 | Customer language | Verbatim problem/solution phrases; words to use/avoid; glossary |
+| 10 | Brand voice | Tone, style, personality adjectives |
+| 11 | Proof points | Metrics, logos, testimonials, value themes |
+| 12 | Goals | Business goal, conversion action, current metrics if known |
+
+### Step 3 — Save document
+
+Use this structure (fill all applicable sections):
+
+```markdown
+# Product Marketing Context
+
+*Last updated: YYYY-MM-DD*
+
+## Product Overview
+**One-liner:**
+**What it does:**
+**Product category:**
+**Product type:**
+**Business model:**
+
+## Target Audience
+**Target companies/customers:**
+**Decision-makers:**
+**Primary use case:**
+**Jobs to be done:**
+**Use cases:**
+
+## Personas
+| Persona | Cares about | Challenge | Value we promise |
+|---------|-------------|-----------|------------------|
+
+## Problems & Pain Points
+**Core problem:**
+**Why alternatives fall short:**
+**What it costs them:**
+**Emotional tension:**
+
+## Competitive Landscape
+**Direct:** …
+**Secondary:** …
+**Indirect:** …
+
+## Differentiation
+**Key differentiators:**
+**How we do it differently:**
+**Why customers choose us:**
+
+## Objections
+| Objection | Response |
+|-----------|----------|
+
+**Anti-persona:**
+
+## Switching Dynamics
+**Push:** **Pull:** **Habit:** **Anxiety:**
+
+## Customer Language
+**How they describe the problem:**
+**How they describe us:**
+**Words to use:** **Words to avoid:**
+**Glossary:** | Term | Meaning |
+
+## Brand Voice
+**Tone:** **Style:** **Personality:**
+
+## Proof Points
+**Metrics:** **Customers:** **Testimonials:**
+**Value themes:** | Theme | Proof |
+
+## Goals
+**Business goal:** **Conversion action:** **Current metrics:**
+```
+
+### Step 4 — Confirm
+
+- Show completed doc; ask for corrections.
+- Tell user: other marketing rules will read this automatically; re-run when positioning or ICP shifts materially.
+
+---
+
+## Tips **[core]**
+
+- Ask "What's the #1 frustration that brings them to you?" not "What problem do you solve?"
+- Capture examples: "Can you quote how a customer described this?"
+- Validate each section before moving on when interviewing from scratch.
+
+---
+
+## What this rule does not cover
+
+| Need | Use instead |
+|------|-------------|
+| Deep launch/revamp positioning workshop | `brand-strategy.mdc` |
+| Write homepage or landing copy | `marketing-copy.mdc` |
+| SEO audit or page optimization | `seo-audit.mdc`, `on-page-seo.mdc` |
+
+## Related rules
+
+- After context exists → `brand-strategy.mdc`, `marketing-copy.mdc`, `programmatic-seo.mdc`, `seo-audit.mdc` (all read context first)

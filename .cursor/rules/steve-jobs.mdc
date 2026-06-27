@@ -151,6 +151,7 @@ One action in the next 7 days.
 | Safe edits, commits, tests | `cursor-agent-discipline.mdc` |
 | HLD/LLD, scale, APIs | `system-design.mdc` |
 | CIRCLES + multi-stakeholder verdict | `product-council.mdc` |
+| Brand positioning, tone of voice, segmentation | `brand-strategy.mdc` |
 | SEO, ads, stack-specific patterns | domain rules in this repo |
 
 **Do not** use Mode A to add features. **Do not** use Modes B/C to override explicit shipped constraints without calling that out.

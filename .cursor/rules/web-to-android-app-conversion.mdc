@@ -1,0 +1,278 @@
+---
+description: Web-to-Android — mobile UX/input conversion, WebView/Capacitor shells, Gradle asset sync, Play Store graphics/icons, haptics, viral hooks, five game themes, signing
+globs: "**/android/**",**/equalize-android/**,capacitor.config.*,**/app/build.gradle*,**/app/build.gradle.kts",**/PLAYSTORE*.md",**/README_ANDROID.md"
+alwaysApply: false
+---
+
+# Web-to-Android App Conversion
+
+**Intent:** Ship a **web-first** product to Google Play with correct graphics, themes, and a thin native shell — without duplicating game logic in Kotlin. Reference implementations: **Equalize** (`equalize-android` WebView shell) and **DSA Patterns** (`dsapatterns-website` Capacitor wrapper).
+
+**Cross-refs:** Game embed/PWA rules → `games-building.mdc`. Host site vendoring → `website-building.mdc`. UI/a11y baseline → `universal-product.mdc` §2a.
+
+---
+
+## §1 Architecture — web owns the product **[core]**
+
+| Concern | Owner |
+|---------|--------|
+| Game logic, UI, levels, themes, copy | Web (`*.html`, React/Vite `dist/`, inline JS) |
+| Splash, launcher icons, signing, Play packaging | Android shell |
+| Back navigation | Web stack (`EqualizeBack` / History API) + Android `OnBackPressedCallback` |
+| Timer pause on background | Web (`visibilitychange`) + Android `onPause`/`onResume` |
+| Release hardening (strip debug globals) | Gradle pipeline |
+| Offline first launch | Bundled `file:///android_asset/…` or Capacitor `webDir` |
+
+**Do not** duplicate gameplay, levels, colors, or dashboard behavior in native Kotlin.
+
+### Two shells we use
+
+| Pattern | When | Sync |
+|---------|------|------|
+| **Thin WebView shell** | Single HTML game (Equalize) | Gradle `syncEqualizeWebAssets` copies curated files from repo root into `app/build/generated/…` on every asset merge |
+| **Capacitor** | Full React/Vite SPA (DSA Patterns) | `npm run build` → `npx cap copy android` (or `cap sync android` after plugin/native config changes) |
+
+Pick one per product. Do not mix Capacitor plugins into a hand-rolled WebView shell without an ADR.
+
+### WebView shell constraints (Equalize learnings)
+
+- Load `file:///android_asset/<entry>.html` — **no network required** for first launch in release.
+- **Skip service worker** on `file://` (register only on HTTP/HTTPS).
+- **No `INTERNET` permission** if fonts and assets are self-hosted in the bundle.
+- `allowBackup="false"` when local scores/progress must not cloud-restore (anti-tamper).
+- Release builds **strip** `window.EqualizeDebug` (or equivalent) via Gradle — never ship debug hooks.
+- Use `WebViewAssetLoader` for same-origin asset paths; block external navigation in `shouldOverrideUrlLoading`.
+- Disable zoom controls; enable `domStorageEnabled` for `localStorage`.
+
+---
+
+## §11 Mobile UX & Input Conversion **[core]**
+
+When porting a web game to Android, Cursor MUST automatically audit and refactor the UX for mobile constraints:
+
+- **Input Refactoring:** Strip all Keyboard (`WASD`/Arrow keys) and `hover`-state event listeners. Replace them with single-tap, swipe-to-move, or virtual floating joystick logic using touch events (`touchstart`, `touchmove`).
+- **Kill On-Screen D-Pads:** Do NOT implement visible on-screen directional buttons unless explicitly requested. Prioritize frictionless gesture-based mechanics.
+- **Mobile Safe Areas:** Ensure all Canvas and DOM elements respect Android safe areas. Critical UI (scores, back buttons) MUST NOT render in the top 40px (notches/status bar) or bottom 40px (gesture bar).
+- **Instant Restart Loop:** Remove multi-step 'Game Over' modals. On failure, implement a maximum **0.5-second reset loop** to allow instant, frictionless replayability.
+
+---
+
+## §2 Five in-game themes (Equalize standard) **[core]**
+
+We ship **five** player-selectable themes. Persist choice in `localStorage` (e.g. `eq_theme`). Update `<meta name="theme-color">` on switch for Android status-bar harmony.
+
+| ID | Label | `data-theme` | Background / mood | Notes |
+|----|-------|--------------|-------------------|-------|
+| **balance** | ⚖️ Balance | `balance` | `#0A0A0A` black, purple/crimson/gold | **Default for Play Store** — dark, premium |
+| **ember** | 🔥 Ember | `ember` | `#1A0A0A` warm dark, orange accents | High contrast on dark |
+| **zen** | ☀️ Zen Sand | `zen` | `#F5F0E8` cream paper | **Light theme** — audit all tutorial/game text (see §6) |
+| **midnight** | 🌙 Midnight | *(remove `data-theme`)* | `#1A1A2E` indigo night | Uses `:root` jewel-spectrum tiles |
+| **ocean** | 🌊 Ocean | `ocean` | `#0A1628` deep blue | Cool palette |
+
+Cycle order in UI: `balance → ember → zen → midnight → ocean`.
+
+**Screenshot / Play Store rule:** Capture store screenshots in **Balance** (or the theme shown in the icon) so listing matches first launch. If the icon is dark/gold, do not lead with Zen Sand screenshots unless the default theme is Zen.
+
+---
+
+## §3 Generating Android-ready graphics **[core]**
+
+### Play Store asset spec
+
+| Asset | Size | Format | Rules |
+|-------|------|--------|-------|
+| **App icon (listing)** | **512×512** | **32-bit PNG ONLY** | **CRITICAL: No JPEGs.** Must include alpha channel. Flat 2D graphic only (no device photos). Keep core art inside a **15% padding safe zone** to account for Google's automatic 30% squircle mask. |
+| **Feature graphic** | **1024×500** | PNG/JPEG | Exact dimensions required (1023x500 will fail). No transparency. No misleading text (“#1”, “Free money”). |
+| **Phone screenshots** | min 2; long side **1080+** | PNG/JPEG | **9:16** or **16:9**. Must depict **real in-app UI**. |
+| **Adaptive launcher** | foreground **432×432** | PNG in `mipmap-*` | Must visually match the 512x512 Store Icon to prevent Misleading Claims policy violations. |
+
+### Launcher icon — density table
+
+Generate from one **1024×1024** master (keep safe zone ~66% center for adaptive crop):
+
+| Folder | px |
+|--------|-----|
+| `mipmap-mdpi` | 48 |
+| `mipmap-hdpi` | 72 |
+| `mipmap-xhdpi` | 96 |
+| `mipmap-xxhdpi` | 144 |
+| `mipmap-xxxhdpi` | 192 |
+
+**Adaptive icon:** `mipmap-anydpi-v26/ic_launcher.xml` — separate **background color** (`values/colors.xml`) and **foreground** PNG. Match Balance default: background `#0A0A0A`, foreground = brand mark (e.g. gold cairn / 3×3 grid motif).
+
+### How we generate images (workflow)
+
+1. **Design brief** — one sentence: subject, background color, flat vs gradient, **no text** on launcher icon unless it exists in-app.
+2. **Master art** — Cursor **GenerateImage** or Figma export at 1024×1024 (icon) and 1024×500 (feature graphic). Prefer **simple geometric marks** (Equalize: stacked stones / 3×3 grid) over busy screenshots for the icon.
+3. **Resize / density export**
+   - **Play listing icon:** Export **512×512 32-bit PNG** with alpha — verify with `file play-store-icon-512.png` (must say "PNG image data, 512 x 512, 8-bit/color RGBA"). **Never upload JPEG.**
+   - **Android Studio:** Right-click `res` → **New → Image Asset** → Launcher Icons (Adaptive and Legacy) → import master PNG.
+   - **CLI (macOS):** `sips -z 512 512 master.png --out play-store-icon-512.png`; loop sizes for mipmaps.
+   - **ImageMagick:** `magick master.png -resize 144x144 mipmap-xxhdpi/ic_launcher.png`
+4. **Store screenshots** — Playwright or emulator:
+   ```bash
+   npx playwright screenshot --viewport-size=390,844 \
+     "file:///path/to/game.html" screenshot-tutorial.png
+   ```
+   Capture: tutorial, mid-game, win state. Run at **390×844** (embed) and **1080×2400** (Play upload) by scaling or device frame.
+5. **Sanity check** — Side-by-side: **launcher icon ↔ first screen ↔ Play listing icon**. Google **Misleading Claims** rejections often come from icons/screenshots that promise UI the app does not show (wrong colors, fake “Level 100”, DSA/LeetCode logos on a puzzle game, etc.).
+
+### Play Store listing honesty checklist
+
+- Icon = what users see after install (same palette and motif).
+- Screenshots = **Balance theme** (or documented default), not one-off marketing mocks.
+- Short/full description matches **actual** features (no “500 levels” if 35, no “online multiplayer” if local-only).
+- Feature graphic: game name + real board art; avoid stock “brain training” clip art unrelated to the product.
+
+---
+
+## §4 Build & sync pipeline **[core]**
+
+### Capacitor (full site)
+
+```bash
+# From web repo root — NOT android/
+npm run build
+npx cap copy android          # assets only
+# npx cap sync android        # after new Capacitor plugins / native config
+```
+
+Open `android/` in Android Studio → Run.
+
+### WebView shell (single HTML game)
+
+1. Edit web game in **parent repo** (`equalize.html`, `levels.js`, …).
+2. Gradle `syncEqualizeWebAssets` (or equivalent) runs before `merge*Assets` — copies into `app/build/generated/equalizeAssetsDebug|Release`.
+3. **Debug** keeps test hooks; **Release** strips debug globals.
+4. Increment **`versionCode`** (integer, always up) and **`versionName`** (user string) in `app/build.gradle(.kts)` before every Play upload.
+
+### Version bump discipline
+
+| Field | Rule |
+|-------|------|
+| `versionCode` | +1 every Play Console upload |
+| `versionName` | Semver string users see (e.g. `2.0.2`) |
+| Web + Android | Bump Android when **web assets** shipped to Play change materially (tutorial, levels, themes) |
+
+---
+
+## §5 Native polish **[core]**
+
+- **Splash:** `Theme.SplashScreen` with `windowSplashScreenBackground` = default theme bg (`#0A0A0A` for Balance).
+- **Status / nav bar:** Match `theme-color` / Balance black in `themes.xml`.
+- **Orientation:** Test portrait, landscape, tablet, notch — especially tutorial grid and embed-style short viewports.
+- **Preserve DOM hooks:** Do not rename IDs/classes used by game-over, restart, or E2E (`btn-gameover-home`, `.btn-pri`, etc.) without updating WebView tests.
+- **Haptic Feedback (Juice):** Whenever a core interaction occurs (e.g., placing a tile, connecting a wire, or failing a level), trigger tactile feedback using `navigator.vibrate([15])` (light tap) or `navigator.vibrate([50, 50, 50])` (heavy crash).
+- **60FPS Lock:** Ensure the `requestAnimationFrame` or tick loop is tightly locked to 60Hz or higher. Physics calculations must be decoupled from framerate to prevent jittering on 120Hz mobile displays.
+
+---
+
+## §6 Theme contrast on Android (common bug) **[core]**
+
+Light themes break tutorial copy if overrides are missing.
+
+**Symptom:** `.tut-goal-line`, `.tut-rule-line`, `.dot` stay white on Zen Sand cream → invisible.
+
+**Fix pattern:**
+
+```css
+[data-theme="zen"] .tut-goal-line { color: #4527A0; }
+[data-theme="zen"] .tut-rule-line { color: #5A4D3E; }
+[data-theme="zen"] .dot { background: rgba(61,46,31,.2); }
+[data-theme="zen"] .dot.on { background: #3D2E1F; }
+```
+
+**Before Play release:** cycle all five themes on device; verify tutorial, pager dots, headers, and win overlays.
+
+---
+
+## §7 Common Android errors & fixes **[core]**
+
+1. **EDT blocking in Android Studio**
+   - *Error:* `IllegalStateException: This method is forbidden on EDT…`
+   - *Fix:* Run `./gradlew` from terminal; use Studio’s background sync modal — do not run heavy Gradle tasks on the UI thread.
+
+2. **WebView game-over / buttons dead**
+   - *Cause:* Renamed element IDs or classes that JS listeners target.
+   - *Fix:* Preserve core interactive IDs; run Espresso/WebView tests before publish.
+
+3. **Stale bundled web assets**
+   - *Symptom:* Android shows old tutorial/UI after web fix.
+   - *Fix:* Rebuild web → `cap copy` or trigger Gradle asset sync → **Clean Project** in Studio → reinstall APK.
+
+4. **Play “Misleading Claims” rejection**
+   - *Cause:* Icon/screenshots/description do not match installed app.
+   - *Fix:* Regenerate assets from §3; align listing copy with actual level count and features.
+
+---
+
+## §8 Signed Android App Bundle (.aab) **[core]**
+
+1. Verify `applicationId`, `versionCode`, `versionName`, launcher mipmaps.
+2. **Android Studio:** Build → Generate Signed Bundle / APK → **Android App Bundle** → release keystore.
+3. **CLI:**
+   ```bash
+   export KEYSTORE_PASSWORD="…"
+   export KEY_ALIAS="…"
+   export KEY_PASSWORD="…"
+   ./gradlew :app:bundleRelease
+   ```
+4. Upload `app-release.aab` to Play Console. **Back up keystore** — loss = cannot update the app.
+
+Store keystore **outside** the public git repo.
+
+---
+
+## §9 Verification before ship **[core]**
+
+```bash
+# WebView game (Equalize pattern)
+gradle :app:assembleDebug :app:assembleDebugAndroidTest
+gradle :app:connectedDebugAndroidTest
+
+# Capacitor site
+npm run build && npx cap copy android
+```
+
+Manual on device:
+
+- [ ] Cold start offline (airplane mode)
+- [ ] All **five themes** readable (especially Zen tutorial text)
+- [ ] Back button exits overlays → game → tutorial → app
+- [ ] Launcher icon matches Play listing 512×512 **32-bit PNG** (same art, adaptive foreground aligned)
+- [ ] Screenshots match Balance (default) UI
+- [ ] No keyboard/hover-only controls; touch and safe-area layout verified
+- [ ] Haptic feedback on core interactions (where supported)
+- [ ] Daily Challenge + share loop wired (§12) if puzzle/logic game
+
+---
+
+## §10 Distribution channels (keep in sync) **[core]**
+
+| Channel | Entry | Sync |
+|---------|-------|------|
+| GitHub Pages / canonical web | `equalize.html` | Git push |
+| Educational embed (iframe) | `public/games/<id>/` | Manual vendor copy + CDN purge |
+| Android | WebView assets | Gradle sync or Capacitor copy |
+
+Web repo is **source of truth**. Android is a packaging layer — never fork gameplay in Kotlin.
+
+---
+
+## §12 Viral & Meta-Layer Architecture **[growth]**
+
+Every puzzle/logic game ported to mobile must include hooks for organic growth and retention:
+
+- **The Wordle Engine (Daily Seed):** The game architecture MUST support a Daily Challenge mode. Use a deterministic procedural generation algorithm seeded by the current date (`YYYYMMDD`) so all users globally play the exact same level every 24 hours.
+- **1-Tap Share Loop:** Implement the native mobile Web Share API (`navigator.share`). When a user beats a Daily Challenge, automatically generate a text-based emoji grid (e.g., 🟩 🟨 ⬛) of their gameplay and prompt them to share it to WhatsApp/Twitter.
+
+---
+
+## Related rules
+
+| Need | Rule |
+|------|------|
+| Game embed, PWA, iframe height | `games-building.mdc` §4, §12 |
+| Capacitor/React site deploy | `website-building.mdc` |
+| Touch targets, a11y | `universal-product.mdc` §2a |
+| Mobile UX, daily share hooks | This rule §11, §12 |

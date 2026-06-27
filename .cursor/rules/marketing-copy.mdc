@@ -1,0 +1,128 @@
+---
+description: Marketing copy — homepage, landing, pricing, feature, about page copy; headlines, CTAs, value propositions, taglines. Use when writing or rewriting persuasive website text.
+globs: "**/*.{md,html,jsx,tsx,vue},**/content/**/*,src/**/copy*,src/**/i18n*"
+alwaysApply: false
+---
+
+# Marketing Copy
+
+**Intent:** Write clear, compelling copy that drives action on marketing pages — not brand positioning workshops (`brand-strategy.mdc`), not SEO element checklists (`on-page-seo.mdc`), not centralizing strings in code (`website-building.mdc`).
+
+---
+
+## Before you write **[core]**
+
+1. Read `.agents/product-marketing.md` if present — use ICP, voice, customer language, proof points.
+2. If voice is undefined, run `brand-strategy.mdc` Mode A/C or `product-marketing-context.mdc` first.
+3. Gather page-specific context (ask only if missing):
+   - Page type (homepage, landing, pricing, feature, about)
+   - **One** primary action (signup, book demo, download, purchase)
+   - Traffic source (ads, organic, email) — headline must match intent
+   - Objections to address on this page
+
+---
+
+## Copy principles **[core]**
+
+| Principle | Practice |
+|-----------|----------|
+| Clarity over cleverness | If you must choose, choose clear |
+| Benefits over features | What it means for the customer, not what it does |
+| Specificity over vagueness | Numbers, time saved, named outcomes — not "streamline" or "optimize" |
+| Customer language | Mirror voice-of-customer from context doc, reviews, support |
+| One idea per section | Build a logical argument down the page |
+| Honest over sensational | No fabricated stats or testimonials |
+
+### Style rules
+
+- Simple words: "use" not "utilize"
+- Active voice; cut "almost," "very," "really"
+- No exclamation points in body copy
+- Show outcomes; avoid empty buzzwords
+
+---
+
+## Page structure **[core]**
+
+### Above the fold
+
+| Element | Rule |
+|---------|------|
+| **Headline** | Single most important message; specific > generic |
+| **Subheadline** | Expands headline; 1–2 sentences max |
+| **Primary CTA** | Action + what they get: "Start free trial" > "Sign up" |
+
+**Headline formulas (pick one fit):**
+- `{Outcome} without {pain}`
+- `The {category} for {audience}`
+- `Never {unpleasant event} again`
+- Question highlighting main pain
+
+### Core sections (order as needed)
+
+| Section | Purpose |
+|---------|---------|
+| Social proof | Logos, stats, testimonials — credibility early |
+| Problem / pain | Show you understand their situation |
+| Solution / benefits | 3–5 outcomes tied to jobs |
+| How it works | 3–4 steps; reduce perceived complexity |
+| Objection handling | FAQ, comparisons, guarantees |
+| Final CTA | Recap value + repeat CTA + risk reversal |
+
+---
+
+## Page-specific guidance **[applicable if page type matches]**
+
+| Page | Focus |
+|------|-------|
+| Homepage | Broadest value prop; clear paths for different intents |
+| Landing page | Single message, single CTA; match ad/traffic source |
+| Pricing | Reduce "which plan?" anxiety; make recommendation obvious |
+| Feature | Feature → benefit → outcome; path to try/buy |
+| About | Why you exist; connect mission to customer benefit; still include CTA |
+
+---
+
+## CTA copy **[core]**
+
+**Weak:** Submit, Sign Up, Learn More, Click Here, Get Started
+
+**Strong:** Start Free Trial, Get [Specific Thing], See [Product] in Action, Create Your First [Thing]
+
+**Formula:** [Action verb] + [What they get] + [Qualifier if needed]
+
+---
+
+## Output format **[core]**
+
+Provide:
+
+### Page copy
+Organized by section: headline, subheadline, CTA, section headers, body, secondary CTAs.
+
+### Annotations
+For headline and primary CTA: why this choice + which principle it applies.
+
+### Alternatives
+For headline and primary CTA: 2–3 options with rationale each.
+
+### Meta handoff `[applicable if SEO matters]`
+Suggest page title + meta description — implementation details → `on-page-seo.mdc`.
+
+---
+
+## What this rule does not cover
+
+| Need | Use instead |
+|------|-------------|
+| Positioning, tone matrix, rebrand | `brand-strategy.mdc` |
+| Title/meta/canonical/keyword map | `on-page-seo.mdc` |
+| Email, popup, ad copy | domain-specific skills / archive rules |
+| Put copy in `i18n.js` / `copy.ts` | `website-building.mdc` § Copy source of truth |
+
+## Related rules
+
+- Voice and pillars → `brand-strategy.mdc`
+- Context doc → `product-marketing-context.mdc`
+- Ship SEO tags → `on-page-seo.mdc`
+- Redundancy audit on live pages → `website-building.mdc` § Simplification

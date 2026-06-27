@@ -83,6 +83,8 @@ Google Search Console, PageSpeed Insights, Rich Results Test, Mobile-Friendly Te
 
 ## Related rules
 
+- Site-wide diagnosis (ranking drops, indexation) → `seo-audit.mdc`
+- Scaled template page programs → `programmatic-seo.mdc`
 - SPA title/meta on route change → `website-building.mdc`
 - AI citation structure → `ai-seo.mdc`
 - Backlinks and authority → `off-page-seo.mdc`

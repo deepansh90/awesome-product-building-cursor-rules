@@ -26,12 +26,18 @@ Each rule has a **title** and **intent** at the top. Only `cursor-agent-discipli
 | [`website-building.mdc`](.cursor/rules/website-building.mdc) | Web Applications (Static & SPA) | Sites, SPA deploy, hosting vendored bundles |
 | [`automation-software.mdc`](.cursor/rules/automation-software.mdc) | Browser & Form Automation | Selenium/Playwright bots |
 | [`games-building.mdc`](.cursor/rules/games-building.mdc) | Game Development | Any genre; engine, embed, PWA |
+| [`web-to-android-app-conversion.mdc`](.cursor/rules/web-to-android-app-conversion.mdc) | Web-to-Android | WebView/Capacitor shells, Play icons/screenshots, five themes, signing |
 | [`cursor-agent-discipline.mdc`](.cursor/rules/cursor-agent-discipline.mdc) | Agent Discipline | How AI edits code (always on) |
 | [`agent-discipline.mdc`](.cursor/rules/agent-discipline.mdc) | Agent Discipline (minimal) | Ask-first, minimal-change behavior (always on) |
 | [`java-spring-end-to-end.mdc`](.cursor/rules/java-spring-end-to-end.mdc) | Java Spring End-to-End | Spring Boot + JPA + test pyramid |
 | [`product-council.mdc`](.cursor/rules/product-council.mdc) | Product Council (CIRCLES) | Idea/spec critique before build |
 | [`steve-jobs.mdc`](.cursor/rules/steve-jobs.mdc) | Steve Jobs & Mindful Essentialist | Ultrathink UI (no feature changes); vision Q&A; idea tables; essentialism |
 | [`on-page-seo.mdc`](.cursor/rules/on-page-seo.mdc) | On-Page SEO | Titles, content, internal links, page audits |
+| [`product-marketing-context.mdc`](.cursor/rules/product-marketing-context.mdc) | Product Marketing Context | Shared ICP, positioning, voice (`.agents/product-marketing.md`) |
+| [`brand-strategy.mdc`](.cursor/rules/brand-strategy.mdc) | Brand Strategy | Positioning, values, segmentation, tone, creative direction |
+| [`marketing-copy.mdc`](.cursor/rules/marketing-copy.mdc) | Marketing Copy | Headlines, CTAs, landing/home/pricing page copy |
+| [`seo-audit.mdc`](.cursor/rules/seo-audit.mdc) | SEO Audit | Site-wide crawlability, technical SEO, ranking diagnosis |
+| [`programmatic-seo.mdc`](.cursor/rules/programmatic-seo.mdc) | Programmatic SEO | Scaled template pages, directories, pSEO playbooks |
 
 **Optional archive** (not in default `.cursor/rules/` copy): drafts under [`.cursor/Don't include these/`](.cursor/Don't%20include%20these/) — e.g. `python-web-backend.mdc`, `apple-mobile-swiftui.mdc`, `ai-seo.mdc`, `off-page-seo.mdc`, `google-ads.mdc`, `github-workflows.mdc`. Cherry-pick into your project if needed.
 
@@ -50,7 +56,11 @@ Each rule has a **title** and **intent** at the top. Only `cursor-agent-discipli
 | iOS / SwiftUI | + `apple-mobile-swiftui` from archive |
 | Game (browser, embed, PWA) | + `product-council` + `games-building` |
 | Game embedded in parent site | + `games-building` + `website-building` |
-| Marketing / growth (SEO, AI search, Google Ads) | + `on-page-seo`; + `off-page-seo`, `ai-seo`, `google-ads` from archive if needed |
+| Web game → Google Play (WebView or Capacitor) | + `web-to-android-app-conversion` + `games-building` |
+| New brand or rebrand | + `product-marketing-context` → `brand-strategy` → `marketing-copy` |
+| Marketing / growth (SEO, AI search, Google Ads) | + `on-page-seo`; + `seo-audit` for troubleshooting; + `programmatic-seo` for scaled landings; + `off-page-seo`, `ai-seo`, `google-ads` from archive if needed |
+| SEO troubleshooting (traffic drop, not ranking) | + `seo-audit` → then `on-page-seo` for page fixes |
+| Scaled SEO landing pages (templates + data) | + `programmatic-seo` + `on-page-seo` + `website-building` |
 
 ## Tool boundaries
 
@@ -65,9 +75,9 @@ Patterns informed by community collections and public best-practice guides, incl
 
 - [cursor-ai-tips](https://github.com/murataslan1/cursor-ai-tips) (agent workflow, common mistakes)
 - [awesome-cursorrules](https://github.com/PatrickJS/awesome-cursorrules) (Conventional Commits, Playwright E2E, Python/Java/SwiftUI stack patterns)
-- [marketingskills](https://github.com/coreyhaines31/marketingskills) (seo-audit, ai-seo, ads, directory-submissions patterns)
-- [alirezarezvani/claude-skills](https://github.com/alirezarezvani/claude-skills) (programmatic SEO playbooks)
-- [rampstackco/claude-skills](https://github.com/rampstackco/claude-skills) (programmatic SEO quality control)
+- [marketingskills](https://github.com/coreyhaines31/marketingskills) (product-marketing, copywriting, seo-audit, marketing-psychology patterns)
+- [alirezarezvani/claude-skills](https://github.com/alirezarezvani/claude-skills) (programmatic SEO playbooks, brand-guidelines)
+- [rampstackco/claude-skills](https://github.com/rampstackco/claude-skills) (programmatic SEO quality control at scale)
 
 - **Dieter Rams** — product/UI principles referenced in `universal-product.mdc` §1b (clarity, honesty, as little design as possible)
 - **CIRCLES** — product sense framework (Lewis C. Lin); used in `product-council.mdc`
