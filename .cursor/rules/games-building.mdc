@@ -85,8 +85,71 @@ Host routing details → `website-building.mdc` (vendored folder only).
 - E2E (Playwright or equivalent): reach first interactive frame, complete minimal play path, screenshot on critical views.
 - **`[applicable if deterministic core]`** — automated replay verification in CI.
 - Smoke narrow + wide viewport; test embed and standalone if both ship.
+- **`[applicable if level-based puzzle]`** — **one unit test per level** (structure + solvability where provable); shared `level-count.test.mjs` asserting N levels in source; update E2E copy when total level count changes (e.g. `Puzzle 1 / 15`, not stale `/ 3`).
+- **`[applicable if embed iframe on educational host]`** — run E2E against local preview server serving `dist/client` at `/games/<slug>/`; keep `?e2e=1` auto-win paths **fast and deterministic** (instant win when puzzle already solved — do not depend on multi-second animations in CI).
 
-## §9 Optional / niche
+## §12 Embed puzzle suite — production learnings (Bharat Brawlers / dsapatterns) **[applicable if iframe embed on parent SPA]**
+
+Reference implementation: five TanStack Router games vendored to `public/games/<slug>/` on dsapatterns-website. Capture these before shipping the next embed game.
+
+### Theme switcher (Equalize tokens + Tailwind)
+
+- Import `equalize-theme-templates.css` **before** Tailwind; Tailwind `@layer base { body { background-color: var(--color-background) } }` **overrides** `body { background: var(--bg) }` — themes appear broken (always white/light).
+- **Fix:** after Tailwind base, force embed shells:
+  ```css
+  html[class$="-embed"],
+  html[class$="-embed"] body {
+    background-color: var(--bg) !important;
+    color: var(--txt-hi) !important;
+  }
+  ```
+- **`useGameTheme`:** always `document.documentElement.setAttribute('data-theme', theme)` — do not remove the attribute for midnight.
+- Game shells and canvas wrappers: **`var(--bg)` / `var(--txt-hi)`**, not hardcoded `#0A0A0F`, `bg-black`, etc. Theme button needs `pointer-events: auto` and high z-index in iframe.
+
+### Iframe height — critical UI above the fold
+
+- Parent iframes are often **~370–500px tall** while a naive `min-h-screen` layout is **700px+**. Trays, CTAs, and instructions below the canvas are **invisible without scroll** (users report “missing mirrors / can’t play”).
+- **Fix:** `h-[100dvh] flex flex-col overflow-hidden` on root; **compact header (shrink-0)** → **interactive tray / primary actions (shrink-0, above canvas)** → **playfield (`flex-1 min-h-0`)**.
+- Screenshot or Playwright at **embed height**, not only full desktop viewport.
+
+### Touch vs drag (mirror / token trays)
+
+- HTML5 **drag-and-drop does not work reliably on mobile**. If gameplay is “drag from tray,” add **tap-to-select → tap grid cell to place** as the primary mobile path; keep drag as desktop enhancement.
+- Label empty tray honestly: puzzle may need **zero tray mirrors** (beam already hits target) — say so in UI, not only in README.
+
+### Level design at scale (15+ levels)
+
+- **Minimum bar:** 15 levels per puzzle game in the suite; each level named and listed in source.
+- **Solvability:** for ray/path puzzles, ship a **solver** (brute-force tray placement + `traceBeam`) and run in CI (`scripts/games/validate-*-puzzles.ts` or test helper). Hand-authored mirror paths must be traced — `/` vs `\` reflection is easy to get wrong.
+- **Seeded procedural levels** (e.g. wire grid): `generatePuzzleForLevel(n)` with `LEVEL_COUNT = 15`; clamp level index; verify connected/solvable path for e2e `skipShuffle` builds.
+- **Echo / timing games:** e2e uses `?e2e=1` to auto-complete or skip shuffle; keep **3 fast E2E specs** for levels 1–3 even when product has 15 levels.
+
+### Game-specific pitfalls (verified in production)
+
+| Game | Pitfall | Fix |
+|------|---------|-----|
+| **Laser / mirror** | Tray below fold; puzzle 1 has 0 mirrors | Tray above canvas; tap-to-place; hint when tray empty |
+| **Pixel path** | Player orb only drawn when `running` | Draw orb + gold on title preview and whenever `screen === playing` |
+| **Track / urgency** | Random rotation of **path** tiles → instant derail | Scramble **decoys only** when enterable but unsolved; e2e `skipShuffle` + instant win if `isPathConnected` |
+| **Echo node** | Doors require plates held while walking to exit | **Latch** doors once both plates pressed together |
+| **Neon circuit** | E2E expects win overlay | Pre-solved grid when `?e2e=1`; skip rotation randomization |
+
+### Embed build pipeline (CSR in iframe)
+
+- **`DSAPATTERNS_EMBED=1`:** Vite `ssr: false`; build → `scripts/games/patch-embed-client.mjs` (basepath) → `generate-csr-index.mjs` (single `index.html` shell) → vendor to `public/games/<slug>/`.
+- Preview all five: `node scripts/games/embed-preview-server.mjs` on port 5299; Playwright `baseURL` points there.
+- After deploy: purge CDN cache for `/` and `/games/*` if shell references stale JS hashes.
+
+### Verification checklist before push
+
+```bash
+node --test tests/games/*.test.mjs          # level count + solvability
+npm run build:embed:games                   # all dists + vendor
+npx playwright test -c playwright.games.config.mjs
+```
+
+Do **not** commit scratch scripts (`check_*.mjs`, `staged_diff.txt`) — add to `.gitignore` if they recur.
+
 
 | Tag | Topics |
 |-----|--------|
