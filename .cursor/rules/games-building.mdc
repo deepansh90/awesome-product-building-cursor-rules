@@ -147,6 +147,12 @@ Cross-promo footers may reference UTC daily rotation; **Mind Pack hub is removed
   ```
 - **`useGameTheme`:** always `document.documentElement.setAttribute('data-theme', theme)` — do not remove the attribute for midnight.
 - Game shells and canvas wrappers: **`var(--bg)` / `var(--txt-hi)`**, not hardcoded `#0A0A0F`, `bg-black`, etc. Theme button needs `pointer-events: auto` and high z-index in iframe.
+- **Placement (live audit Jun 2026):** default `ThemeSwitcher` at `bottom: 20px; right: 20px` overlaps bottom trays, modals, and touch zones (confirmed on Pocket Park Tycoon **Reset**, Helicopter Rush play area, Arrow Time arrow-type row). **Hide or relocate** when overlays/menus are open; verify at embed iframe width (~600px), not only full desktop viewport.
+
+### Host games page — mobile iframe visibility
+
+- On narrow host viewports (~650px), the games list stacks above the iframe; the embed can start **below the fold** (~1000px+ from top) so users do not see the game after tapping a title.
+- **Fix (host):** on `#games/<slug>` change, `scrollIntoView` the iframe region or collapse the nav list on small breakpoints.
 
 ### Iframe height — critical UI above the fold
 
@@ -189,6 +195,8 @@ Cross-promo footers may reference UTC daily rotation; **Mind Pack hub is removed
 | **Track / urgency** | Random rotation of **path** tiles → instant derail | Scramble **decoys only** when enterable but unsolved; e2e `skipShuffle` + instant win if `isPathConnected` |
 | **Echo node** | Doors require plates held while walking to exit | **Latch** doors once both plates pressed together |
 | **Neon circuit** | E2E expects win overlay | Pre-solved grid when `?e2e=1`; skip rotation randomization |
+| **Theme switcher** | Fixed bottom-right chip overlaps trays/modals | Hide on overlay open or move to header; test ~600px embed width |
+| **Host games nav (mobile)** | Iframe below full game list | Scroll embed into view on select or collapse list on `sm:` breakpoints |
 
 ### Embed build pipeline (CSR in iframe)
 
