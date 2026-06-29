@@ -96,21 +96,21 @@ Reference implementation: **eleven TanStack Start CSR games** vendored to `publi
 
 | Display name | Slug | Hash route | Levels/waves |
 |--------------|------|------------|--------------|
-| TimeTwin | `echo-node` | `#games/echo-node` | 30 |
-| GhostLoop | `pixel-path` | `#games/pixel-path` | 20 |
-| Helicopter Rush | `choppa` | `#games/choppa` | 20 |
-| Arrow Time | `arrow-master` | `#games/arrow-master` | 20 |
-| Train Panic | `track-tycoon` | `#games/track-tycoon` | 20 |
-| Optic Beam Puzzle | `neon-ray` | `#games/neon-ray` | 30 |
-| Circuit Flow | `neon-circuit` | `#games/neon-circuit` | 20 |
-| GRID Tower Defense | `grid-td` | `#games/grid-td` | 20 |
-| Pocket Park Tycoon | `parkos` | `#games/parkos` | 20 |
+| TimeTwin | `time-twin` | `#games/time-twin` | 30 |
+| GhostLoop | `ghost-loop` | `#games/ghost-loop` | 20 |
+| Helicopter Rush | `helicopter-rush` | `#games/helicopter-rush` | 20 |
+| Arrow Time | `arrow-time` | `#games/arrow-time` | 20 |
+| Train Panic | `train-panic` | `#games/train-panic` | 20 |
+| Optic Beam Puzzle | `optic-beam-puzzle` | `#games/optic-beam-puzzle` | 30 |
+| Circuit Flow | `circuit-flow` | `#games/circuit-flow` | 20 |
+| GRID Tower Defense | `grid-tower-defense` | `#games/grid-tower-defense` | 20 |
+| Pocket Park Tycoon | `pocket-park-tycoon` | `#games/pocket-park-tycoon` | 20 |
 | Crush the Swappy | `crush-the-swappy` | `#games/crush-the-swappy` | 30 |
 | Orbit Defense | `orbit-defense` | `#games/orbit-defense` | 30 |
 
-**GRID Tower Defense** (`grid-td`, ASCII roguelike TD) and **Orbit Defense** (`orbit-defense`, minimalist path TD) are distinct SKUs — never conflate slugs or copy.
+**GRID Tower Defense** (`grid-tower-defense`, ASCII roguelike TD) and **Orbit Defense** (`orbit-defense`, minimalist path TD) are distinct SKUs — never conflate slugs or copy.
 
-Slugs are stable for bookmarks/CDN; display names target Play Store keywords.
+Slugs are stable for bookmarks/CDN; display names target Play Store keywords. Legacy hash routes (`#games/echo-node`, etc.) redirect to canonical slugs via `LEGACY_GAME_SLUG_REDIRECTS` in dsapatterns `routes.js`.
 
 **All eleven embeds** must ship the **Equalize 5-theme switcher** (`balance`, `ember`, `zen`, `midnight`, `ocean`) via copied `useGameTheme.ts` + `ThemeSwitcher.tsx` + `equalize-theme-templates.css` (see Theme switcher below).
 
