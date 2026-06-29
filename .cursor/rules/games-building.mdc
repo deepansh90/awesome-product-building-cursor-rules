@@ -85,12 +85,48 @@ Host routing details → `website-building.mdc` (vendored folder only).
 - E2E (Playwright or equivalent): reach first interactive frame, complete minimal play path, screenshot on critical views.
 - **`[applicable if deterministic core]`** — automated replay verification in CI.
 - Smoke narrow + wide viewport; test embed and standalone if both ship.
-- **`[applicable if level-based puzzle]`** — **one unit test per level** (structure + solvability where provable); shared `level-count.test.mjs` asserting N levels in source; update E2E copy when total level count changes (e.g. `Puzzle 1 / 15`, not stale `/ 3`).
-- **`[applicable if embed iframe on educational host]`** — run E2E against local preview server serving `dist/client` at `/games/<slug>/`; keep `?e2e=1` auto-win paths **fast and deterministic** (instant win when puzzle already solved — do not depend on multi-second animations in CI).
+- **`[applicable if level-based puzzle]`** — **one unit test per level** (structure + solvability where provable); shared `level-count.test.mjs` asserting N levels in source; update E2E copy when total level count changes (e.g. `Puzzle 1 / 30` for Echo, `/ 20` for most suite games — never stale `/ 3` or `/ 15`).
+- **`[applicable if embed iframe on educational host]`** — run E2E against local preview server serving `dist/client` at `/games/<slug>/`; keep `?e2e=1` auto-win paths **runtime-only** (never `VITE_E2E` at build — `build-all-embeds.mjs` deletes it); clear `localStorage` progress keys in `beforeEach`; `campaign-5` (all 9 embeds, levels 1–5) + `campaign-15` (subset 1–20); fast and deterministic (instant win when puzzle already solved).
 
 ## §12 Embed puzzle suite — production learnings (Bharat Brawlers / dsapatterns) **[applicable if iframe embed on parent SPA]**
 
-Reference implementation: five TanStack Router games vendored to `public/games/<slug>/` on dsapatterns-website. Capture these before shipping the next embed game.
+Reference implementation: **nine TanStack Start CSR games** vendored to `public/games/<slug>/` on dsapatterns-website (`#games/<slug>` hash routes). Full inventory → Bharat Brawlers `docs/embed-dsapatterns-puzzles.md`; tier scores → `GAMES_RANKING.md`.
+
+### Embed inventory (June 2026)
+
+| Display name | Slug | Hash route | Levels |
+|--------------|------|------------|--------|
+| Echo Delay | `echo-node` | `#games/echo-node` | 30 |
+| Ghost Path | `pixel-path` | `#games/pixel-path` | 20 |
+| Choppa | `choppa` | `#games/choppa` | 20 |
+| Longbow | `arrow-master` | `#games/arrow-master` | 20 |
+| Rail Rush | `track-tycoon` | `#games/track-tycoon` | 20 |
+| Laser Mirror | `neon-ray` | `#games/neon-ray` | 30 |
+| Wire Connect | `neon-circuit` | `#games/neon-circuit` | 20 |
+| GRID Defense | `grid-td` | `#games/grid-td` | 20 |
+| ParkOS | `parkos` | `#games/parkos` | 20 |
+
+Slugs are stable for bookmarks/CDN; display names target Play Store keywords.
+
+### Tier strategy (investment order)
+
+Use `GAMES_RANKING.md` scores — do not polish all nine equally:
+
+- **Tier A (invest):** Echo Delay, Ghost Path — ghost overlays, share, campaign depth.
+- **Tier B (polish):** Choppa, Longbow — distinct hooks, OG share, PB ghost.
+- **Tier C (differentiate):** Rail Rush, Laser Mirror, Wire Connect — daily mode, beam preview, undo.
+- **Tier D (demo hooks only):** GRID Defense, ParkOS — 20 levels shipped; juice/onboarding deferred.
+
+### Viral hooks (client-only — no server leaderboards)
+
+Copy templates from `scripts/games/templates/` into each game's `src/lib/` (never import `../../../scripts/` from game src — paths break in standalone builds):
+
+- `dailySeed.ts` + `?daily=1` — deterministic daily puzzle.
+- `shareResult.ts` + `shareOverlay.css` — emoji/OG share cards on win.
+- `localBest.ts` — local PB ghost replay.
+- `progress.ts` — campaign persist (`<slug>.progress` in `localStorage`).
+
+Cross-promo footers may reference UTC daily rotation; **Mind Pack hub is removed** — host lists all nine in `GamesSection`; legacy `#games/mind-pack` redirects only.
 
 ### Theme switcher (Equalize tokens + Tailwind)
 
@@ -117,12 +153,24 @@ Reference implementation: five TanStack Router games vendored to `public/games/<
 - HTML5 **drag-and-drop does not work reliably on mobile**. If gameplay is “drag from tray,” add **tap-to-select → tap grid cell to place** as the primary mobile path; keep drag as desktop enhancement.
 - Label empty tray honestly: puzzle may need **zero tray mirrors** (beam already hits target) — say so in UI, not only in README.
 
-### Level design at scale (15+ levels)
+### Level design at scale (20+ levels)
 
-- **Minimum bar:** 15 levels per puzzle game in the suite; each level named and listed in source.
+- **Minimum bar:** 20 levels per puzzle game (Echo 30, Laser Mirror 30+); each level named and listed in source.
 - **Solvability:** for ray/path puzzles, ship a **solver** (brute-force tray placement + `traceBeam`) and run in CI (`scripts/games/validate-*-puzzles.ts` or test helper). Hand-authored mirror paths must be traced — `/` vs `\` reflection is easy to get wrong.
-- **Seeded procedural levels** (e.g. wire grid): `generatePuzzleForLevel(n)` with `LEVEL_COUNT = 15`; clamp level index; verify connected/solvable path for e2e `skipShuffle` builds.
-- **Echo / timing games:** e2e uses `?e2e=1` to auto-complete or skip shuffle; keep **3 fast E2E specs** for levels 1–3 even when product has 15 levels.
+- **Seeded procedural levels** (e.g. wire grid): `generatePuzzleForLevel(n)` with `LEVEL_COUNT` matching shipped count; clamp level index; verify connected/solvable path for e2e `skipShuffle` builds.
+- **Echo / timing games:** e2e uses `?e2e=1` to auto-complete or skip shuffle; `campaign-5` covers levels 1–5 across all nine embeds.
+
+### Audio: `puzzleJuice.ts` (SFX) vs BGM
+
+- **SFX** — `puzzleJuice.ts` per game: WebAudio oscillators, haptics, slow-mo on solve. Call `unlockSfx()` on first user gesture.
+- **BGM** — separate concern: `HTMLAudioElement` looping files, not WebAudio. Do not mix BGM into `puzzleJuice.ts`.
+- **Pilot pattern** (Echo Node reference):
+  1. Place loop at `public/audio/<slug>/bgm-loop.{m4a|mp3|ogg}` (Vite copies to `dist/client/`).
+  2. Copy `scripts/games/templates/bgm.ts` → `src/lib/bgm.ts`; add thin `gameAudio.ts` wiring `unlockSfx()` + `playBgmLoop()` on first gesture.
+  3. Runtime URL: `/games/<slug>/audio/<slug>/bgm-loop.*`
+  4. `localStorage` key `<slug>.musicEnabled` (default on; respect `prefers-reduced-motion`).
+  5. `duckBgm()` on win overlay; `stopBgm()` on route unmount.
+  6. Source tracks live in `games/<folder>/music/` — **do not commit** `music/` folders; only ship `public/audio/` assets. Manifest: `scripts/games/music-asset-manifest.json`; prompts: `docs/game-music-prompts.md`.
 
 ### Game-specific pitfalls (verified in production)
 
@@ -136,19 +184,31 @@ Reference implementation: five TanStack Router games vendored to `public/games/<
 
 ### Embed build pipeline (CSR in iframe)
 
-- **`DSAPATTERNS_EMBED=1`:** Vite `ssr: false`; build → `scripts/games/patch-embed-client.mjs` (basepath) → `generate-csr-index.mjs` (single `index.html` shell) → vendor to `public/games/<slug>/`.
-- Preview all five: `node scripts/games/embed-preview-server.mjs` on port 5299; Playwright `baseURL` points there.
-- After deploy: purge CDN cache for `/` and `/games/*` if shell references stale JS hashes.
+- **`build-all-embeds.mjs`** orchestrates all nine: `DSAPATTERNS_EMBED=1` Vite build (`ssr: false`) → copy `.output/public` → `dist/client` → `patch-embed-client.mjs` (basepath, relative `./assets/`) → `generate-csr-index.mjs` (static `index.html` shell, no Nitro SSR fetch) → `patch-embed.mjs` (manifest / SW scope) → `vendor.mjs` rsync to `../dsapatterns-website/public/games/<slug>/`.
+- **Never set `VITE_E2E` at build** — build script deletes it; auto-win is runtime `?e2e=1` only.
+- Preview all nine: `node scripts/games/embed-preview-server.mjs` on port 5299; Playwright `baseURL` points there.
+- **Deploy:** after vendoring, in dsapatterns-website run `npm test && npm run test:e2e`, commit `public/games/`, push `main` (+ `main:master` mirror if used). Cloudflare Workers SPA fallback via `wrangler.jsonc` `not_found_handling`; purge CDN for `/` and `/games/*` if shell references stale JS hashes.
 
 ### Verification checklist before push
 
 ```bash
-node --test tests/games/*.test.mjs          # level count + solvability
-npm run build:embed:games                   # all dists + vendor
-npx playwright test -c playwright.games.config.mjs
+node --test tests/games/*.test.mjs                              # level count + solvability + CSR shell
+node scripts/games/build-all-embeds.mjs                         # all 9 dists + vendor (or SKIP_VENDOR=1)
+npx playwright test -c playwright.games.config.mjs e2e/games/campaign-5.spec.mjs   # levels 1→5, all 9
+npx playwright test -c playwright.games.config.mjs e2e/games/campaign-15.spec.mjs  # levels 1→20: Choppa, GRID, ParkOS, Longbow
 ```
 
-Do **not** commit scratch scripts (`check_*.mjs`, `staged_diff.txt`) — add to `.gitignore` if they recur.
+E2E `beforeEach`: clear `<slug>.progress` / `_epoch` keys in `localStorage`. Do **not** commit scratch scripts (`check_*.mjs`, `staged_diff.txt`) or `games/*/music/` source folders.
+
+### Stale pitfalls (June 2026)
+
+| Stale assumption | Reality |
+|------------------|---------|
+| "Five embed games" / Mind Pack hub | Nine games; `#games/mind-pack` redirects only |
+| "15 levels per game" | 20+ minimum; Echo 30, Laser 30 |
+| `import from '../../../scripts/games/templates/...'` in game `src/` | Copy template into `src/lib/` per game |
+| `VITE_E2E=1` at build time | Runtime `?e2e=1` only; build deletes `VITE_E2E` |
+| BGM via WebAudio in `puzzleJuice.ts` | SFX = WebAudio; BGM = `HTMLAudioElement` loop via `bgm.ts` |
 
 
 | Tag | Topics |
