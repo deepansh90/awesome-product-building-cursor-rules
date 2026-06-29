@@ -86,36 +86,42 @@ Host routing details → `website-building.mdc` (vendored folder only).
 - **`[applicable if deterministic core]`** — automated replay verification in CI.
 - Smoke narrow + wide viewport; test embed and standalone if both ship.
 - **`[applicable if level-based puzzle]`** — **one unit test per level** (structure + solvability where provable); shared `level-count.test.mjs` asserting N levels in source; update E2E copy when total level count changes (e.g. `Puzzle 1 / 30` for Echo, `/ 20` for most suite games — never stale `/ 3` or `/ 15`).
-- **`[applicable if embed iframe on educational host]`** — run E2E against local preview server serving `dist/client` at `/games/<slug>/`; keep `?e2e=1` auto-win paths **runtime-only** (never `VITE_E2E` at build — `build-all-embeds.mjs` deletes it); clear `localStorage` progress keys in `beforeEach`; `campaign-5` (all 9 embeds, levels 1–5) + `campaign-15` (subset 1–20); fast and deterministic (instant win when puzzle already solved).
+- **`[applicable if embed iframe on educational host]`** — run E2E against local preview server serving `dist/client` at `/games/<slug>/`; keep `?e2e=1` auto-win paths **runtime-only** (never `VITE_E2E` at build — `build-all-embeds.mjs` deletes it); clear `localStorage` progress keys in `beforeEach`; `campaign-5` (all **11** embeds, levels/waves 1–5) + `campaign-15` (subset 1–20); fast and deterministic (instant win when puzzle already solved).
 
 ## §12 Embed puzzle suite — production learnings (Bharat Brawlers / dsapatterns) **[applicable if iframe embed on parent SPA]**
 
-Reference implementation: **nine TanStack Start CSR games** vendored to `public/games/<slug>/` on dsapatterns-website (`#games/<slug>` hash routes). Full inventory → Bharat Brawlers `docs/embed-dsapatterns-puzzles.md`; tier scores → `GAMES_RANKING.md`.
+Reference implementation: **eleven TanStack Start CSR games** vendored to `public/games/<slug>/` on dsapatterns-website (`#games/<slug>` hash routes). Full inventory → Bharat Brawlers `docs/embed-dsapatterns-puzzles.md`; tier scores → `GAMES_RANKING.md`.
 
 ### Embed inventory (June 2026)
 
-| Display name | Slug | Hash route | Levels |
-|--------------|------|------------|--------|
-| Echo Delay | `echo-node` | `#games/echo-node` | 30 |
-| Ghost Path | `pixel-path` | `#games/pixel-path` | 20 |
-| Choppa | `choppa` | `#games/choppa` | 20 |
-| Longbow | `arrow-master` | `#games/arrow-master` | 20 |
-| Rail Rush | `track-tycoon` | `#games/track-tycoon` | 20 |
-| Laser Mirror | `neon-ray` | `#games/neon-ray` | 30 |
-| Wire Connect | `neon-circuit` | `#games/neon-circuit` | 20 |
-| GRID Defense | `grid-td` | `#games/grid-td` | 20 |
-| ParkOS | `parkos` | `#games/parkos` | 20 |
+| Display name | Slug | Hash route | Levels/waves |
+|--------------|------|------------|--------------|
+| TimeTwin | `echo-node` | `#games/echo-node` | 30 |
+| GhostLoop | `pixel-path` | `#games/pixel-path` | 20 |
+| Helicopter Rush | `choppa` | `#games/choppa` | 20 |
+| Arrow Time | `arrow-master` | `#games/arrow-master` | 20 |
+| Train Panic | `track-tycoon` | `#games/track-tycoon` | 20 |
+| Optic Beam Puzzle | `neon-ray` | `#games/neon-ray` | 30 |
+| Circuit Flow | `neon-circuit` | `#games/neon-circuit` | 20 |
+| GRID Tower Defense | `grid-td` | `#games/grid-td` | 20 |
+| Pocket Park Tycoon | `parkos` | `#games/parkos` | 20 |
+| Crush the Swappy | `crush-the-swappy` | `#games/crush-the-swappy` | 30 |
+| Orbit Defense | `orbit-defense` | `#games/orbit-defense` | 30 |
+
+**GRID Tower Defense** (`grid-td`, ASCII roguelike TD) and **Orbit Defense** (`orbit-defense`, minimalist path TD) are distinct SKUs — never conflate slugs or copy.
 
 Slugs are stable for bookmarks/CDN; display names target Play Store keywords.
+
+**All eleven embeds** must ship the **Equalize 5-theme switcher** (`balance`, `ember`, `zen`, `midnight`, `ocean`) via copied `useGameTheme.ts` + `ThemeSwitcher.tsx` + `equalize-theme-templates.css` (see Theme switcher below).
 
 ### Tier strategy (investment order)
 
 Use `GAMES_RANKING.md` scores — do not polish all nine equally:
 
-- **Tier A (invest):** Echo Delay, Ghost Path — ghost overlays, share, campaign depth.
-- **Tier B (polish):** Choppa, Longbow — distinct hooks, OG share, PB ghost.
-- **Tier C (differentiate):** Rail Rush, Laser Mirror, Wire Connect — daily mode, beam preview, undo.
-- **Tier D (demo hooks only):** GRID Defense, ParkOS — 20 levels shipped; juice/onboarding deferred.
+- **Tier A (invest):** TimeTwin, GhostLoop — ghost overlays, share, campaign depth.
+- **Tier B (polish):** Helicopter Rush, Arrow Time — distinct hooks, OG share, PB ghost.
+- **Tier C (differentiate):** Train Panic, Optic Beam Puzzle, Circuit Flow — daily mode, beam preview, undo.
+- **Tier D (demo hooks only):** GRID Tower Defense, Pocket Park Tycoon — 20 levels shipped; juice/onboarding deferred.
 
 ### Viral hooks (client-only — no server leaderboards)
 
@@ -126,7 +132,7 @@ Copy templates from `scripts/games/templates/` into each game's `src/lib/` (neve
 - `localBest.ts` — local PB ghost replay.
 - `progress.ts` — campaign persist (`<slug>.progress` in `localStorage`).
 
-Cross-promo footers may reference UTC daily rotation; **Mind Pack hub is removed** — host lists all nine in `GamesSection`; legacy `#games/mind-pack` redirects only.
+Cross-promo footers may reference UTC daily rotation; **Mind Pack hub is removed** — host lists all **eleven** in `GamesSection`; legacy `#games/mind-pack` redirects only.
 
 ### Theme switcher (Equalize tokens + Tailwind)
 
@@ -158,13 +164,15 @@ Cross-promo footers may reference UTC daily rotation; **Mind Pack hub is removed
 - **Minimum bar:** 20 levels per puzzle game (Echo 30, Laser Mirror 30+); each level named and listed in source.
 - **Solvability:** for ray/path puzzles, ship a **solver** (brute-force tray placement + `traceBeam`) and run in CI (`scripts/games/validate-*-puzzles.ts` or test helper). Hand-authored mirror paths must be traced — `/` vs `\` reflection is easy to get wrong.
 - **Seeded procedural levels** (e.g. wire grid): `generatePuzzleForLevel(n)` with `LEVEL_COUNT` matching shipped count; clamp level index; verify connected/solvable path for e2e `skipShuffle` builds.
-- **Echo / timing games:** e2e uses `?e2e=1` to auto-complete or skip shuffle; `campaign-5` covers levels 1–5 across all nine embeds.
+- **Echo / timing games:** e2e uses `?e2e=1` to auto-complete or skip shuffle; `campaign-5` covers levels/waves 1–5 across all **eleven** embeds.
 
 ### Audio: `puzzleJuice.ts` (SFX) vs BGM
 
 - **SFX** — `puzzleJuice.ts` per game: WebAudio oscillators, haptics, slow-mo on solve. Call `unlockSfx()` on first user gesture.
-- **BGM** — separate concern: `HTMLAudioElement` looping files, not WebAudio. Do not mix BGM into `puzzleJuice.ts`.
-- **Pilot pattern** (Echo Node reference):
+- **BGM** — separate from SFX. Two supported paths:
+  1. **File BGM** — `HTMLAudioElement` looping files via `scripts/games/templates/bgm.ts` (do not mix into `puzzleJuice.ts`).
+  2. **Procedural BGM** — step-sequencer loops via `scripts/games/templates/proceduralMusic/` (`tracks.ts`, `player.ts`) + thin `proceduralBgm.ts` wrapper. Copy into each game's `src/lib/` (never `../../../scripts/` imports). Used when no Suno asset exists (pixel-path `neon`, choppa `boss`, grid-td `dungeon`, parkos `tavern`). Crush the Swappy keeps an 11-track in-game picker (excludes tracks redistributed to embeds).
+- **Pilot pattern (file BGM)** — Echo Node reference:
   1. Place loop at `public/audio/<slug>/bgm-loop.{m4a|mp3|ogg}` (Vite copies to `dist/client/`).
   2. Copy `scripts/games/templates/bgm.ts` → `src/lib/bgm.ts`; add thin `gameAudio.ts` wiring `unlockSfx()` + `playBgmLoop()` on first gesture.
   3. Runtime URL: `/games/<slug>/audio/<slug>/bgm-loop.*`
@@ -184,17 +192,17 @@ Cross-promo footers may reference UTC daily rotation; **Mind Pack hub is removed
 
 ### Embed build pipeline (CSR in iframe)
 
-- **`build-all-embeds.mjs`** orchestrates all nine: `DSAPATTERNS_EMBED=1` Vite build (`ssr: false`) → copy `.output/public` → `dist/client` → `patch-embed-client.mjs` (basepath, relative `./assets/`) → `generate-csr-index.mjs` (static `index.html` shell, no Nitro SSR fetch) → `patch-embed.mjs` (manifest / SW scope) → `vendor.mjs` rsync to `../dsapatterns-website/public/games/<slug>/`.
+- **`build-all-embeds.mjs`** orchestrates all **eleven**: `DSAPATTERNS_EMBED=1` Vite build (`ssr: false`) → copy `.output/public` → `dist/client` → `patch-embed-client.mjs` (basepath, relative `./assets/`) → `generate-csr-index.mjs` (static `index.html` shell, no Nitro SSR fetch) → `patch-embed.mjs` (manifest / SW scope) → `vendor.mjs` rsync to `../dsapatterns-website/public/games/<slug>/`.
 - **Never set `VITE_E2E` at build** — build script deletes it; auto-win is runtime `?e2e=1` only.
-- Preview all nine: `node scripts/games/embed-preview-server.mjs` on port 5299; Playwright `baseURL` points there.
+- Preview all eleven: `node scripts/games/embed-preview-server.mjs` on port 5299; Playwright `baseURL` points there.
 - **Deploy:** after vendoring, in dsapatterns-website run `npm test && npm run test:e2e`, commit `public/games/`, push `main` (+ `main:master` mirror if used). Cloudflare Workers SPA fallback via `wrangler.jsonc` `not_found_handling`; purge CDN for `/` and `/games/*` if shell references stale JS hashes.
 
 ### Verification checklist before push
 
 ```bash
 node --test tests/games/*.test.mjs                              # level count + solvability + CSR shell
-node scripts/games/build-all-embeds.mjs                         # all 9 dists + vendor (or SKIP_VENDOR=1)
-npx playwright test -c playwright.games.config.mjs e2e/games/campaign-5.spec.mjs   # levels 1→5, all 9
+node scripts/games/build-all-embeds.mjs                         # all 11 dists + vendor (or SKIP_VENDOR=1)
+npx playwright test -c playwright.games.config.mjs e2e/games/campaign-5.spec.mjs   # levels/waves 1→5, all 11
 npx playwright test -c playwright.games.config.mjs e2e/games/campaign-15.spec.mjs  # levels 1→20: Choppa, GRID, ParkOS, Longbow
 ```
 
@@ -204,11 +212,11 @@ E2E `beforeEach`: clear `<slug>.progress` / `_epoch` keys in `localStorage`. Do 
 
 | Stale assumption | Reality |
 |------------------|---------|
-| "Five embed games" / Mind Pack hub | Nine games; `#games/mind-pack` redirects only |
+| "Five embed games" / Mind Pack hub | Eleven games; `#games/mind-pack` redirects only |
 | "15 levels per game" | 20+ minimum; Echo 30, Laser 30 |
 | `import from '../../../scripts/games/templates/...'` in game `src/` | Copy template into `src/lib/` per game |
 | `VITE_E2E=1` at build time | Runtime `?e2e=1` only; build deletes `VITE_E2E` |
-| BGM via WebAudio in `puzzleJuice.ts` | SFX = WebAudio; BGM = `HTMLAudioElement` loop via `bgm.ts` |
+| BGM via WebAudio in `puzzleJuice.ts` | SFX = WebAudio; BGM = file loop (`bgm.ts`) **or** procedural (`proceduralBgm.ts` + `proceduralMusic/`) |
 
 
 | Tag | Topics |
