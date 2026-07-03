@@ -436,6 +436,28 @@ Omit leaderboard, daily challenge, multiplayer, and “hints” unless §13 matr
 
 When porting TanStack Start / Vite / Nitro games into per-game Play shells (`games/<Name>/android/`), follow this pipeline. **Embed builds are not Play builds.**
 
+### Framework CLI (14 games, excludes Equalize)
+
+Registry: `Bharat Brawlers/scripts/games/android/registry.mjs`. Skill: `.agents/skills/webapp-to-android/SKILL.md`.
+
+```bash
+# One command — default: patch, web build, Gradle, icons
+node scripts/games/android/run.mjs <slug|--all> [--scaffold] [--screenshots] [--smoke]
+
+npm run android:all          # from Bharat Brawlers root
+node scripts/games/android/audit-parity.mjs
+```
+
+| Module | Role |
+|--------|------|
+| `run.mjs` | Orchestrator |
+| `patch-web.mjs` | `ANDROID_STANDALONE` vite/router/`__root` |
+| `apply-theme-parity.mjs` | 5-theme `ThemeSwitcher` (§13 discoverability) |
+| `build-web.mjs` | `dist/android-client/` (`.output/public` or `dist/client`) |
+| `capture-screenshots.mjs` | 1080×2400 via `screenshot-scenes.mjs` |
+
+Legacy shims: `build-android-standalone.mjs` → `run.mjs`.
+
 ### Canonical output chain
 
 ```

@@ -1,9 +1,7 @@
 ---
-description: Game development — engine/shell split, determinism, screens/embeds, PWA, testing; tagged optional sections
-globs: "**/packages/**/*",**/game/**,**/games/**,public/games/**/*,**/*engine*/**,**/ROADMAP.md",**/android/**/assets/**
+description: Game development — engine/shell split, determinism, screens/embeds, host iframe hardening, PWA, testing; tagged optional sections
 alwaysApply: false
 ---
-
 # Game Development
 
 **Intent:** Build any game genre (action, puzzle, idle, narrative) with optional determinism, embeds, and PWA — not general marketing site routing (see `website-building.mdc`). UI policy on all surfaces → `universal-product.mdc` §2a.
@@ -52,7 +50,7 @@ Standalone PWA **or** iframe on a parent site:
 - **Iframe / shell height** — `clamp()` / `dvh` floors so menus and CTAs are not clipped; `@media (max-height: …)` fallback.
 - **Touch** — minimum targets; on-screen controls when keyboard unavailable **`[applicable if mobile browser]`**.
 - **`[applicable if portrait-first mobile]`** — dedicated HUD pass (after core loop is fun on landscape/desktop).
-- **Host vendoring** — build with correct `base` subpath → copy to `public/games/<id>/` → host SPA fallback → theme overlay CSS for parent contrast.
+- **Host vendoring** — build with correct `base` subpath → copy to `public/games/<id>/` → host SPA fallback → theme overlay CSS for parent contrast. Host shell height, checklist, and Equalize minify → §12 *Host site integration* and *Legacy Equalize*.
 - **`[applicable if educational host]`** — short note naming real algorithms used (accurate labels only).
 
 Host routing details → `website-building.mdc` (vendored folder only).
@@ -76,8 +74,9 @@ Host routing details → `website-building.mdc` (vendored folder only).
 ## §7 Delivery & hardening **[core]**
 
 - **`[applicable if offline / installable]`** — PWA with documented SW strategy; on embed subpaths, scope or disable SW so the **parent site's** service worker and routing are not hijacked — test both standalone and iframe before ship.
-- No debug globals exposing solver, full state, or level data in production; build verify fails if reintroduced.
-- Minify shipped client JS; `drop_console` where appropriate; README states client bundles are not secret — license + server validation when cheating matters.
+- No debug globals exposing solver, full state, or level data in production; build verify fails if reintroduced. **Exception:** legacy Equalize `window.EqualizeDebug` is intentional upstream and stripped by the host minify gate — see §12 *Legacy Equalize*.
+- Minify shipped client JS; `drop_console` where appropriate; README states client bundles are not secret — license + server validation when cheating matters (deterrence, not secrecy).
+- **`[applicable if TanStack CSR embed suite]`** — Bharat `build-all-embeds.mjs` uses esbuild `drop: ['console']`; host `verify-game-dist-cloudflare.mjs` gates shipped assets.
 - Test on throttled network once before release.
 
 ## §8 Testing & definition of done **[core]**
@@ -151,12 +150,45 @@ Cross-promo footers may reference UTC daily rotation; **Mind Pack hub is removed
 - Game shells and canvas wrappers: **`var(--bg)` / `var(--txt-hi)`**, not hardcoded `#0A0A0F`, `bg-black`, etc. Theme button needs `pointer-events: auto` and high z-index in iframe.
 - **Placement (live audit Jun 2026):** default `ThemeSwitcher` at `bottom: 20px; right: 20px` overlaps bottom trays, modals, and touch zones (confirmed on Pocket Park Tycoon **Reset**, Helicopter Rush play area, Arrow Time arrow-type row). **Hide or relocate** when overlays/menus are open; verify at embed iframe width (~600px), not only full desktop viewport.
 
-### Host games page — mobile iframe visibility
+### Host site integration (dsapatterns-website) **[applicable if dsapatterns host]**
+
+Vendored static bundles live under `public/games/<slug>/`. The React shell is `src/components/GamesSection.jsx` (hash routes `#games/<slug>`, default `#games/equalize` in `App.jsx`).
+
+#### Outer iframe shell (host)
+
+- **Width:** responsive cap on the games column (`60vw`, `max-w-[900px]`, centered).
+- **Height:** stable block so in-iframe CTAs are not clipped — e.g. `h-[clamp(760px,96dvh,2000px)]` on the shell and `h-full min-h-0 flex-1` on the `<iframe>` so it fills the shell. Tune per game if a title needs more headroom.
+- **`iframeSrc`:** TanStack CSR embeds use `'/games/<slug>/'` (trailing slash helps SPA entry resolve). Legacy Equalize uses `'/games/equalize/equalize.html'`.
+
+#### Host games page — mobile iframe visibility
 
 - On narrow host viewports (~650px), the games list stacks above the iframe; the embed can start **below the fold** (~1000px+ from top) so users do not see the game after tapping a title.
 - **Fix (host):** on `#games/<slug>` change, `scrollIntoView` the iframe region or collapse the nav list on small breakpoints.
 
-### Iframe height — critical UI above the fold
+#### Tutorial UX inside the iframe (game-side)
+
+- **First-run tutorial** must stay usable when embedded: primary CTAs (**Next**, dots, **Start**) must not sit below a clipped fold.
+- **Detect embed early:** `window.self !== window.top` → add compact class on `<html>` as early as possible (inline script right after `<body>` for legacy single-file games; React mount for TanStack titles).
+- **Legacy Equalize (`html.eq-embed`):** scale deck (`width: min(96%, 60vw, 720px)`), fluid 3×3 grid (`minmax(0, 1fr)`, `aspect-ratio: 1`), `@media (max-height: 720px)` fallback; `#tut` needs `overflow-y: auto`, `-webkit-overflow-scrolling: touch`, generous `padding-bottom`, and `scroll-padding-bottom` so **Next** stays reachable.
+- **TanStack suite:** use `<slug>-embed` on `<html>` plus §12 *Iframe height* layout (`flex-col`, tray above canvas).
+
+#### Adding a vendored game (host checklist)
+
+1. **Upstream:** build with correct Vite `base` + router `basepath` (`/games/<slug>/`); fix or strip manifest / service worker `scope` and `start_url` for embed copy (see Bharat `docs/embed-dsapatterns-puzzles.md`).
+2. **Vendor:** copy **client** output only → `public/games/<slug>/` with `index.html` at that root (no SSR bundle required on static host).
+3. **`GamesSection.jsx`:** append to `GAMES` with `iframeSrc: '/games/<slug>/'`.
+4. **`App.jsx` / `routes.js`:** allow hash route; add `LEGACY_GAME_SLUG_REDIRECTS` if renaming slugs.
+5. **Embed CSS:** mirror compact iframe pattern if full-screen UI clips in short iframes.
+6. **Hardening:** strip debug globals before commit unless a parallel strip-and-verify pipeline exists (Equalize exception below; TanStack suite → `verify-game-dist-cloudflare.mjs`).
+7. **E2E:** add `#games/<slug>` to `e2e/smoke.spec.mjs` `pages` with **stable copy** the test asserts; extend Bharat `campaign-5` when adding a suite title.
+8. **README:** note vendored path, sync from upstream (`build-all-embeds.mjs`), honest security copy (client bundles are not secret).
+
+#### Cloudflare vs Vercel (nested SPA client routes)
+
+- `vercel.json` may rewrite `/games/<slug>/*` so deep links (e.g. `/play`) serve the **game** shell, not the marketing SPA.
+- **Cloudflare Workers** static hosting uses `wrangler.jsonc` `not_found_handling: single-page-application` for the **main** site — nested game SPAs may still need equivalent routing or path-specific rules; test live deep links after deploy and purge CDN for `/games/*` when hashes look stale.
+
+### Iframe height — critical UI above the fold (game-side)
 
 - Parent iframes are often **~370–500px tall** while a naive `min-h-screen` layout is **700px+**. Trays, CTAs, and instructions below the canvas are **invisible without scroll** (users report “missing mirrors / can’t play”).
 - **Fix:** `h-[100dvh] flex flex-col overflow-hidden` on root; **compact header (shrink-0)** → **interactive tray / primary actions (shrink-0, above canvas)** → **playfield (`flex-1 min-h-0`)**.
@@ -206,6 +238,14 @@ Cross-promo footers may reference UTC daily rotation; **Mind Pack hub is removed
 | **Attack the Army / lane TD** | Too many lanes + weak hit feedback | Fewer lanes (e.g. 4) + one `LANES` constant; `damageFlash` vignette + visible miss counter beats more briefing copy |
 | **Rename game folder** | Broken embed paths after `git mv` | **Slug stays stable** for CDN/bookmarks; update `embed-registry.mjs`, e2e, `verify-game-dist-cloudflare.mjs`, host `public/games/<slug>/` only |
 
+### Legacy Equalize (single-file HTML) **[applicable if equalize bundle on host]**
+
+Equalize ships as one self-contained `public/games/equalize/equalize.html` (not the TanStack CSR pipeline). Host-specific gates live on **dsapatterns-website**:
+
+- **`window.EqualizeDebug`** from the canonical Equalize repo is intentional — upstream E2E depends on it. The host **minify plugin strips it** from `dist/`; **`verify-equalize-dist.mjs`** fails the build if it reappears in `dist/games/equalize/equalize.html`. Do not strip manually when syncing upstream unless the pipeline is broken.
+- **Production minify** (`scripts/vite-plugin-minify-equalize.mjs`, registered in `vite.config.js`): after Vite copies `public/` → `dist/`, Terser runs on Equalize **inline** script (`compress`, **`mangle: true`**, **`drop_console: true`**, no comments) and **`levels.js`** (`mangle: false` so global **`LEVELS`** stays valid). No source maps for that step.
+- **New games:** add parallel minify + verify only if shipping comparable inline debug hooks or one-liner `window` exports. TanStack suite uses Bharat embed build + `verify-game-dist-cloudflare.mjs` instead.
+
 ### Embed build pipeline (CSR in iframe)
 
 - **`build-all-embeds.mjs`** orchestrates all **thirteen**: `DSAPATTERNS_EMBED=1` Vite build (`ssr: false`) → copy `.output/public` → `dist/client` → `patch-embed-client.mjs` (basepath, relative `./assets/`) → `generate-csr-index.mjs` (static `index.html` shell, no Nitro SSR fetch) → `patch-embed.mjs` (manifest / SW scope) → `vendor.mjs` rsync to `../dsapatterns-website/public/games/<slug>/`.
@@ -224,6 +264,19 @@ npx playwright test -c playwright.games.config.mjs e2e/games/campaign-15.spec.mj
 
 E2E `beforeEach`: clear `<slug>.progress` / `_epoch` keys in `localStorage`. Do **not** commit scratch scripts (`check_*.mjs`, `staged_diff.txt`) or `games/*/music/` source folders.
 
+### Quick references (dsapatterns host)
+
+| Concern | Where |
+|--------|--------|
+| Iframe height / width | `dsapatterns-website` `GamesSection.jsx` |
+| Equalize embed CSS + `eq-embed` | `public/games/equalize/equalize.html` |
+| TanStack embed plan (upstream) | Bharat Brawlers `docs/embed-dsapatterns-puzzles.md` |
+| CSR embed build + vendor | Bharat `scripts/games/build-all-embeds.mjs` |
+| TanStack dist verification | Bharat `scripts/games/verify-game-dist-cloudflare.mjs` |
+| Equalize prod minify | `dsapatterns-website` `scripts/vite-plugin-minify-equalize.mjs`, `vite.config.js` |
+| Equalize dist verification | `dsapatterns-website` `scripts/verify-equalize-dist.mjs`, `package.json` `build` |
+| Honest security copy | `dsapatterns-website` `README.md` **Games** section |
+
 ### Stale pitfalls (June 2026)
 
 | Stale assumption | Reality |
@@ -234,11 +287,22 @@ E2E `beforeEach`: clear `<slug>.progress` / `_epoch` keys in `localStorage`. Do 
 | `import from '../../../scripts/games/templates/...'` in game `src/` | Copy template into `src/lib/` per game |
 | `VITE_E2E=1` at build time | Runtime `?e2e=1` only; build deletes `VITE_E2E` |
 | BGM via WebAudio in `puzzleJuice.ts` | SFX = WebAudio; BGM = file loop (`bgm.ts`) **or** procedural (`proceduralBgm.ts` + `proceduralMusic/`) |
+| Separate `games-embed-hardening.mdc` on dsapatterns | Merged into this file §12 *Host site integration* + *Legacy Equalize* |
 
 ### Recent Learnings (July 2026)
 
 - **Web Share API (`navigator.share`) vs Clipboard**: Silently falling back to `navigator.clipboard.writeText` when `navigator.share` fails or is unsupported (common on some desktop environments) creates a jarring UX. Users expect a native share sheet; getting a silent "Copied to clipboard" instead is confusing. **Learning**: Avoid silent fallbacks. If native share isn't reliably supported, either hide the share button entirely, or provide explicit, separate "Copy Link" and "Share" buttons so the user knows exactly what will happen.
 - **Physics-Based CPU Opponents (Tank Wars)**: Implementing CPU AI in physics/trajectory games (like Tank Wars) doesn't require complex analytical math with wind integration. **Learning**: Use **Monte-Carlo simulation** during the CPU's turn. Run the deterministic physics loop headlessly 50-100 times with random angle/power variations, pick the trajectory that gets closest to the player, and add a small random `noise` variable to the final parameters so the CPU isn't unfairly perfect.
+- **Embed auto-start when skipping tutorial levels**: Hiding the start overlay in embed (`isEmbedMode() && !isE2eMode()`) is not enough if the sim tick gates on `running === false` — users see a static canvas ("hung"). **Learning**: When embed auto-jumps to `START_LEVEL_INDEX > 0`, set `running = true` on mount in the same code path that hides the start screen. E2E must still use `?e2e=1` to begin at level 1 for `campaign-5`.
+- **Progress epoch for start-level bumps**: Changing the first level players see invalidates old `localStorage` progress silently. **Learning**: Pair `START_LEVEL` / `START_LEVEL_INDEX` with a bumped `<slug>.progress_epoch`; on mismatch, reset progress to the new floor. Always exempt `?e2e=1` and document the epoch bump in the commit message.
+- **Tower defense leak detection**: Checking only `pathIdx >= path.length` misses creeps that visually passed the exit column. **Learning**: Extract testable helpers (`leakExitX`, `creepHasLeaked`, tier-based `leakLifeCost`); treat leak when path is exhausted **or** creep center `x >= exit column`. Unit-test leak predicates separately from React.
+- **TD win/lose same-frame race**: Clearing the last enemy and leaking on the same tick can show victory while lives hit zero. **Learning**: Mirror terminal flags in refs (`gameOverRef`, `wonRef`) read inside the RAF loop; stop `update()` when `gameOverRef` is true; on 0 lives set `won = false` explicitly — never infer defeat only from wave-clear logic.
+- **Physics special ammo (Crush the Swappy)**: Players expect bombs to explode on **any** impact, not only when hitting a crush target. **Learning**: In Matter.js `collisionActive`/`collisionStart`, detonate when `ammoKind === "bomb"` on either body; keep crush scoring on separate target collisions.
+- **Minimal embed copy beats briefing walls**: Long deploy/tutorial overlays shrink the playfield and do not improve retention. **Learning**: Steve-Jobs-style HUD — icon ammo bar, one-line goal, `⋯` for rare actions; invest juice in **damage feedback** (vignette, counters, near-miss signals) instead of more text.
+- **Stable slug vs display rename**: Folder/display name can change (`Game Genesis Forge-2` → `Crush the Swappy`) without breaking bookmarks if **embed slug** (`crush-the-swappy`) stays fixed. **Learning**: `git mv` the folder; update `scripts/games/embed-registry.mjs`, e2e paths, capture-screenshots — do not rename `public/games/<slug>/` unless intentionally migrating URLs.
+- **WinOverlay `testIdPrefix`**: Shared win overlay across games needs per-slug Playwright IDs without forking the component. **Learning**: Optional `testIdPrefix` prop → `{prefix}-win` / `{prefix}-continue`; pass slug-specific prefix from each game's play route.
+- **Pure sim helpers in TD/puzzle cores**: Leak checks and solvers belong in `src/lib/` with `node --test` coverage, not buried in component effects — enables fast regression when tuning wave scripts or grid size.
+- **TanStack route-tree build flake**: Occasional `Crawling result not available` during `routeTree.gen.ts` generation can fail `npm run build` for one game in `build-all-embeds.mjs`. **Learning**: Retry the single-game build; confirm new routes are imported in the router; do not vendor a partial dist to the host.
 
 | Tag | Topics |
 |-----|--------|
@@ -259,3 +323,5 @@ E2E `beforeEach`: clear `<slug>.progress` / `_epoch` keys in `localStorage`. Do 
 ## §11 Android shell **[applicable if Android native shell]**
 
 WebView/Capacitor packaging, Play Store graphics, five-theme checklist, Gradle sync, signing, and common WebView errors → **`web-to-android-app-conversion.mdc`** (moved here from this file — single source of truth).
+
+**Bharat Brawlers (14 TanStack games):** one-command pipeline at `scripts/games/android/run.mjs`; theme/audio parity via `audit-parity.mjs` + `music-asset-manifest.json`; only claim “5 themes” in Play copy when `ThemeSwitcher` is visible within 120s (§13).

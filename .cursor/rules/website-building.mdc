@@ -1,9 +1,6 @@
 ---
-description: Static/React/Vite websites — SPA deploy, simplification, vendored embeds, testing, docs map
-globs: "**/*.{jsx,tsx,vue,html,css,js,ts,mjs}",vite.config.*,wrangler.jsonc,vercel.json,e2e/**/*
-alwaysApply: false
+alwaysApply: true
 ---
-
 # Web Applications (Static & SPA)
 
 **Intent:** Ship, test, and host marketing or product web apps and **host vendored client bundles** (e.g. games). Cross-surface UI policy lives in `universal-product.mdc` §2a. Game engines and replay logic live in `games-building.mdc`. **Simplification passes** (cut copy, chrome, redundancy) → this rule § Simplification + `steve-jobs.mdc` Mode A.
@@ -15,10 +12,10 @@ alwaysApply: false
 | Doc | Purpose |
 |-----|---------|
 | `README.md` | Dev commands, deploy targets, design philosophy |
-| `design_spec.md` / `roadmap.md` | Product direction, paused features (e.g. monetization flags) |
+| `design_spec.md` / `design_specification.md` / `roadmap.md` | Product direction, paused features (e.g. monetization flags) |
 | `wrangler.jsonc` / `vercel.json` | Host-specific routing (only the file for your target) |
 
-Read before large changes.
+Read before large changes. **dsapatterns.io** repo-specific paths and deploy → § *DSA Patterns site*.
 
 ## Stack-agnostic defaults **[core]**
 
@@ -197,6 +194,8 @@ Rules:
 - **Vercel / Netlify:** equivalent SPA rewrite rules in host config.
 - **Dev server:** if you vend a nested client SPA under `public/<app>/`, mirror SPA fallback in Vite (or host) preview so deep links work locally — not only in production.
 
+**DSA Patterns production deploy** → § *DSA Patterns site* below (Wrangler upload, CDN purge, `main`/`master` mirror).
+
 ## Thin server on static apps **[applicable if Workers/API routes proxy third-party URLs or ingest user links]**
 
 Static-first does not mean zero server logic. When you add a **fetch proxy** or **link-ingest** handler (Drive folders, OG images, etc.), treat it as a shared resource every user hits.
@@ -267,7 +266,65 @@ npm run test:e2e   # when present
 
 ## Git & deploy **[core]**
 
-- After deploy, if users see stale shells: purge CDN cache for `/` and `/assets/*`, hard-refresh; confirm latest CI deploy succeeded.
+- **Canonical branch:** prefer `main`; if the remote still mirrors **`master`**, keep aligned: `git push origin main` then `git push origin main:master` when your workflow references both.
+- After deploy, if users see stale shells: purge CDN cache for `/` and `/assets/*` (and `/games/*` when vendored embeds changed), hard-refresh; confirm latest CI deploy succeeded.
+
+## DSA Patterns site (dsapatterns.io) **[applicable if dsapatterns-website repo]**
+
+**Project map** for agents working in `dsapatterns-website`. Embedded games → `games-building.mdc` §12 (*Host site integration*, *Legacy Equalize*).
+
+### Authoritative docs (read before large changes)
+
+| Doc | Use for |
+|-----|--------|
+| [`README.md`](README.md) | Dev commands, **Cloudflare Workers** deploy, Android/Capacitor, **Games** vendoring, testing, **design philosophy** (minimalist, focused) |
+| [`wrangler.jsonc`](wrangler.jsonc) | Cloudflare static assets from `./dist`, SPA `not_found_handling`; Worker `name` must match dashboard Worker |
+| [`design_specification.md`](design_specification.md) | Static-first React, Tailwind **without preflight** (`preflight: false` — branding in `style.css`), `public/data` JSON, component roles (`App.jsx`, `DSASection`, etc.) |
+| [`roadmap.md`](roadmap.md) | **Monetization paused** (`MONETIZATION_PAUSED`); restore pricing/auth later; **Equalize countdown mode** re-vendor when [upstream Equalize](https://github.com/deepansh90/deepansh90.github.io/blob/main/roadmap.md) ships it |
+| [`android/app/README_ANDROID.md`](android/app/README_ANDROID.md) | Native shell after `npm run build` + `npx cap copy/sync android` |
+
+### Stack and structure
+
+- **React 19**, **Vite**, **Tailwind v3** (layout utilities; global look/feel in [`style.css`](style.css)).
+- **Routing:** hash-based (`#dsa`, `#sysdes`, `#games/<slug>`, `#about`, etc.) — [`src/App.jsx`](src/App.jsx).
+- **Data:** static JSON under [`public/data/`](public/data/); curriculum markdown/images under `public/content/` where applicable.
+- **System Design UI:** reuse [`SystemDesignSection.jsx`](src/components/SystemDesignSection.jsx) patterns — `hi-sd-page`, `hi-sd-eyebrow`, `hi-sd-chapter`, article cards — for similar long-form or nav-heavy sections.
+
+### UI and UX (site-specific)
+
+- **Design philosophy:** simplicity, edge-to-edge readability, calm typography; avoid visual noise (see README).
+- **Themes:** **Default** and **Midnight** only — tokens in [`style.css`](style.css), switcher in [`Header.jsx`](src/components/Header.jsx), persistence in [`App.jsx`](src/App.jsx). Theme menu: opaque `.theme-switcher-menu` (no translucent bleed-through over trust bar).
+- **Copy:** English only — [`src/lib/i18n.js`](src/lib/i18n.js), `t()` with no locale argument. No language toggle without explicit product decision.
+- **Mobile:** semantic breakpoints (`sm:`, `lg:`), touch-friendly targets (~44px where it matters).
+- **Accessibility:** preserve `:focus-visible` from [`style.css`](style.css); keep keyboard affordances.
+
+### Monetization and premium code
+
+- **Monetization paused** unless explicitly re-enabling: search `MONETIZATION_PAUSED` in [`Header.jsx`](src/components/Header.jsx), [`App.jsx`](src/App.jsx), [`DSASection.jsx`](src/components/DSASection.jsx). Do not half-restore paywalls without [`roadmap.md`](roadmap.md).
+
+### Verification (dsapatterns)
+
+```bash
+npm test
+npm run build    # includes Equalize dist verification when games assets change
+npm run test:e2e
+```
+
+- Structural/SEO/data: `tests/*.test.mjs`.
+- Smoke: [`e2e/smoke.spec.mjs`](e2e/smoke.spec.mjs) — new hash pages need **stable copy** in the `pages` list.
+
+### Deployment (Cloudflare Workers + Git)
+
+Production for **dsapatterns.io** is driven from this repo via **Cloudflare** (Workers static assets), not only Vercel.
+
+- **Git integration:** Cloudflare dashboard links the Worker to **GitHub**; pushes to **`main`** trigger build. Treat **`main`** as source of truth; mirror **`master`** when workflow still references it (see § Git & deploy).
+- **Build + deploy:** `npm run build` then `npx wrangler versions upload`. [`wrangler.jsonc`](wrangler.jsonc): `assets.directory` = `./dist`, `not_found_handling` = `single-page-application`. **Do not** upload without successful Vite build — `dist/` must include `public/` (e.g. `public/games/**`).
+- **Worker name:** `"name"` in `wrangler.jsonc` must match Cloudflare Worker name.
+- **Stale live site:** Hashed `/assets/*` cache-bust each build; **`index.html`** may lag. After successful deploy: purge CDN (`/` and `/assets/*`, or purge all), hard-refresh/incognito; confirm deploy logs succeeded.
+- **Vercel-only config:** [`vercel.json`](vercel.json) rewrites apply on **Vercel**, not Cloudflare Worker. Nested game SPAs (`/games/<slug>/*`) may need extra routing on Cloudflare — `games-building.mdc` §12 *Cloudflare vs Vercel*.
+- **Sanity check:** `npm run build && npx wrangler versions upload --dry-run`.
+
+*Former `dsapatterns-website/.cursor/rules/website-conventions.mdc` content lives in this section.*
 
 ## What this rule does not cover
 
