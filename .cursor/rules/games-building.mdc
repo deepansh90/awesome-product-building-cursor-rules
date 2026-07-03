@@ -325,3 +325,5 @@ E2E `beforeEach`: clear `<slug>.progress` / `_epoch` keys in `localStorage`. Do 
 WebView/Capacitor packaging, Play Store graphics, five-theme checklist, Gradle sync, signing, and common WebView errors → **`web-to-android-app-conversion.mdc`** (moved here from this file — single source of truth).
 
 **Bharat Brawlers (14 TanStack games):** one-command pipeline at `scripts/games/android/run.mjs`; theme/audio parity via `audit-parity.mjs` + `music-asset-manifest.json`; only claim “5 themes” in Play copy when `ThemeSwitcher` is visible within 120s (§13).
+
+**Phase 8 — native shell & Play Vitals hardening** (when shipping WebView APKs): predictive back via `OnBackPressedDispatcher`, non-blocking `onCreate`, `IntentSanitizer` before external `startActivity`, `windowSoftInputMode="adjustResize"`, 16 KB NDK alignment if native libs are added, and `preBuild` Gradle asset sync for AGP 9. Enforced by `apply-native-hardening.mjs` / `audit-native-hardening.mjs` — see conversion rule §14 Phase 8 and skill `webapp-to-android` §5b–§7.

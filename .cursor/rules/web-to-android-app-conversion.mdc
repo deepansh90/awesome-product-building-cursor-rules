@@ -587,6 +587,22 @@ Gate **release** Play builds: strip `?e2e=1` auto-win paths in Gradle `stripRele
 | Fake / composited screenshots | Emulator from release APK/AAB only |
 | `com.dsapatterns.*` on standalone game | Per-game `applicationId` (e.g. `com.circuitflow.puzzle`) |
 
+### Phase 8 — Native shell & Play Vitals hardening **[applicable if Android native shell]**
+
+Patterns from modern WebView wrappers (`shiaho777/web-to-app`, `Jipok/website-to-apk`, `Drjacky/claude-android-ninja`). Bharat Brawlers enforces via `apply-native-hardening.mjs` + `audit-native-hardening.mjs`.
+
+| Concern | Requirement |
+|---------|-------------|
+| **Predictive back (API 33+)** | `onBackPressedDispatcher.addCallback` — never override deprecated `Activity.onBackPressed()` |
+| **Play Vitals ANR** | No blocking disk I/O in `onCreate`; defer `webView.loadUrl` with `webView.post { }` to keep start-to-interactive under ~2s |
+| **16 KB page size (API 35+)** | If adding NDK `.so` libs, link with `-Wl,-z,max-page-size=16384` (CMake: `ANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON`) |
+| **WebView immersion** | Double-back exit, `Intent.ACTION_VIEW` for external schemes, `mediaPlaybackRequiresUserGesture = false`, hardware acceleration, portrait lock, `shortEdges` cutout |
+| **Intent redirection security** | Strip `component`/`selector` from parsed intents; sanitize with `androidx.core.content.IntentSanitizer` before `startActivity()` |
+| **IME soft input** | `android:windowSoftInputMode="adjustResize"` on `<activity>` so keyboards resize the canvas on Android 15+ edge-to-edge |
+| **AGP 9 future-proofing** | `preBuild` → `Sync` into `layout.buildDirectory.dir("generated/gameAssets")` — not deprecated per-variant `assets` sourceSet hacks |
+
+Canonical Kotlin/manifest snippets: `Bharat Brawlers/scripts/games/android/native-hardening-template.mjs`.
+
 ---
 
 ## §15 Android Studio test & Play Store publish **[core]**

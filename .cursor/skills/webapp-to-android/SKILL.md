@@ -57,6 +57,8 @@ Registry: `scripts/games/android/registry.mjs` (14 games; Equalize excluded).
 | `registry.mjs` | Slugs, packageIds, activity layout |
 | `patch-web.mjs` | vite / router / gameBack / `__root` |
 | `apply-theme-parity.mjs` | ThemeSwitcher + cycling `useGameTheme` |
+| `apply-native-hardening.mjs` | Phase 8 shell: IntentSanitizer, predictive back, `adjustResize` |
+| `audit-native-hardening.mjs` | Verify §5b + Phase 8 on all 14 shells |
 | `scaffold.mjs` | Gradle + Kotlin WebView shell |
 | `build-web.mjs` | `dist/android-client/` CSR bundle |
 | `build-native.mjs` | debug APK, release APK, AAB |
@@ -176,10 +178,33 @@ When scaffolding or modifying Android web shells, enforce these patterns learned
 
 ---
 
+## §7 Phase 8 — Native shell & Play Vitals hardening
+
+Apply on every Bharat shell (and any new WebView game) via:
+
+```bash
+node scripts/games/android/apply-native-hardening.mjs --all
+node scripts/games/android/audit-native-hardening.mjs
+```
+
+| Check | Implementation |
+|-------|----------------|
+| Predictive back | `onBackPressedDispatcher.addCallback` — not `onBackPressed()` |
+| ANR / start-to-interactive | `webView.post { loadUrl(...) }` after `setContentView`; no sync asset I/O in `onCreate` |
+| Intent redirection | `IntentSanitizer` + strip `component`/`selector` before `startActivity` |
+| IME / keyboard | `android:windowSoftInputMode="adjustResize"` on activity |
+| 16 KB page size | Document in `app/build.gradle.kts` when NDK libs are added |
+| AGP 9 | `preBuild` → `generated/gameAssets` sync (§3) |
+
+Template source: `scripts/games/android/native-hardening-template.mjs`.
+
+---
+
 ## §6 Verification
 
 ```bash
 node scripts/games/android/run.mjs --all --skip-emulator
+node scripts/games/android/audit-native-hardening.mjs
 node scripts/games/android/audit-parity.mjs
 node scripts/games/android/capture-screenshots.mjs --all
 npm run test:e2e:games
