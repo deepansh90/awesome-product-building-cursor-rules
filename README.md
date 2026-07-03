@@ -23,10 +23,10 @@ Each rule has a **title** and **intent** at the top. Only `cursor-agent-discipli
 |------|--------|-------------|
 | [`system-design.mdc`](.cursor/rules/system-design.mdc) | System Design (HLD + LLD) | Architecture before implementation |
 | [`universal-product.mdc`](.cursor/rules/universal-product.mdc) | Universal Product Excellence | Philosophy, UI/a11y, security, privacy, ship criteria |
-| [`website-building.mdc`](.cursor/rules/website-building.mdc) | Web Applications (Static & SPA) | Sites, SPA deploy, hosting vendored bundles |
+| [`website-building.mdc`](.cursor/rules/website-building.mdc) | Web Applications (Static & SPA) | Sites, SPA deploy, dsapatterns.io map (§ DSA Patterns), vendored bundles |
 | [`automation-software.mdc`](.cursor/rules/automation-software.mdc) | Browser & Form Automation | Selenium/Playwright bots |
-| [`games-building.mdc`](.cursor/rules/games-building.mdc) | Game Development | Any genre; engine, embed, PWA |
-| [`web-to-android-app-conversion.mdc`](.cursor/rules/web-to-android-app-conversion.mdc) | Web-to-Android | WebView/Capacitor shells, Play icons/screenshots, five themes, signing |
+| [`games-building.mdc`](.cursor/rules/games-building.mdc) | Game Development | Engine, embed, host iframe hardening (§12), PWA, TanStack CSR suite |
+| [`web-to-android-app-conversion.mdc`](.cursor/rules/web-to-android-app-conversion.mdc) | Web-to-Android | WebView/Capacitor shells, Play icons/screenshots, §13 listing audit, §14 TanStack pipeline, **§15 Studio + Play publish** |
 | [`cursor-agent-discipline.mdc`](.cursor/rules/cursor-agent-discipline.mdc) | Agent Discipline | How AI edits code (always on) |
 | [`agent-discipline.mdc`](.cursor/rules/agent-discipline.mdc) | Agent Discipline (minimal) | Ask-first, minimal-change behavior (always on) |
 | [`java-spring-end-to-end.mdc`](.cursor/rules/java-spring-end-to-end.mdc) | Java Spring End-to-End | Spring Boot + JPA + test pyramid |

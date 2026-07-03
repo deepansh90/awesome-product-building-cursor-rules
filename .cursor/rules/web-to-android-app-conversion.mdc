@@ -567,6 +567,133 @@ Gate **release** Play builds: strip `?e2e=1` auto-win paths in Gradle `stripRele
 
 ---
 
+## §15 Android Studio test & Play Store publish **[core]**
+
+End-to-end checklist from **first open in Studio** through **Production** (or Internal testing). Run on **each** game shell before upload.
+
+### A. One-time machine setup
+
+| Step | Action |
+|------|--------|
+| JDK | **JDK 17** — `brew install openjdk@17` or use Android Studio’s embedded JDK (Settings → Build → Gradle → Gradle JDK). CLI: `export JAVA_HOME="/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home"` |
+| Android Studio | Latest stable; install **SDK Platform 35** + **Build-Tools** via SDK Manager |
+| Emulator | Device Manager → create phone AVD (e.g. Pixel 7, API 34+) |
+| Play Console | [Google Play Console](https://play.google.com/console) — developer account ($25 one-time) |
+
+### B. Build web assets (every web change)
+
+From **game monorepo root** (e.g. Bharat Brawlers):
+
+```bash
+node scripts/games/build-android-standalone.mjs <slug>
+# slug: circuit-flow | train-panic | grid-tower-defense | pocket-park-tycoon | tank-wars
+```
+
+Output: `games/<Name>/dist/android-client/`. Gradle syncs this on next build (§14).
+
+### C. Open project in Android Studio
+
+1. **File → Open** → `games/<Name>/android/` (the folder containing `settings.gradle.kts`, not the repo root).
+2. Let Gradle sync finish. If sync fails on JDK 25, set Gradle JDK to **17** in Settings.
+3. Confirm `local.properties` exists with `sdk.dir=…` (gitignored; Studio creates it).
+4. **Optional CLI sanity check** (faster than Studio for CI):
+   ```bash
+   cd games/<Name>/android
+   ./gradlew :app:assembleDebug
+   ```
+
+### D. Run on emulator or device (debug)
+
+1. Start AVD or connect USB device (USB debugging on).
+2. Select **app** configuration → **Run** (green play).
+3. **Smoke test (offline):** enable airplane mode → force-stop app → cold launch → game home/play loads (no blank WebView).
+4. Tap **back** — overlays/routes dismiss before app exits (`GameBack`).
+5. Run instrumentation tests (Circuit Flow / Train Panic):
+   ```bash
+   ./gradlew :app:connectedDebugAndroidTest
+   ```
+   Or full scripted pass: `node scripts/games/test-android-standalone.mjs` from repo root.
+
+### E. Build signed release AAB
+
+**Do not upload debug APKs to Play.** Use a **production keystore** (back up securely — loss = cannot update the app).
+
+**Android Studio (recommended first time):**
+
+1. **Build → Generate Signed App Bundle / APK…**
+2. Choose **Android App Bundle**.
+3. Create or select keystore (`release-key.keystore` is for **local test only** in repo shells).
+4. Build variant: **release**.
+5. Output: `app/build/outputs/bundle/release/app-release.aab`
+
+**CLI (CI / repeat uploads):**
+
+```bash
+export KEYSTORE_PASSWORD="your-secure-password"
+export KEY_ALIAS="release"
+export KEY_PASSWORD="your-secure-password"
+cd games/<Name>/android
+./gradlew :app:bundleRelease
+```
+
+Before upload: bump `versionCode` (+1) and `versionName` in `app/build.gradle.kts`.
+
+### F. §13 pre-upload audit (required)
+
+On a **clean install** of the **release AAB** (install via `bundletool` or Internal testing track):
+
+| Time | Check |
+|------|--------|
+| 0:00 | Cold launch, airplane mode — no crash |
+| 0:30 | First screen matches screenshot #1 |
+| 0:45 | Every home/HUD button cited in listing works |
+| 1:00 | One non-obvious listed feature (leaderboard, daily tab, undo) |
+| 1:20 | UI matches uploaded screenshots (theme, layout) |
+| 2:00 | `adb logcat` — no repeating fatal JS errors |
+
+Fill listing matrix in `docs/play-listings/<slug>.md` (or equivalent). **Do not** claim themes, modes, or leaderboard without discoverable UI (§13).
+
+Re-capture **Play screenshots from release build on emulator** (1080×2400) — preview-server shots are draft only.
+
+### G. Play Console upload (per app)
+
+1. **Create app** → default language → app name matches standalone identity (not portal brand).
+2. **Dashboard → Production** (or start with **Internal testing**).
+3. **Create new release** → upload `app-release.aab`.
+4. Complete required sections (first app takes longest):
+
+| Section | TanStack WebView typical answers |
+|---------|----------------------------------|
+| **App category** | Game → Puzzle / Casual / etc. |
+| **Store listing** | Short + full description from §13 matrix; 512×512 **PNG** icon; feature graphic 1024×500; ≥2 phone screenshots |
+| **Content rating** | IARC questionnaire (usually low violence for puzzles) |
+| **Target audience** | Age bands per content |
+| **Data safety** | No data collected / all on-device if no `INTERNET` and no analytics |
+| **Ads** | No (unless added) |
+| **Privacy policy** | URL required if any data collected; offline-only games often still need a simple policy page |
+| **App access** | All functionality available without login |
+
+5. **Review and roll out** Internal testing first → fix Misleading Claims issues → promote to Production.
+6. Update **all active tracks and locales** — stale hi-IN / testing tracks cause rejections (§13).
+
+### H. Post-launch
+
+- Keep `applicationId` stable forever.
+- Each update: web build → `versionCode++` → new AAB → release notes cite visible UI changes.
+- Do not publish a second app in the same category with duplicate positioning (e.g. Lumen Circuit + Circuit Flow).
+
+### Quick reference — Bharat Brawlers slugs
+
+| Game | Slug | `applicationId` | Android path |
+|------|------|-----------------|--------------|
+| Circuit Flow | `circuit-flow` | `com.circuitflow.puzzle` | `games/Circuit Flow/android/` |
+| Train Panic | `train-panic` | `com.trainpanic.puzzle` | `games/Train Panic/android/` |
+| GRID Tower Defense | `grid-tower-defense` | `com.bharatbrawlers.gridtd` | `games/GRID Tower Defense/android/` |
+| Pocket Park Tycoon | `pocket-park-tycoon` | `com.bharatbrawlers.pocketpark` | `games/Pocket Park Tycoon/android/` |
+| Tank Wars | `tank-wars` | `com.bharatbrawlers.tankwars` | `games/Tank Wars/android/` |
+
+---
+
 ## Related rules
 
 | Need | Rule |
@@ -577,3 +704,4 @@ Gate **release** Play builds: strip `?e2e=1` auto-win paths in Gradle `stripRele
 | Mobile UX, daily share hooks | This rule §11, §12 |
 | Play Misleading Claims, listing audit | This rule §13 |
 | TanStack SPA → Play WebView pipeline | This rule §14 |
+| Android Studio test + Play publish | This rule §15 |
