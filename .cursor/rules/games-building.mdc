@@ -86,13 +86,13 @@ Host routing details → `website-building.mdc` (vendored folder only).
 - **`[applicable if deterministic core]`** — automated replay verification in CI.
 - Smoke narrow + wide viewport; test embed and standalone if both ship.
 - **`[applicable if level-based puzzle]`** — **one unit test per level** (structure + solvability where provable); shared `level-count.test.mjs` asserting N levels in source; update E2E copy when total level count changes (e.g. `Puzzle 1 / 30` for Echo, `/ 20` for most suite games — never stale `/ 3` or `/ 15`).
-- **`[applicable if embed iframe on educational host]`** — run E2E against local preview server serving `dist/client` at `/games/<slug>/`; keep `?e2e=1` auto-win paths **runtime-only** (never `VITE_E2E` at build — `build-all-embeds.mjs` deletes it); clear `localStorage` progress keys in `beforeEach`; `campaign-5` (all **11** embeds, levels/waves 1–5) + `campaign-15` (subset 1–20); fast and deterministic (instant win when puzzle already solved).
+- **`[applicable if embed iframe on educational host]`** — run E2E against local preview server serving `dist/client` at `/games/<slug>/`; keep `?e2e=1` auto-win paths **runtime-only** (never `VITE_E2E` at build — `build-all-embeds.mjs` deletes it); clear `localStorage` progress keys in `beforeEach`; `campaign-5` (all **13** embeds, levels/waves 1–5) + `campaign-15` (subset 1–20); fast and deterministic (instant win when puzzle already solved).
 
 ## §12 Embed puzzle suite — production learnings (Bharat Brawlers / dsapatterns) **[applicable if iframe embed on parent SPA]**
 
-Reference implementation: **eleven TanStack Start CSR games** vendored to `public/games/<slug>/` on dsapatterns-website (`#games/<slug>` hash routes). Full inventory → Bharat Brawlers `docs/embed-dsapatterns-puzzles.md`; tier scores → `GAMES_RANKING.md`.
+Reference implementation: **thirteen TanStack Start CSR games** vendored to `public/games/<slug>/` on dsapatterns-website (`#games/<slug>` hash routes). Full inventory → Bharat Brawlers `docs/embed-dsapatterns-puzzles.md`; tier scores → `GAMES_RANKING.md`.
 
-### Embed inventory (June 2026)
+### Embed inventory (July 2026)
 
 | Display name | Slug | Hash route | Levels/waves |
 |--------------|------|------------|--------------|
@@ -107,12 +107,14 @@ Reference implementation: **eleven TanStack Start CSR games** vendored to `publi
 | Pocket Park Tycoon | `pocket-park-tycoon` | `#games/pocket-park-tycoon` | 20 |
 | Crush the Swappy | `crush-the-swappy` | `#games/crush-the-swappy` | 30 |
 | Orbit Defense | `orbit-defense` | `#games/orbit-defense` | 30 |
+| Attack the Army | `attack-the-army` | `#games/attack-the-army` | campaign |
+| Lumen Circuit | `lumen-circuit` | `#games/lumen-circuit` | 20 |
 
 **GRID Tower Defense** (`grid-tower-defense`, ASCII roguelike TD) and **Orbit Defense** (`orbit-defense`, minimalist path TD) are distinct SKUs — never conflate slugs or copy.
 
 Slugs are stable for bookmarks/CDN; display names target Play Store keywords. Legacy hash routes (`#games/echo-node`, etc.) redirect to canonical slugs via `LEGACY_GAME_SLUG_REDIRECTS` in dsapatterns `routes.js`.
 
-**All eleven embeds** must ship the **Equalize 5-theme switcher** (`balance`, `ember`, `zen`, `midnight`, `ocean`) via copied `useGameTheme.ts` + `ThemeSwitcher.tsx` + `equalize-theme-templates.css` (see Theme switcher below).
+**All thirteen embeds** must ship the **Equalize 5-theme switcher** (`balance`, `ember`, `zen`, `midnight`, `ocean`) via copied `useGameTheme.ts` + `ThemeSwitcher.tsx` + `equalize-theme-templates.css` (see Theme switcher below).
 
 ### Tier strategy (investment order)
 
@@ -132,7 +134,7 @@ Copy templates from `scripts/games/templates/` into each game's `src/lib/` (neve
 - `localBest.ts` — local PB ghost replay.
 - `progress.ts` — campaign persist (`<slug>.progress` in `localStorage`).
 
-Cross-promo footers may reference UTC daily rotation; **Mind Pack hub is removed** — host lists all **eleven** in `GamesSection`; legacy `#games/mind-pack` redirects only.
+Cross-promo footers may reference UTC daily rotation; **Mind Pack hub is removed** — host lists all **thirteen** in `GamesSection`; legacy `#games/mind-pack` redirects only.
 
 ### Theme switcher (Equalize tokens + Tailwind)
 
@@ -170,7 +172,7 @@ Cross-promo footers may reference UTC daily rotation; **Mind Pack hub is removed
 - **Minimum bar:** 20 levels per puzzle game (Echo 30, Laser Mirror 30+); each level named and listed in source.
 - **Solvability:** for ray/path puzzles, ship a **solver** (brute-force tray placement + `traceBeam`) and run in CI (`scripts/games/validate-*-puzzles.ts` or test helper). Hand-authored mirror paths must be traced — `/` vs `\` reflection is easy to get wrong.
 - **Seeded procedural levels** (e.g. wire grid): `generatePuzzleForLevel(n)` with `LEVEL_COUNT` matching shipped count; clamp level index; verify connected/solvable path for e2e `skipShuffle` builds.
-- **Echo / timing games:** e2e uses `?e2e=1` to auto-complete or skip shuffle; `campaign-5` covers levels/waves 1–5 across all **eleven** embeds.
+- **Echo / timing games:** e2e uses `?e2e=1` to auto-complete or skip shuffle; `campaign-5` covers levels/waves 1–5 across all **thirteen** embeds.
 
 ### Audio: `puzzleJuice.ts` (SFX) vs BGM
 
@@ -197,20 +199,26 @@ Cross-promo footers may reference UTC daily rotation; **Mind Pack hub is removed
 | **Neon circuit** | E2E expects win overlay | Pre-solved grid when `?e2e=1`; skip rotation randomization |
 | **Theme switcher** | Fixed bottom-right chip overlaps trays/modals | Hide on overlay open or move to header; test ~600px embed width |
 | **Host games nav (mobile)** | Iframe below full game list | Scroll embed into view on select or collapse list on `sm:` breakpoints |
+| **GhostLoop / embed + skip tutorial** | Start screen hidden but `running` stays false → frozen canvas | On embed mount (not `?e2e=1`), set sim `running = true` when auto-starting past level 1 |
+| **Skip early levels** | Returning players stuck on old progress; E2E expects level 1 | Bump `PROGRESS_EPOCH`; floor at `START_LEVEL`; `?e2e=1` bypasses floor; route redirects honor `?e2e=1` |
+| **GRID Tower Defense** | Leaks not detected; win on same frame as leak | Pure `creepHasLeaked()` (path end **and** `x >= exit`); `gameOverRef`/`wonRef` in tick; `won = false` on 0 lives |
+| **Crush the Swappy / physics ammo** | Bomb only explodes on target hit | Detonate bomb on **any** Matter collision contact; swap launcher ammo when selecting type |
+| **Attack the Army / lane TD** | Too many lanes + weak hit feedback | Fewer lanes (e.g. 4) + one `LANES` constant; `damageFlash` vignette + visible miss counter beats more briefing copy |
+| **Rename game folder** | Broken embed paths after `git mv` | **Slug stays stable** for CDN/bookmarks; update `embed-registry.mjs`, e2e, `verify-game-dist-cloudflare.mjs`, host `public/games/<slug>/` only |
 
 ### Embed build pipeline (CSR in iframe)
 
-- **`build-all-embeds.mjs`** orchestrates all **eleven**: `DSAPATTERNS_EMBED=1` Vite build (`ssr: false`) → copy `.output/public` → `dist/client` → `patch-embed-client.mjs` (basepath, relative `./assets/`) → `generate-csr-index.mjs` (static `index.html` shell, no Nitro SSR fetch) → `patch-embed.mjs` (manifest / SW scope) → `vendor.mjs` rsync to `../dsapatterns-website/public/games/<slug>/`.
+- **`build-all-embeds.mjs`** orchestrates all **thirteen**: `DSAPATTERNS_EMBED=1` Vite build (`ssr: false`) → copy `.output/public` → `dist/client` → `patch-embed-client.mjs` (basepath, relative `./assets/`) → `generate-csr-index.mjs` (static `index.html` shell, no Nitro SSR fetch) → `patch-embed.mjs` (manifest / SW scope) → `vendor.mjs` rsync to `../dsapatterns-website/public/games/<slug>/`.
 - **Never set `VITE_E2E` at build** — build script deletes it; auto-win is runtime `?e2e=1` only.
-- Preview all eleven: `node scripts/games/embed-preview-server.mjs` on port 5299; Playwright `baseURL` points there.
+- Preview all thirteen: `node scripts/games/embed-preview-server.mjs` on port 5299; Playwright `baseURL` points there.
 - **Deploy:** after vendoring, in dsapatterns-website run `npm test && npm run test:e2e`, commit `public/games/`, push `main` (+ `main:master` mirror if used). Cloudflare Workers SPA fallback via `wrangler.jsonc` `not_found_handling`; purge CDN for `/` and `/games/*` if shell references stale JS hashes.
 
 ### Verification checklist before push
 
 ```bash
 node --test tests/games/*.test.mjs                              # level count + solvability + CSR shell
-node scripts/games/build-all-embeds.mjs                         # all 11 dists + vendor (or SKIP_VENDOR=1)
-npx playwright test -c playwright.games.config.mjs e2e/games/campaign-5.spec.mjs   # levels/waves 1→5, all 11
+node scripts/games/build-all-embeds.mjs                         # all 13 dists + vendor (or SKIP_VENDOR=1)
+npx playwright test -c playwright.games.config.mjs e2e/games/campaign-5.spec.mjs   # levels/waves 1→5, all 13
 npx playwright test -c playwright.games.config.mjs e2e/games/campaign-15.spec.mjs  # levels 1→20: Choppa, GRID, ParkOS, Longbow
 ```
 
@@ -220,12 +228,17 @@ E2E `beforeEach`: clear `<slug>.progress` / `_epoch` keys in `localStorage`. Do 
 
 | Stale assumption | Reality |
 |------------------|---------|
-| "Five embed games" / Mind Pack hub | Eleven games; `#games/mind-pack` redirects only |
+| "Five embed games" / Mind Pack hub | Thirteen games; `#games/mind-pack` redirects only |
+| "Eleven embed games" (June 2026) | Thirteen after Attack the Army + Lumen Circuit |
 | "15 levels per game" | 20+ minimum; Echo 30, Laser 30 |
 | `import from '../../../scripts/games/templates/...'` in game `src/` | Copy template into `src/lib/` per game |
 | `VITE_E2E=1` at build time | Runtime `?e2e=1` only; build deletes `VITE_E2E` |
 | BGM via WebAudio in `puzzleJuice.ts` | SFX = WebAudio; BGM = file loop (`bgm.ts`) **or** procedural (`proceduralBgm.ts` + `proceduralMusic/`) |
 
+### Recent Learnings (July 2026)
+
+- **Web Share API (`navigator.share`) vs Clipboard**: Silently falling back to `navigator.clipboard.writeText` when `navigator.share` fails or is unsupported (common on some desktop environments) creates a jarring UX. Users expect a native share sheet; getting a silent "Copied to clipboard" instead is confusing. **Learning**: Avoid silent fallbacks. If native share isn't reliably supported, either hide the share button entirely, or provide explicit, separate "Copy Link" and "Share" buttons so the user knows exactly what will happen.
+- **Physics-Based CPU Opponents (Tank Wars)**: Implementing CPU AI in physics/trajectory games (like Tank Wars) doesn't require complex analytical math with wind integration. **Learning**: Use **Monte-Carlo simulation** during the CPU's turn. Run the deterministic physics loop headlessly 50-100 times with random angle/power variations, pick the trajectory that gets closest to the player, and add a small random `noise` variable to the final parameters so the CPU isn't unfairly perfect.
 
 | Tag | Topics |
 |-----|--------|
