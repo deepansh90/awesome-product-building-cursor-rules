@@ -145,8 +145,8 @@ When scaffolding or modifying Android web shells, enforce these patterns learned
 
 1. **Double Back Press Exit (`MainActivity.kt`):**
    Prevent accidental app termination when navigating UI overlays by intercepting back presses on the root screen: require two back taps within 2000ms along with a short Toast notice (*"Press back again to exit"*).
-2. **External Link & Custom Scheme Interception (`WebViewClient`):**
-   Override `shouldOverrideUrlLoading` to intercept non-HTTP schemes (`mailto:`, `market://`, `share://`, social intents). Open them safely via system `Intent(Intent.ACTION_VIEW)` rather than allowing WebView navigation to fail or replace the offline game session.
+2. **External Link & Intent Redirection Security (`WebViewClient` / `IntentSanitizer`):**
+   Override `shouldOverrideUrlLoading` to intercept non-HTTP schemes (`mailto:`, `market://`, `intent://`, social intents). To prevent Intent Redirection Vulnerabilities (official `android/skills` rule), never execute unvalidated `Intent.parseUri()` targets directly. Use `Intent.URI_INTENT_SCHEME` stripped of component/selector overrides or sanitize external intents using `androidx.core.content.IntentSanitizer` before launching via `Intent.ACTION_VIEW`.
 3. **Unblocked WebGL & Audio Playback (`WebSettings`):**
    Always configure:
    ```kotlin
@@ -169,6 +169,10 @@ When scaffolding or modifying Android web shells, enforce these patterns learned
    Keep start-to-interactive under the 2-second Play target. Never execute synchronous heavy disk I/O or blocking asset decompression on the main thread during `MainActivity.onCreate`.
 9. **16 KB Native Page Size Readiness (API 35+):**
    Google Play requires 16 KB page size alignment for Android 15+. If bundling native C++/NDK libraries (e.g. SQLite or sound decoders), ensure they are built with `-z max-page-size=16384`.
+10. **IME Soft Input Resizing (`windowSoftInputMode`):**
+    For Android 15+ edge-to-edge layouts, any web game with text entry fields must declare `android:windowSoftInputMode="adjustResize"` inside `<activity>` so the virtual keyboard resizes the viewport instead of covering the game canvas.
+11. **AGP 9 Future-Proofing via preBuild Sync:**
+    Android Gradle Plugin 9 removes deprecated asset sourceSet assignment hacks. Always use explicit Gradle `Sync` tasks wired to `preBuild` targeting `layout.buildDirectory.dir("generated/gameAssets")`.
 
 ---
 
