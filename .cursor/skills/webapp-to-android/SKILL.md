@@ -163,6 +163,12 @@ When scaffolding or modifying Android web shells, enforce these patterns learned
    HTML5 puzzle/arcade games designed for portrait layout break if the device rotates into landscape. Lock activity orientation using `android:screenOrientation="portrait"` (or `"sensorPortrait"`).
 6. **Edge-to-Edge Display Cutout Mode (`styles.xml` / `MainActivity`):**
    On Android 9+ (API 28+), prevent black letterbox bars around camera notches by enabling cutout layout: `android:windowLayoutInDisplayCutoutMode = shortEdges` or programmatically in onCreate via `window.attributes.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES`.
+7. **Predictive Back Navigation (`OnBackPressedDispatcher` / API 33+):**
+   Overriding `Activity.onBackPressed()` is deprecated in Android 13+. Use `onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) { ... })` to intercept back gestures without breaking modern OS predictive back animations.
+8. **Google Play Vitals Main-Thread ANR Prevention:**
+   Keep start-to-interactive under the 2-second Play target. Never execute synchronous heavy disk I/O or blocking asset decompression on the main thread during `MainActivity.onCreate`.
+9. **16 KB Native Page Size Readiness (API 35+):**
+   Google Play requires 16 KB page size alignment for Android 15+. If bundling native C++/NDK libraries (e.g. SQLite or sound decoders), ensure they are built with `-z max-page-size=16384`.
 
 ---
 
