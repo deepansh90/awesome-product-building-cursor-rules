@@ -1,0 +1,73 @@
+---
+description: Mobile app product building guidance for iOS, Android, React Native, and Flutter
+alwaysApply: false
+---
+
+# Mobile Applications (Native + Cross-platform)
+
+**Intent:** Build high-quality mobile apps with platform-correct UX, predictable state, and production-ready release gates.
+
+## Scope
+
+- iOS (`SwiftUI`)
+- Android (`Jetpack Compose`)
+- Cross-platform (`React Native`, `Flutter`)
+- Mobile-first PWAs that behave like app shells
+
+## Build order
+
+1. Define one primary job-to-be-done per screen.
+2. Sketch navigation model (tabs, stack, modal, deep links).
+3. Define semantic design tokens (color, type, spacing, radius, elevation).
+4. Build core screens with accessibility + loading/error/empty states.
+5. Add analytics, crash reporting, and release checks.
+
+## UI system baseline
+
+- Keep one source of truth for tokens.
+- Prefer semantic tokens over hardcoded values.
+- Keep touch targets >=44pt iOS / >=48dp Android.
+- Do not rely on color only for status.
+- Respect reduced motion and dynamic type / font scaling.
+
+## Platform behavior rules
+
+- Follow native patterns before custom patterns.
+- iOS: prioritize tab + stack clarity, swipe-back compatibility.
+- Android: preserve system back and predictable top app bar behavior.
+- Cross-platform: match platform conventions where users expect them.
+
+## Reliability and state
+
+- Define explicit offline, loading, error, and success states.
+- Persist user-critical drafts locally when flows are multi-step.
+- Prevent duplicate submits with disabled/loading button states.
+- Use optimistic updates only when rollback is defined.
+
+## Performance gate
+
+- Keep startup lightweight; lazy-load heavy features.
+- Virtualize long lists.
+- Avoid layout thrash and unnecessary rerenders/rebuilds.
+- Compress and size media assets for mobile network constraints.
+
+## Security and privacy
+
+- Never hardcode credentials or secrets.
+- Store sensitive data in secure storage/keychain equivalents.
+- Minimize permissions to what the feature actually needs.
+- Add clear copy for data collection and camera/location usage.
+
+## Testing and release checklist
+
+- Unit tests for core business logic.
+- Integration tests for critical flows (auth, payment, upload, checkout).
+- Device coverage: small phone, large phone, and tablet (if supported).
+- Verify deep links, push notification routes, and back-stack behavior.
+- Verify dark mode, accessibility labels, and keyboard/voice support where applicable.
+
+## Design source options
+
+- For style anchoring, you may use a `DESIGN.md` file from `awesome-design-md`.
+- For fast UI system recommendations, use `ui-ux-pro-max-skill` design system patterns.
+- Keep brand adaptation explicit: cite chosen style family and why.

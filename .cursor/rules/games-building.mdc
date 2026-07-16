@@ -15,6 +15,17 @@ alwaysApply: false
 - **`[applicable if public roster / real-world names]`** — legal/name checklist before scaling content (trademark, slurs, restricted names).
 - **`[applicable if freemium]`** — document DLC scope; never sell gameplay power.
 
+## §1b Product design craft **[core]**
+
+Systems and feel before feature lists. Prefer Cursor agents `@game-designer`, `@level-designer`, `@narrative-designer`, `@technical-artist`, `@game-audio-engineer` when authoring GDDs or levels; keep this rule as the engineering checklist.
+
+- **Design pillars** — lock 3–5 non-negotiable player experiences before adding features; every mechanic must serve at least one pillar.
+- **Three-loop model** — document moment-to-moment (0–30s), session (5–30 min), and long-term (hours–weeks) loops. For puzzle embeds: solve beat → session of N levels → campaign/meta progression.
+- **Mechanic spec minimum** — for each core mechanic: purpose, player fantasy, inputs/outputs, success and failure states, edge cases, tuning levers. Mark unplaytested numbers `[PLACEHOLDER]` until validated.
+- **Onboarding checklist** — core verb within ~30s of first control; first success guaranteed; each new mechanic in low-stakes context; at least one discoverable without wall-of-text; first session ends on a hook (unlock, cliff-hanger, or “one more”).
+- **Level / pacing `[applicable if level-based]`** — per level: player fantasy, pacing arc, mechanic taught (spatially when possible), critical-path readability. Ship order: blockout (solvable grey box) → playtest → dress (VFX/audio). Do not art-polish an untested layout.
+- **Audio feel `[applicable if SFX/music]`** — every core verb gets a clear sonic cue when audio is on; keep gesture-gated unlock and volume controls per §5; prefer lean WebAudio / procedural SFX when download budget is tight (§3).
+
 ## §2 Architecture: engine vs shell **[core]**
 
 - **Pure game core** — no UI framework, no DOM, no `window` in simulation code (`packages/<engine>/` or equivalent).
@@ -89,7 +100,7 @@ Host routing details → `website-building.mdc` (vendored folder only).
 
 ## §12 Embed puzzle suite — production learnings (Bharat Brawlers / dsapatterns) **[applicable if iframe embed on parent SPA]**
 
-Reference implementation: **thirteen TanStack Start CSR games** vendored to `public/games/<slug>/` on dsapatterns-website (`#games/<slug>` hash routes). Full inventory → Bharat Brawlers `docs/embed-dsapatterns-puzzles.md`; tier scores → `GAMES_RANKING.md`.
+Reference implementation: **thirteen TanStack Start CSR games** vendored to `public/games/<slug>/` on dsapatterns-website (`#games/<slug>` hash routes). Full inventory → Bharat Brawlers `docs/embed-dsapatterns-puzzles.md`; tier scores → `GAMES_RANKING.md`. Design craft (loops, onboarding, level pacing) → §1b before scaling new embeds.
 
 ### Embed inventory (July 2026)
 
@@ -98,7 +109,7 @@ Reference implementation: **thirteen TanStack Start CSR games** vendored to `pub
 | TimeTwin | `time-twin` | `#games/time-twin` | 30 |
 | GhostLoop | `ghost-loop` | `#games/ghost-loop` | 20 |
 | Helicopter Rush | `helicopter-rush` | `#games/helicopter-rush` | 20 |
-| Arrow Time | `arrow-time` | `#games/arrow-time` | 20 |
+| Tank Wars | `tank-wars` | `#games/tank-wars` | match |
 | Train Panic | `train-panic` | `#games/train-panic` | 20 |
 | Optic Beam Puzzle | `optic-beam-puzzle` | `#games/optic-beam-puzzle` | 30 |
 | Circuit Flow | `circuit-flow` | `#games/circuit-flow` | 20 |
@@ -108,19 +119,20 @@ Reference implementation: **thirteen TanStack Start CSR games** vendored to `pub
 | Orbit Defense | `orbit-defense` | `#games/orbit-defense` | 30 |
 | Attack the Army | `attack-the-army` | `#games/attack-the-army` | campaign |
 | Lumen Circuit | `lumen-circuit` | `#games/lumen-circuit` | 20 |
+| Jobsian Joy | `jobsian-joy` | `#games/jobsian-joy` | 150 |
 
 **GRID Tower Defense** (`grid-tower-defense`, ASCII roguelike TD) and **Orbit Defense** (`orbit-defense`, minimalist path TD) are distinct SKUs — never conflate slugs or copy.
 
 Slugs are stable for bookmarks/CDN; display names target Play Store keywords. Legacy hash routes (`#games/echo-node`, etc.) redirect to canonical slugs via `LEGACY_GAME_SLUG_REDIRECTS` in dsapatterns `routes.js`.
 
-**All thirteen embeds** must ship the **Equalize 5-theme switcher** (`balance`, `ember`, `zen`, `midnight`, `ocean`) via copied `useGameTheme.ts` + `ThemeSwitcher.tsx` + `equalize-theme-templates.css` (see Theme switcher below).
+**All fifteen TanStack embeds** must ship the **Equalize 5-theme switcher** (`balance`, `ember`, `zen`, `midnight`, `ocean`) via copied `useGameTheme.ts` + `ThemeSwitcher.tsx` + `equalize-theme-templates.css` (see Theme switcher below).
 
 ### Tier strategy (investment order)
 
 Use `GAMES_RANKING.md` scores — do not polish all nine equally:
 
 - **Tier A (invest):** TimeTwin, GhostLoop — ghost overlays, share, campaign depth.
-- **Tier B (polish):** Helicopter Rush, Arrow Time — distinct hooks, OG share, PB ghost.
+- **Tier B (polish):** Helicopter Rush, Tank Wars — distinct hooks, OG share, PB ghost.
 - **Tier C (differentiate):** Train Panic, Optic Beam Puzzle, Circuit Flow — daily mode, beam preview, undo.
 - **Tier D (demo hooks only):** GRID Tower Defense, Pocket Park Tycoon — 20 levels shipped; juice/onboarding deferred.
 

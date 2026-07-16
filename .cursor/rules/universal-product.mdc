@@ -35,6 +35,8 @@ Industrial design principles (Braun, Vitsœ) apply directly to software UI: clar
 | **Environmentally friendly** | Lean assets, lazy load, respect reduced motion and battery; avoid shipping MB of unused CSS/JS. |
 | **As little design as possible** | Flat, legible surfaces by default; add decoration only when it teaches or delights without clutter. |
 
+**Purposeful delight [applicable if UI]:** Personality, micro-interactions, and whimsy are allowed when they teach, reduce friction, or reward completion — never when they fight *as little design as possible*, compete with the primary action, or ignore `prefers-reduced-motion`.
+
 **Skeuomorphism vs flat [applicable if visual UI]:** Use real-world metaphor only for unfamiliar controls; otherwise prefer flat hierarchy (type, spacing, contrast). Decorative skeuomorphism violates *honest* and *as little design as possible*.
 
 **Design responsibility [core with UI]:** Align UI with privacy and ethics (§6); reject patterns that fail *honest* or *unobtrusive*.
