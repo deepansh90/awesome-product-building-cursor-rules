@@ -1,0 +1,110 @@
+---
+description: Agent ops — ask-first edits, research workflow, git sync before merge/push, clean code
+alwaysApply: true
+---
+
+# Agent Ops
+
+**Intent:** How AI coding agents should edit any repository safely — not what product to build (see domain books).
+
+## Core discipline
+
+Ask, don't assume. If something's unclear, ask before writing a line and no silent guesses about intent, architecture, or requirements.
+
+Simplest solution first and implement the minimum thing that works. No abstractions you didn't request.
+
+Don't touch unrelated code and if a file isn't part of the current task, leave it.
+
+Flag uncertainty explicitly or if you're not confident, say so before proceeding as confidence without certainty causes more damage than admitting a gap.
+
+## CRITICAL edit rules
+
+- Prefer **partial edits** (search-and-replace, targeted patches) over rewriting whole files — preserves git history.
+- When a full-file replacement is required, output the **complete** file — never placeholders such as `// ... existing code ...` or `# previous implementation`.
+- Do not invent changes beyond what the user requested; preserve unrelated code and structure.
+- Verify claims against the codebase; cite `file:line` or command output — never claim "tests pass" without running them. Use `@Files` for 2–3 relevant files instead of bloated `@Codebase` context.
+- On multi-file work: prefer **one file per commit** when practical; review each diff before stacking the next.
+
+## Tool boundaries (UI generator + IDE)
+
+| Own in UI generators (Lovable, etc.) | Own in Cursor / IDE |
+|--------------------------------------|---------------------|
+| Layout, components, styling iterations | Auth, database, payments, webhooks |
+| Visual feedback loops | Tests, CI, migrations |
+| Marketing pages, dashboards (UI) | Complex business logic, security hardening |
+
+Sync via Git: UI tool pushes layout; IDE pushes logic and tests. Use `product_spec.md` and `tech_spec.md` (or equivalent) before large agent sessions.
+
+**Nearest-product UI:** Before generating screens, name the existing product’s look and feel as the anchor. Follow `product-excellence.mdc` §2d — familiar patterns beat generic templates.
+
+## Research-first workflow
+
+1. **Discover** — map how the target area is used before changing it.
+2. **Plan** — list files to touch; get approval on non-trivial refactors.
+3. **Execute** — implement the approved plan only.
+4. **Audit** — review `git diff` line by line before claiming done.
+
+## Git & session hygiene
+
+- Commit (or stash) before long autonomous agent runs.
+- **Conventional Commits:** `type(scope): description` — types `feat|fix|docs|refactor|test|chore|ci|perf|build`; optional body explains *why*; `BREAKING CHANGE:` footer or `feat!` when APIs break.
+- **PR body must include:** purpose, implementation notes, tests run (exact commands), rollout/rollback note if relevant, linked issue/ticket.
+- Fresh chat after ~20 failed debug turns; paste a 3–4 sentence summary + current error.
+- Stick to **one model** per task; switch models in a new chat if needed.
+- Set API spend limits; require confirmation for destructive terminal commands when available.
+
+## Git: take latest code before merge
+
+Never merge, rebase, cherry-pick onto a shared branch, or push assuming local `main`/`master` is current. Stale local tips silently overwrite remote work.
+
+### Before merge / rebase / push to a shared branch
+
+1. **Fetch first:** `git fetch origin` (or the active remote).
+2. **Integrate latest into your base:**
+   - Merging to `main`: `git checkout main && git pull --ff-only origin main` (or rebase your feature onto updated `main`).
+   - Updating a feature branch: rebase/merge **from** the updated base — do not force-push over others' commits.
+3. **Re-check status:** `git status` and `git log HEAD..origin/<base> --oneline` — if remote is ahead, integrate before continuing.
+4. **Resolve conflicts deliberately** — never discard remote changes with `git checkout --theirs/--ours` or reset without stating what you are dropping.
+
+### Before long edit sessions
+
+- If the working tree may be stale vs remote: `git fetch` + note whether `origin/<branch>` is ahead.
+- Prefer **stash or commit** local WIP before pulling so a pull cannot clobber uncommitted edits.
+- After pull, **re-read files you are about to edit** — do not apply patches written against an older tip.
+
+### Anti-patterns
+
+```text
+❌ Edit for 30 minutes, then git push --force to main
+❌ git merge feature without git fetch / pull on the target branch
+❌ Overwrite local files from an old checkout while origin has newer commits
+❌ Assume "up to date" from session start after others may have pushed
+```
+
+```text
+✅ git fetch origin
+✅ git pull --ff-only origin main   # on the merge target
+✅ rebase/merge feature onto updated main
+✅ push only after local base matches remote (or intentional non-ff with user OK)
+```
+
+### Exception
+
+Skip only when the user explicitly says to work offline / ignore remote, or when pushing a brand-new branch with no upstream yet (still `fetch` first when the base branch exists).
+
+## Clean code (any language)
+
+- Named constants over magic numbers.
+- Meaningful names; single responsibility per function.
+- DRY — one source of truth for shared logic.
+- Handle edge cases; consider security on every change.
+- Add or update tests for new behaviour at trust boundaries.
+
+## What this rule does not cover
+
+- System design documents → `system-design.mdc`
+- Product, UI, security policy → `product-excellence.mdc`
+- Create web/game → `create-web-game.mdc`
+- Convert / publish mobile → `convert-web-to-mobile.mdc`, `publish-mobile.mdc`
+- SEO / go-to-market → `seo-gtm.mdc`
+- Ideation / scope → `incubation.mdc`

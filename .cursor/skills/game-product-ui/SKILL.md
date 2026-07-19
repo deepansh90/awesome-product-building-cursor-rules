@@ -8,7 +8,7 @@ disable-model-invocation: true
 
 Use this skill for game interfaces, game shells, and embedded game UX.
 
-Pair with `games-building.mdc` (especially §1b craft and §5 HUD). For systems design or level pacing, invoke Cursor agents `@game-designer` / `@level-designer` (optional `@narrative-designer`, `@technical-artist`, `@game-audio-engineer`).
+Pair with `create-web-game.mdc` (especially §1b craft and §5 HUD). For systems design or level pacing, invoke Cursor agents `@game-designer` / `@level-designer` (optional `@narrative-designer`, `@technical-artist`, `@game-audio-engineer`).
 
 ## Inputs to collect
 
@@ -19,7 +19,7 @@ Pair with `games-building.mdc` (especially §1b craft and §5 HUD). For systems 
 
 ## Workflow
 
-1. Define loop-first UX (time-to-fun in first session); map moment / session / long-term loops per `games-building.mdc` §1b.
+1. Define loop-first UX (time-to-fun in first session); map moment / session / long-term loops per `create-web-game.mdc` §1b.
 2. Design HUD with ruthless control economy (only essential controls visible).
 3. Teach new verbs spatially before wall-of-text tutorials when the layout can carry the lesson.
 4. Implement clear success/fail feedback and fast retry — every core verb needs visual + state change; add audio when SFX is on.

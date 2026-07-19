@@ -1,0 +1,850 @@
+---
+description: SEO and go-to-market — product marketing context, brand, copy, on-page SEO, programmatic SEO, site-wide audit
+globs: "**/.agents/product-marketing.md","**/product-marketing*.md","**/*seo*","**/sitemap*","robots.txt","**/marketing/**","docs/**/*.md","**/*.{html,jsx,tsx,vue,md}"
+alwaysApply: false
+---
+
+# SEO & Go-to-Market
+
+**Intent:** One rulebook for positioning, copy, and SEO. Always read `.agents/product-marketing.md` first when it exists. Web ship mechanics → `create-web-game.mdc`. Ideation → `incubation.mdc`.
+
+**Shared opener:** Do not re-ask ICP/voice if the context doc exists — only fill gaps.
+
+**Audit order:** If traffic/rankings are broken, run **Section 6 (audit)** before title tweaks in Section 4. Schema: do not trust `curl` alone for JS-rendered markup — verify in a browser.
+
+## Section 1 — Product marketing context
+
+# Product Marketing Context
+
+**Intent:** Create and maintain `.agents/product-marketing.md` so brand, copy, and SEO rules do not re-ask basics. Not deep repositioning workshops (`seo-gtm.mdc`) or page-level copy (`seo-gtm.mdc`).
+
+**Canonical path:** `.agents/product-marketing.md`
+
+**Legacy paths to check:** `.claude/product-marketing.md`, `product-marketing-context.md` (in `.agents/` or `.claude/`). If found elsewhere, offer to move to `.agents/product-marketing.md`.
+
+---
+
+## Workflow **[core]**
+
+### Step 1 — Check existing context
+
+**If file exists:**
+- Read and summarize what's captured.
+- Ask which sections to update; only gather info for those.
+
+**If file does not exist, offer:**
+
+1. **Auto-draft from codebase** (recommended) — read README, landing pages, meta descriptions, about copy, `package.json`, existing docs; draft V1; user reviews and corrects.
+2. **Start from scratch** — walk sections conversationally, one at a time.
+
+Push for **verbatim customer language** — exact phrases beat polished marketing speak.
+
+### Step 2 — Gather or draft sections
+
+Skip sections that clearly don't apply (e.g. B2B Personas table for pure B2C).
+
+| # | Section | Capture |
+|---|---------|---------|
+| 1 | Product overview | One-liner, what it does, category, type, business model |
+| 2 | Target audience | Company/consumer type, decision-makers, primary use case, JTBD |
+| 3 | Personas | `[applicable if B2B]` User, champion, buyer — cares / challenge / value |
+| 4 | Problems & pain | Core challenge, why alternatives fail, cost, emotional tension |
+| 5 | Competitive landscape | Direct, secondary, indirect competitors — how each falls short |
+| 6 | Differentiation | Key differentiators, how you solve differently, why customers choose you |
+| 7 | Objections & anti-persona | Top 3 objections + responses; who is NOT a fit |
+| 8 | Switching dynamics | Push, pull, habit, anxiety |
+| 9 | Customer language | Verbatim problem/solution phrases; words to use/avoid; glossary |
+| 10 | Brand voice | Tone, style, personality adjectives |
+| 11 | Proof points | Metrics, logos, testimonials, value themes |
+| 12 | Goals | Business goal, conversion action, current metrics if known |
+
+### Step 3 — Save document
+
+Use this structure (fill all applicable sections):
+
+```markdown
+# Product Marketing Context
+
+*Last updated: YYYY-MM-DD*
+
+## Product Overview
+**One-liner:**
+**What it does:**
+**Product category:**
+**Product type:**
+**Business model:**
+
+## Target Audience
+**Target companies/customers:**
+**Decision-makers:**
+**Primary use case:**
+**Jobs to be done:**
+**Use cases:**
+
+## Personas
+| Persona | Cares about | Challenge | Value we promise |
+|---------|-------------|-----------|------------------|
+
+## Problems & Pain Points
+**Core problem:**
+**Why alternatives fall short:**
+**What it costs them:**
+**Emotional tension:**
+
+## Competitive Landscape
+**Direct:** …
+**Secondary:** …
+**Indirect:** …
+
+## Differentiation
+**Key differentiators:**
+**How we do it differently:**
+**Why customers choose us:**
+
+## Objections
+| Objection | Response |
+|-----------|----------|
+
+**Anti-persona:**
+
+## Switching Dynamics
+**Push:** **Pull:** **Habit:** **Anxiety:**
+
+## Customer Language
+**How they describe the problem:**
+**How they describe us:**
+**Words to use:** **Words to avoid:**
+**Glossary:** | Term | Meaning |
+
+## Brand Voice
+**Tone:** **Style:** **Personality:**
+
+## Proof Points
+**Metrics:** **Customers:** **Testimonials:**
+**Value themes:** | Theme | Proof |
+
+## Goals
+**Business goal:** **Conversion action:** **Current metrics:**
+```
+
+### Step 4 — Confirm
+
+- Show completed doc; ask for corrections.
+- Tell user: other marketing rules will read this automatically; re-run when positioning or ICP shifts materially.
+
+---
+
+## Tips **[core]**
+
+- Ask "What's the #1 frustration that brings them to you?" not "What problem do you solve?"
+- Capture examples: "Can you quote how a customer described this?"
+- Validate each section before moving on when interviewing from scratch.
+
+---
+
+## What this rule does not cover
+
+| Need | Use instead |
+|------|-------------|
+| Deep launch/revamp positioning workshop | `seo-gtm.mdc` |
+| Write homepage or landing copy | `seo-gtm.mdc` |
+| SEO audit or page optimization | `seo-gtm.mdc`, `seo-gtm.mdc` |
+
+## Related rules
+
+- After context exists → `seo-gtm.mdc`, `seo-gtm.mdc`, `seo-gtm.mdc`, `seo-gtm.mdc` (all read context first)
+
+## Section 2 — Brand strategy
+
+# Brand Strategy (Consumer Behavior & Positioning)
+
+**Intent:** Define *who* the brand is for, *why* it matters, and *how* it should sound and look — rooted in consumer behavior and segmentation. Not UI polish (`incubation.mdc` Mode A), not go/no-go product critique (`incubation.mdc`), not page copy (`seo-gtm.mdc`).
+
+**Archetype:** Brand strategist with a psychology-informed lens — people hire brands to solve emotional and functional jobs; resonance beats decoration.
+
+**When to run:** new brand launch, rebrand, "brand not resonating," positioning, tone of voice, market segmentation, creative direction, campaign strategy purpose.
+
+**Keywords:** brand positioning, tone of voice, market segmentation, creative direction, rebrand, brand values, consumer behavior, messaging pillars, anti-persona
+
+Tagging matches sibling rules: **[core]** in the active mode; **[applicable if …]** when the condition holds.
+
+---
+
+## Before you start **[core]**
+
+1. Read `.agents/product-marketing.md` if it exists — use as baseline; only ask for gaps.
+2. If no context doc, run `seo-gtm.mdc` first or gather: business type (B2B/B2C/personal brand), stage (startup/SMB/enterprise), industry, primary conversion goal.
+3. Do not conflate **product scope** (what to build) with **brand strategy** (how to be perceived). Scope → `incubation.mdc` or `incubation.mdc`.
+
+---
+
+## When to use — and when not to **[core]**
+
+| Use this rule | Use something else |
+|---------------|-------------------|
+| Launch positioning + values for a new brand | Mode A |
+| Revamp when messaging feels flat or misaligned | Mode B |
+| Tone matrix + visual/verbal creative brief | Mode C |
+| Write homepage headlines or CTAs | `seo-gtm.mdc` |
+| Visual UI polish without messaging change | `incubation.mdc` Mode A |
+| Feature prioritization or architecture | `incubation.mdc`, `system-design.mdc` |
+
+---
+
+## Shared frameworks **[core — all modes]**
+
+### Jobs to be done
+People don't buy categories — they hire your brand for an outcome. Frame every pillar around the job, not feature lists.
+
+### Switching forces (JTBD Four Forces)
+| Force | Question |
+|-------|----------|
+| **Push** | What frustrations drive them away from the status quo? |
+| **Pull** | What attracts them to your promise? |
+| **Habit** | What keeps them stuck with the current approach? |
+| **Anxiety** | What worries them about switching to you? |
+
+Address anxiety explicitly in messaging — unspoken fear kills conversion.
+
+### Segment grid **[applicable if multiple audiences]**
+
+Capture at least: business type × stage × industry × primary decision-maker. Pick **one primary segment** per campaign or launch; secondary segments get adapted messaging, not a generic middle.
+
+| Dimension | Examples |
+|-----------|----------|
+| Business type | B2B, B2C, personal brand |
+| Stage | Startup, SMB, mid-market, enterprise |
+| Industry | Education, food & beverage, gaming, lifestyle, etc. |
+| Strategy purpose | Company/brand strategy, campaign, product launch |
+
+### Ethical persuasion **[core]**
+Use psychology to clarify and reduce friction — not to manipulate. Social proof, specificity, and loss framing are fair when honest. Dark patterns, fake scarcity, and fabricated stats are out of scope.
+
+---
+
+## Mode A — Brand Launch **[core when starting a new brand]**
+
+**Goal:** Ship a coherent brand foundation before copy or campaigns.
+
+**Process:**
+1. **Comprehend** — one-sentence category + the job customers hire you for.
+2. **Segment** — primary audience, anti-persona (who you are *not* for).
+3. **Position** — for [primary segment] who [job/pain], [brand] is the [category] that [unique outcome] because [proof/differentiator].
+4. **Values** — who we are, why we exist, what we do, how we behave (4-value frame).
+5. **Messaging pillars** — 3–5 themes; each ties to a customer pain and proof point.
+6. **Voice sketch** — tone adjectives, words to use/avoid (draft for Mode C).
+
+**Output format:**
+```text
+## Brand foundation
+- Positioning statement: …
+- Primary segment / anti-persona: …
+- Values (who / why / what / how): …
+- Messaging pillars: numbered with pain → promise → proof
+- Switching forces: push / pull / habit / anxiety (1 line each)
+- Next: Mode C for tone matrix, or marketing-copy for first pages
+```
+
+---
+
+## Mode B — Brand Revamp **[core when "not resonating"]**
+
+**Goal:** Diagnose misalignment and prescribe repositioning moves — not a full rebrand for its own sake.
+
+**Audit dimensions:**
+| Check | Failure signal |
+|-------|----------------|
+| Audience fit | Traffic/engagement from wrong segment; high bounce on hero |
+| Differentiation | Interchangeable with competitors in blind copy test |
+| Consistency | Tone/visual drift across site, social, email, product |
+| Emotional job | Copy lists features; customers can't state why they chose you |
+| Proof | Claims without evidence; no customer language in copy |
+
+**Process:**
+1. Compare live copy + positioning to primary segment's jobs and language.
+2. List gaps: message | evidence | fix | priority (H/M/L).
+3. Recommend **minimum** repositioning moves (often 1–2 pillars, not full rename).
+
+**Output format:**
+```text
+## Revamp diagnosis
+- Resonance verdict: 1 paragraph (what's broken and for whom)
+- Gap table: Dimension | Issue | Evidence | Fix | Priority
+- Repositioning moves: 3–5 concrete changes (messaging, segment focus, proof)
+- Defer / do not change: explicit nos
+```
+
+---
+
+## Mode C — Creative Direction **[applicable if verbal + visual alignment needed]**
+
+**Goal:** Actionable brand standards a contractor could follow — condensed identity brief, not a 50-page style guide.
+
+**Deliver:**
+1. **Voice attributes** — 3–5 adjectives (e.g. direct, warm, expert-not-academic).
+2. **Tone matrix** — voice × context (homepage, support, social, crisis) with example phrases.
+3. **Verbal rules** — sentence length, jargon policy, humor yes/no, CTA style.
+4. **Visual principles** — color role (not hex unless provided), typography hierarchy, imagery style, logo usage rules (clear space, don'ts).
+5. **Quick audit checklist** — colors, fonts, logo, contrast, imagery, tone, prohibited uses.
+
+**Output format:**
+```text
+## Creative direction brief
+- Voice attributes: …
+- Tone matrix: table (context × tone × example phrase)
+- Verbal do / don't: bullets
+- Visual principles: bullets (no brand-specific vendor content)
+- Audit checklist: checkboxes
+```
+
+Pair with `product-excellence.mdc` §1b when UI must reflect the verbal brand.
+
+---
+
+## What this rule does not cover
+
+| Need | Use instead |
+|------|-------------|
+| Bootstrap `.agents/product-marketing.md` | `seo-gtm.mdc` |
+| Homepage/landing page text | `seo-gtm.mdc` |
+| SEO titles, meta, keyword maps | `seo-gtm.mdc` |
+| Scaled SEO page programs | `seo-gtm.mdc` |
+| Site-wide ranking diagnosis | `seo-gtm.mdc` |
+
+## Related rules
+
+- Foundation doc → `seo-gtm.mdc`
+- Page copy after voice is locked → `seo-gtm.mdc`
+- Centralize strings in code → `create-web-game.mdc` § Copy source of truth
+
+## Section 3 — Marketing copy
+
+# Marketing Copy
+
+**Intent:** Write clear, compelling copy that drives action on marketing pages — not brand positioning workshops (`seo-gtm.mdc`), not SEO element checklists (`seo-gtm.mdc`), not centralizing strings in code (`create-web-game.mdc`).
+
+---
+
+## Before you write **[core]**
+
+1. Read `.agents/product-marketing.md` if present — use ICP, voice, customer language, proof points.
+2. If voice is undefined, run `seo-gtm.mdc` Mode A/C or `seo-gtm.mdc` first.
+3. Gather page-specific context (ask only if missing):
+   - Page type (homepage, landing, pricing, feature, about)
+   - **One** primary action (signup, book demo, download, purchase)
+   - Traffic source (ads, organic, email) — headline must match intent
+   - Objections to address on this page
+
+---
+
+## Copy principles **[core]**
+
+| Principle | Practice |
+|-----------|----------|
+| Clarity over cleverness | If you must choose, choose clear |
+| Benefits over features | What it means for the customer, not what it does |
+| Specificity over vagueness | Numbers, time saved, named outcomes — not "streamline" or "optimize" |
+| Customer language | Mirror voice-of-customer from context doc, reviews, support |
+| One idea per section | Build a logical argument down the page |
+| Honest over sensational | No fabricated stats or testimonials |
+
+### Style rules
+
+- Simple words: "use" not "utilize"
+- Active voice; cut "almost," "very," "really"
+- No exclamation points in body copy
+- Show outcomes; avoid empty buzzwords
+
+---
+
+## Page structure **[core]**
+
+### Above the fold
+
+| Element | Rule |
+|---------|------|
+| **Headline** | Single most important message; specific > generic |
+| **Subheadline** | Expands headline; 1–2 sentences max |
+| **Primary CTA** | Action + what they get: "Start free trial" > "Sign up" |
+
+**Headline formulas (pick one fit):**
+- `{Outcome} without {pain}`
+- `The {category} for {audience}`
+- `Never {unpleasant event} again`
+- Question highlighting main pain
+
+### Core sections (order as needed)
+
+| Section | Purpose |
+|---------|---------|
+| Social proof | Logos, stats, testimonials — credibility early |
+| Problem / pain | Show you understand their situation |
+| Solution / benefits | 3–5 outcomes tied to jobs |
+| How it works | 3–4 steps; reduce perceived complexity |
+| Objection handling | FAQ, comparisons, guarantees |
+| Final CTA | Recap value + repeat CTA + risk reversal |
+
+---
+
+## Page-specific guidance **[applicable if page type matches]**
+
+| Page | Focus |
+|------|-------|
+| Homepage | Broadest value prop; clear paths for different intents |
+| Landing page | Single message, single CTA; match ad/traffic source |
+| Pricing | Reduce "which plan?" anxiety; make recommendation obvious |
+| Feature | Feature → benefit → outcome; path to try/buy |
+| About | Why you exist; connect mission to customer benefit; still include CTA |
+
+---
+
+## CTA copy **[core]**
+
+**Weak:** Submit, Sign Up, Learn More, Click Here, Get Started
+
+**Strong:** Start Free Trial, Get [Specific Thing], See [Product] in Action, Create Your First [Thing]
+
+**Formula:** [Action verb] + [What they get] + [Qualifier if needed]
+
+---
+
+## Output format **[core]**
+
+Provide:
+
+### Page copy
+Organized by section: headline, subheadline, CTA, section headers, body, secondary CTAs.
+
+### Annotations
+For headline and primary CTA: why this choice + which principle it applies.
+
+### Alternatives
+For headline and primary CTA: 2–3 options with rationale each.
+
+### Meta handoff `[applicable if SEO matters]`
+Suggest page title + meta description — implementation details → `seo-gtm.mdc`.
+
+---
+
+## What this rule does not cover
+
+| Need | Use instead |
+|------|-------------|
+| Positioning, tone matrix, rebrand | `seo-gtm.mdc` |
+| Title/meta/canonical/keyword map | `seo-gtm.mdc` |
+| Email, popup, ad copy | domain-specific skills / archive rules |
+| Put copy in `i18n.js` / `copy.ts` | `create-web-game.mdc` § Copy source of truth |
+
+## Related rules
+
+- Voice and pillars → `seo-gtm.mdc`
+- Context doc → `seo-gtm.mdc`
+- Ship SEO tags → `seo-gtm.mdc`
+- Redundancy audit on live pages → `create-web-game.mdc` § Simplification
+
+## Section 4 — On-page SEO
+
+# On-Page SEO
+
+**Intent:** Optimize individual pages to rank and convert — titles, content, structure, internal links. Skip for off-page/backlinks (`off-page-seo.mdc`) or AI citation strategy (`ai-seo.mdc`).
+
+## Before you optimize
+
+1. Pick **one primary keyword** + search intent (informational, commercial, transactional).
+2. Run `site:yourdomain.com "keyword"` — if multiple pages compete, fix cannibalization first (merge, redirect, or retarget).
+3. Confirm page is **indexable** in Google Search Console (not blocked, not noindex, in sitemap).
+4. If diagnosing a drop, audit in order: **crawlability → speed → on-page → content quality → links**. Don't tweak titles if Google can't index the page.
+
+## Page elements checklist
+
+| Element | Rule |
+|---------|------|
+| Title | Unique, 50–60 chars, primary keyword near start, compelling |
+| Meta description | Unique, 150–160 chars, value prop + CTA |
+| H1 | Exactly one; matches title/URL intent |
+| H2/H3 | Logical hierarchy; no skipped levels for styling only |
+| Opening | Primary topic in first ~100 words; no keyword stuffing |
+| URL | Short, readable, hyphens, lowercase; keyword where natural |
+| Images | Descriptive alt text, WebP where possible, lazy-load below fold |
+| Canonical | Self-referencing on unique pages; HTTPS + www consistency |
+
+## SPA & SSR patterns (production lessons)
+
+From shipping [dsapatterns.io](https://dsapatterns.io) keyword landings and Inner Healer (TanStack Start):
+
+| Situation | Do this |
+|-----------|---------|
+| **Hash routes** (`#page`) | Google often indexes one URL — **path URLs** for keyword landings; client-side redirect legacy hashes to paths |
+| **SPA without SSR** | Static defaults in `index.html` + runtime `applyPageSeo()`; **post-build prerender** per path with unique title/meta/canonical in `dist/<path>/index.html` |
+| **SSR / TanStack / Next** | Per-route `head()` / metadata API — no prerender needed if HTML ships unique tags server-side |
+| **Single source of truth** | Central `seo.js` / `seo.ts`: `PAGE_SEO`, `LANDING_SEO`, keyword map — routes and sitemap import from it |
+| **Sitemap** | List **path** canonicals only — never `#fragments` for landing pages |
+| **JSON-LD** | `WebSite` + `Organization` sitewide; `FAQPage` on hub; `Article` / `WebApplication` on tools — verify in Rich Results Test, not `curl` alone |
+| **Visible copy** | Keyword H1 + H2 hub blocks + FAQ on home/hub — not meta-only; one keyword → one canonical page |
+| **Utility pages** | `noindex` favorites, reminders, account — keep out of sitemap |
+| **Tests** | Unit: canonical paths, sitemap entries, seo module exports; E2E: path loads, legacy redirect, no `pageerror` |
+| **Post-deploy** | GSC sitemap resubmit, cache purge (CDN shell), Rich Results spot-check |
+
+**Cannibalization rule:** maintain a keyword → canonical URL table; strengthen assigned page instead of duplicating.
+
+## Content quality
+
+- Answer the query **above the fold** — then add depth.
+- Beat top 3 competitors on usefulness, not word count alone.
+- **E-E-A-T:** named author, cited sources, visible "last updated" date, about/contact pages.
+- Avoid doorway pages, thin tag/category pages, duplicate/near-duplicate content.
+- For scaled/programmatic pages: every URL needs **unique value**, not swapped variables only.
+
+## Internal linking
+
+- No orphan pages — every important URL reachable from nav or hub pages within **3 clicks** of home.
+- Use **descriptive anchor text**; avoid exact-match spam.
+- Hub-and-spoke for page sets: category hub → spoke pages → cross-links between related spokes.
+- Link high-priority pages from higher-traffic pages.
+
+## Schema caveat
+
+Static HTML fetch and `curl` often **miss JS-injected JSON-LD** (Yoast, RankMath, etc.). Verify schema with [Rich Results Test](https://search.google.com/test/rich-results) or rendered DOM — never report "no schema" from fetch alone.
+
+## Output formats
+
+**Pre-ship checklist** — emit as checkboxes before publishing any new/updated page.
+
+**Audit findings** — table columns: Issue | Impact (H/M/L) | Evidence | Fix | Priority (1–5).
+
+## Your routine
+
+- **Weekly:** GSC → Performance → queries with impressions but low CTR → rewrite titles/metas.
+- **Monthly:** Refresh top 10 pages; re-check cannibalization; fix broken internal links.
+
+## Free tools
+
+Google Search Console, PageSpeed Insights, Rich Results Test, Mobile-Friendly Test.
+
+## Related rules
+
+- Site-wide diagnosis (ranking drops, indexation) → `seo-gtm.mdc`
+- Scaled template page programs → `seo-gtm.mdc`
+- SPA title/meta on route change → `create-web-game.mdc`
+- AI citation structure → `ai-seo.mdc`
+- Backlinks and authority → `off-page-seo.mdc`
+
+## Section 5 — Programmatic SEO
+
+# Programmatic SEO
+
+**Intent:** Design SEO page programs at scale (templates + data) that rank without thin-content penalties. Not single-page optimization (`seo-gtm.mdc`), not site-wide diagnosis (`seo-gtm.mdc`), not editorial blog strategy.
+
+---
+
+## Before you design **[core]**
+
+1. Read `.agents/product-marketing.md` if present — ICP, conversion goal, category.
+2. Answer the **fit gate** below honestly. If most gates fail, recommend a smaller editorial or on-page approach instead.
+
+---
+
+## Fit gate — is pSEO the right answer? **[core]**
+
+pSEO works when **all** are true:
+
+| Gate | Requirement |
+|------|-------------|
+| Real data | Structured source with depth (10+ fields/record ideal); not shallow scrape + AI filler |
+| Volume | Aggregate long-tail demand exists; individual queries need not be huge |
+| Queryable intent | User question answerable from structured data — not narrative judgment |
+| Refresh budget | Update cadence matches query volatility (listings daily vs "best X 2026" annually) |
+| QC capacity | Team can sample-audit, fix failures, and maintain quality as set grows |
+
+**Probably not pSEO when:** shallow data, illusory keyword lists nobody searches, no QC budget, scaling AI thin pages without unique data.
+
+---
+
+## Data moat hierarchy **[core]**
+
+| Rank | Source | Defensibility |
+|------|--------|---------------|
+| 1 | Proprietary / first-party | You created it; competitors can't copy |
+| 2 | Product-derived | From your users/transactions |
+| 3 | User-generated | Community reviews, submissions |
+| 4 | Licensed | Exclusive or integrated feeds |
+| 5 | Public / scraped | Weakest — easy to copy; thin-content risk |
+
+**Moat test:** Could a competitor replicate your data source in 90 days? If yes, pSEO has no lasting edge.
+
+---
+
+## Core principles **[core]**
+
+1. **Unique value per page** — not swapped city names in identical prose.
+2. **Subfolders, not subdomains** — `yoursite.com/templates/resume/` not `templates.yoursite.com`.
+3. **Genuine intent match** — page answers what people actually search.
+4. **Quality over quantity** — 100 great pages beat 10,000 thin ones.
+5. **Avoid penalties** — no doorway pages, keyword stuffing, duplicate clusters.
+
+---
+
+## 12 playbooks **[core]**
+
+| Playbook | Pattern | Example |
+|----------|---------|---------|
+| Templates | `[type] template` | resume template |
+| Curation | `best [category]` | best website builders |
+| Conversions | `[X] to [Y]` | $10 USD to GBP |
+| Comparisons | `[X] vs [Y]` | webflow vs wordpress |
+| Examples | `[type] examples` | landing page examples |
+| Locations | `[service] in [location]` | dentists in austin |
+| Personas | `[product] for [audience]` | crm for real estate |
+| Integrations | `[A] [B] integration` | slack asana integration |
+| Glossary | `what is [term]` | what is pSEO |
+| Translations | Localized content | multi-language sets |
+| Directory | `[category] tools` | ai copywriting tools |
+| Profiles | `[entity name]` | company or person profile |
+
+**Choosing:**
+
+| If you have… | Consider… |
+|--------------|-----------|
+| Proprietary data | Directory, Profiles |
+| Many integrations | Integrations |
+| Multi-segment audience | Personas |
+| Local presence | Locations |
+| Tool/utility product | Conversions |
+| Expertise content | Glossary, Curation |
+| Competitor landscape | Comparisons |
+
+Layer playbooks when natural (e.g. "Best coworking spaces in San Diego").
+
+---
+
+## Implementation framework **[core]**
+
+### 1. Keyword pattern research
+- Repeating structure + variables + combinatorial count
+- Validate aggregate volume and trend; head vs long-tail distribution
+
+### 2. Data requirements
+- Fields per record; required vs optional; computed fields; cross-record links for internal linking
+- Update-frequency tags (static vs volatile fields)
+
+### 3. Template design
+- **Above-the-fold answer** in first ~200 words (human + extractable)
+- **Variable density** — graceful fallbacks for sparse records; progressive disclosure for dense
+- **Heading hierarchy** maps to data sections, not decoration
+- **Schema in template** — JSON-LD at scale per page type
+- **Internal link slots** — 5–15 related/parent/sibling links per page
+- Unique title + meta per URL
+
+### 4. Internal linking
+- Hub-and-spoke: category hub → spokes → cross-links
+- No orphan pages; breadcrumbs + sitemap; keyword → canonical URL table
+
+### 5. Indexation strategy
+- Prioritize high-volume patterns first
+- `noindex` very thin variations
+- Separate sitemaps by page type when large
+- Manage crawl budget on 500+ page sets
+
+---
+
+## Quality control **[core]**
+
+### Pre-launch checklist
+
+- [ ] Random sample page answers query competently in isolation
+- [ ] Unique value vs parent/sibling pages
+- [ ] Unique titles, metas, H1s
+- [ ] Schema validates (Rich Results Test)
+- [ ] Connected in site architecture; no orphans
+- [ ] In XML sitemap; crawlable; no conflicting noindex
+
+### Post-launch monitoring
+
+Track: indexation rate, rankings, traffic, engagement, conversion.
+
+Watch: thin-content warnings, ranking drops, manual actions, crawl errors.
+
+Define metrics and review cadence **before** launch.
+
+---
+
+## Common mistakes **[core]**
+
+- Thin templates (city/name swap only)
+- Keyword cannibalization across generated URLs
+- Over-generation with no search demand
+- Stale or wrong data
+- Pages built for crawlers, not users
+
+---
+
+## Output formats **[core]**
+
+**Opportunity analysis** — table: pattern | est. pages | aggregate volume | data source | difficulty
+
+**Strategy doc** — playbook choice, implementation plan, content uniqueness rules
+
+**Page template spec** — URL pattern, title/meta templates, content blocks, schema type, linking rules
+
+**Pre-launch checklist** — checkboxes as above
+
+---
+
+## What this rule does not cover
+
+| Need | Use instead |
+|------|-------------|
+| Per-page title/H1/meta ship patterns | `seo-gtm.mdc` |
+| "Why is my site not ranking?" | `seo-gtm.mdc` |
+| Single editorial articles | content strategy / `seo-gtm.mdc` |
+| Backlinks and directories outreach | `off-page-seo.mdc` (archive) |
+
+## Related rules
+
+- Context + conversion goals → `seo-gtm.mdc`
+- Per-URL optimization at ship → `seo-gtm.mdc`
+- Live set underperforming → `seo-gtm.mdc`
+- SPA prerender + sitemap → `create-web-game.mdc`
+
+## Section 6 — SEO audit
+
+# SEO Audit
+
+**Intent:** Identify SEO issues site-wide and deliver a prioritized fix plan. Not single-page element optimization (`seo-gtm.mdc`), not designing scaled page programs (`seo-gtm.mdc`), not backlink campaigns (`off-page-seo.mdc`).
+
+---
+
+## Before you audit **[core]**
+
+1. Read `.agents/product-marketing.md` if present — business goals, priority keywords/topics.
+2. Gather (ask if missing):
+   - Site type (SaaS, e-commerce, blog, local, multilingual)
+   - Known issues, recent migrations or redesigns
+   - Scope: full site vs specific sections
+   - GSC / analytics access (or best available evidence)
+
+3. **Do not** start with title tweaks if crawlability or indexation is broken.
+
+---
+
+## Audit priority order **[core]**
+
+1. **Crawlability & indexation** — can Google find and index pages?
+2. **Technical foundations** — fast, secure, mobile-ready?
+3. **On-page optimization** — titles, headings, content alignment?
+4. **Content quality** — does it deserve to rank (E-E-A-T, depth)?
+5. **Authority & links** — off-site credibility?
+
+---
+
+## Schema detection caveat **[core]**
+
+`curl` and static fetches often **miss JS-injected JSON-LD** (Yoast, RankMath, SPA `useEffect`). Never report "no schema" from fetch alone.
+
+Verify with: [Rich Results Test](https://search.google.com/test/rich-results), rendered DOM, or Screaming Frog with JS rendering.
+
+---
+
+## Technical SEO **[core]**
+
+### Crawlability
+- `robots.txt` — no accidental blocks; sitemap reference present
+- XML sitemap — canonical indexable URLs only; submitted to GSC
+- Architecture — important pages within 3 clicks; no orphans
+- `[applicable if large site]` Crawl budget — params, faceted nav, infinite scroll fallbacks
+
+### Indexation
+- `site:domain.com` vs expected URL count
+- GSC coverage — noindex on money pages, wrong canonicals, redirect chains, soft 404s
+- HTTPS + www/non-www + trailing slash consistency
+
+### Speed & Core Web Vitals
+- LCP < 2.5s, INP < 200ms, CLS < 0.1
+- TTFB, images, JS weight, caching, CDN
+
+### Mobile & security
+- Responsive (not separate m. site); tap targets; same content as desktop
+- HTTPS sitewide; no mixed content
+
+---
+
+## International SEO `[applicable if multilingual]`
+
+- Hreflang: self-reference, reciprocal tags, valid ISO codes, `x-default`
+- Each locale self-canonical — never cross-locale canonical to English
+- Fully translated main content — not boilerplate-only locales
+- Thin locale pages can drag site-wide quality — don't create locales you can't make helpful
+
+---
+
+## On-page & content (audit lens) **[core]**
+
+Flag issues; detailed fix patterns → `seo-gtm.mdc`.
+
+| Area | Check |
+|------|-------|
+| Titles / metas | Unique, length, keyword alignment, CTR-worthy |
+| Headings | One H1; logical hierarchy |
+| Content | Intent match, depth vs top 3, thin/doorway pages |
+| Images | Alt text, compression, modern formats |
+| Internal links | Important pages linked; descriptive anchors; cannibalization |
+| E-E-A-T | Author, sources, about/contact, freshness |
+
+---
+
+## Site-type quick hits `[applicable if type matches]`
+
+| Type | Common gaps |
+|------|-------------|
+| SaaS | Thin product/feature pages; blog disconnected from product; missing comparison/alternative pages |
+| E-commerce | Thin categories; duplicate descriptions; faceted duplicates; missing product schema |
+| Content/blog | Outdated posts; cannibalization; weak topical clusters |
+| Local | NAP inconsistency; missing LocalBusiness schema; weak location content |
+
+---
+
+## Output format **[core]**
+
+### Executive summary
+- Overall health (1–2 sentences)
+- Top 3–5 priority issues
+- Quick wins
+
+### Findings tables
+For each issue:
+
+| Issue | Impact (H/M/L) | Evidence | Fix | Priority (1–5) |
+
+Group under: Technical | On-Page | Content | Authority
+
+### Prioritized action plan
+1. Critical (blocking indexation/ranking)
+2. High-impact improvements
+3. Quick wins
+4. Long-term recommendations
+
+Hand off page-level implementation → `seo-gtm.mdc`. Scaled page-set problems → `seo-gtm.mdc`.
+
+---
+
+## Free tools **[core]**
+
+Google Search Console, PageSpeed Insights, Rich Results Test, Mobile-Friendly Test, Bing Webmaster Tools.
+
+---
+
+## What this rule does not cover
+
+| Need | Use instead |
+|------|-------------|
+| Ship unique title/meta per SPA route | `seo-gtm.mdc` |
+| Design 100+ template pages | `seo-gtm.mdc` |
+| AI Overviews / llms.txt | `ai-seo.mdc` (archive) |
+| Link building outreach | `off-page-seo.mdc` (archive) |
+
+## Related rules
+
+- Fix individual pages → `seo-gtm.mdc`
+- pSEO program design → `seo-gtm.mdc`
+- Context + priority keywords → `seo-gtm.mdc`
+- Deploy, prerender, sitemap code → `create-web-game.mdc`

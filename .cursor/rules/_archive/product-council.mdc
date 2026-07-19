@@ -1,5 +1,5 @@
 ---
-description: Product council — CIRCLES PM framework plus multi-stakeholder critique before build or ship
+description: Product council — incubation gate, CIRCLES PM framework, multi-stakeholder critique before build or ship
 globs: "**/product_spec.md,**/tech_spec.md,**/roadmap.md,**/ROADMAP.md,docs/**/*.md,**/*prd*.md,**/*PRD*.md,**/*idea*.md"
 alwaysApply: false
 ---
@@ -10,9 +10,40 @@ alwaysApply: false
 
 **When to run [core]:** new product, major feature, monetization change, go/no-go milestone, or when the user asks for council / critic / PM review. Skip for typo fixes and single-file bugs.
 
-**Before council [optional]:** rapid idea tables or Jobs-style vision Q&A → `steve-jobs.mdc` Modes B/C. Council **stress-tests** a direction; it does not replace early ideation.
+**Before council [optional]:** pattern-mapped wedge ideation → `steve-jobs.mdc` Mode D + Idea Pattern Library; rapid idea tables or Jobs-style vision Q&A → Modes B/C. Council **stress-tests** a direction; it does not replace early ideation.
 
 Tagging matches other rules: **[core]** always in a council pass; **[applicable if …]** only when the product matches.
+
+---
+
+## 0. Pre-Council Incubation Gate **[core when idea not yet stress-tested]**
+
+Run this **before** CIRCLES when evaluating a new product or wedge. Skip if the user already completed incubation in this session.
+
+Work through all ten steps in order. Do not skip to solutions.
+
+| Step | Question |
+|------|----------|
+| **1. User** | Who has the pain, and how often do they feel it? |
+| **2. Pain** | What is broken, slow, expensive, risky, inaccessible, or emotionally frustrating? |
+| **3. Existing Behavior** | What are users already doing manually or with poor tools? |
+| **4. Why Now** | What changed recently in technology, regulation, behavior, cost, or distribution? |
+| **5. Solution** | What new product or workflow becomes possible now? |
+| **6. Wedge** | What narrow segment can you win first? |
+| **7. Moat** | What gets stronger over time: data, workflow memory, trust, network, integrations, brand, or distribution? |
+| **8. Business Model** | Who pays, how much, and why now? |
+| **9. Validation** | What evidence proves demand: prototype, interviews, usage, willingness to pay, comparable companies? |
+| **10. Scale Path** | How does the wedge expand into a larger platform or market? |
+
+**Incubation → CIRCLES mapping:**
+
+| Incubation step | CIRCLES step |
+|-----------------|--------------|
+| User, Pain, Existing Behavior | **C** Comprehend, **I** Identify, **R** Report needs |
+| Wedge | **C** Cut (beachhead) |
+| Solution, Moat | **L** List solutions |
+| Business Model, Validation | **E** Evaluate tradeoffs |
+| Scale Path | **S** Summarize |
 
 ---
 
@@ -47,6 +78,7 @@ After CIRCLES, run each lens below. **Skip** lenses that clearly do not apply (e
 | Lens | Questions this voice asks |
 |------|---------------------------|
 | **Product visionary** (Mindful Essentialist) | Is the core experience irresistible in one sentence? What should we **remove**? Does every screen serve the primary job? For each feature: *What suffering does this relieve?* — if none, it's noise. Prefer **eliminating options** over configurable defaults. Shoshin: *What would we do if we started today?* |
+| **Incubation reviewer** | Does the wedge hold? Is "why now" crisp? Is there a compounding asset (graph, vault, benchmark, model)? Believable path to revenue? |
 | **Product manager** | Does CIRCLES hang together? Are scope and milestone realistic? What is the smallest shippable slice? |
 | **Engineer** | What is the riskiest technical assumption? Can we stub or spike it in days, not weeks? What must be decided before schema/API lock? |
 | **QA lead** | What are acceptance criteria and failure modes? What is the Day-1 test matrix (browsers, offline, accessibility, load)? |
@@ -104,7 +136,8 @@ e.g. ADR, HLD stub, monetization doc, test protocol → point to system-design /
 
 | After council… | Use |
 |----------------|-----|
-| Early ideation / Jobs vision / ultrathink UI | `steve-jobs.mdc` |
+| Pattern ideation / wedge ideas | `steve-jobs.mdc` Mode D + Idea Pattern Library |
+| Early ideation / Jobs vision / ultrathink UI | `steve-jobs.mdc` Modes A–C |
 | Architecture, scale, pitfall audit | `system-design.mdc` |
 | UI, a11y, privacy, Definition of Done | `universal-product.mdc` |
 | Game engine, embed, determinism | `games-building.mdc` |

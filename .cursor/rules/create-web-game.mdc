@@ -1,0 +1,691 @@
+---
+description: Create web apps and games — SPA/static ship, copy economy, hosting, game engine/shell, embeds, PWA, verification
+globs: "**/*.{html,css,jsx,tsx,vue,svelte}","**/wrangler.jsonc","**/vercel.json","**/public/**","**/games/**","**/src/**","**/style.css","**/index.html"
+alwaysApply: false
+---
+
+# Create Web App / Game
+
+**Intent:** Ship marketing sites, SPAs, and browser games (including embeds/PWA). Convert to Android → `convert-web-to-mobile.mdc`. Store publish → `publish-mobile.mdc`. UI philosophy → `product-excellence.mdc`. SEO → `seo-gtm.mdc`.
+
+**Tag legend:** **[core]** always consider; **[applicable if …]** skip when irrelevant.
+
+---
+
+# Part A — Web applications (static & SPA)
+
+# Web Applications (Static & SPA)
+
+**Intent:** Ship, test, and host marketing or product web apps and **host vendored client bundles** (e.g. games). Cross-surface UI policy lives in `product-excellence.mdc` §2a. Game engines and replay logic live in `create-web-game.mdc`. **Simplification passes** (cut copy, chrome, redundancy) → this rule § Simplification + `incubation.mdc` Mode A.
+
+**Applicability:** If a section's `[applicable if …]` does not match your product, **skip the entire section** — do not copy proxy, editor, or ingest patterns onto simple marketing sites.
+
+## Docs map **[core]**
+
+| Doc | Purpose |
+|-----|---------|
+| `README.md` | Dev commands, deploy targets, design philosophy |
+| `design_spec.md` / `design_specification.md` / `roadmap.md` | Product direction, paused features (e.g. monetization flags) |
+| `wrangler.jsonc` / `vercel.json` | Host-specific routing (only the file for your target) |
+
+Read before large changes. **dsapatterns.io** repo-specific paths and deploy → § *DSA Patterns site*.
+
+## Stack-agnostic defaults **[core]**
+
+- Prefer **static-first**: content as JSON or markdown under `public/`; minimal server logic.
+- Document routing (hash-based or path-based) in README so agents do not guess.
+- Global styling: one source of truth (`style.css` or design tokens); if using Tailwind, decide whether preflight is on or off and stay consistent.
+- **Monetization:** use explicit feature flags or a documented “monetization paused” constant — do not half-enable paywalls without updating `roadmap.md`.
+
+## UI expectations (web-specific) **[core]**
+
+Visual and accessibility policy → `product-excellence.mdc` §1b (Rams) and §2a. Web-only: keep one global style source (`style.css` or tokens); document tokens in `design_spec.md` when used. Design-only polish (no new routes or behavior) → `incubation.mdc` Mode A before claiming UI done.
+
+## Simplification & copy economy **[core]**
+
+One job per screen. If the user can infer it from layout, **do not label it again in prose**. Run this audit before claiming UI done (pairs with `incubation.mdc` Mode A).
+
+### Copy source of truth
+
+- **Centralize visible strings** in one module (e.g. `src/lib/i18n.js`, `copy.ts`) — EN + any locale variants. Components consume `t(lang).key`; avoid hardcoded marketing paragraphs in JSX.
+- **SEO vs UI:** longer keyword copy may live in `index.html`, `seo.js`, or prerender landings — **not** duplicated in the hero, trust bar, and three-column “SEO grids” on the same viewport.
+- **Data vs display:** JSON can hold rich hints; the UI may show **caps** (max bullets, max chars) via formatters — trim at display, then shorten source data in a follow-up if still noisy.
+
+### Redundancy audit
+
+Ask for every line of text on a route:
+
+| Question | If yes → |
+|----------|----------|
+| Is this fact shown elsewhere on the same viewport? | Remove the duplicate (keep one source of truth). |
+| Is this the same pitch in hero + trust bar + footer + 3 feature cards? | **One headline + one subline** on the MDP; trust bar = one short line or logos only. |
+| Is this a collapsed/closed section with no visible payoff? | Open by default with real content, or **delete** the section. |
+| Is this geographic, aspirational, or “studio” fluff on a tool page? | Cut or move to a tertiary route — not footer chrome on the MDP. |
+| Is this engineering status dressed as user copy? | Hide when idle; show only during incomplete work (e.g. “Analyzing…”). |
+| Are there two cards for one concept (e.g. “Blueprint” + “Signals”)? | **Merge into one card** with one eyebrow label. |
+
+**Anti-patterns (seen in production):**
+
+- Hero H1 + subline + **three SEO columns** restating company tags / cheat sheet / extension (same page).
+- Same chapter name in header, sidebar tab, and main panel heading.
+- Same photo count in stats line, sidebar badge, grid header, and download button label.
+- Trust copy in hero + floating strip + footer (pick **one** surface + `/privacy` link).
+- Pattern detail: **Trigger / Constraint / Win** labels plus a separate **Signals** box with overlapping bullets.
+- Pattern detail: pattern name in page title **and** again inside the guide card.
+- Brand wordmark run together (`VIVAHALBUMS`) — use explicit word spacing in a shared `BrandLogo` component.
+- Footer with three columns repeating nav + location + taglines the header already implies.
+- List/grid cards with long descriptions when **name + count + CTA** suffices.
+
+### Hero & trust (marketing / tool MDP) **[applicable if landing + app tabs share one shell]**
+
+- **Hero:** one H1 + one subline (≤ ~12 words each when possible). No feature grid under the hero unless each card opens distinct content not visible elsewhere.
+- **Trust bar:** logos **or** one metrics line — not both repeating the hero pitch. Example shape: `3,000+ problems · 19 patterns · Free`.
+- **Tabs / primary nav:** labels only; no paragraph under every tab on first paint.
+- **Curated path cards** (e.g. Blind 75): title + **three-word** subtitle max — or title only.
+
+### Detail pages & reference content **[applicable if cheat sheets, patterns, chapters, docs]**
+
+Use **one card per concept**, identical structure across all items:
+
+```text
+[EYEBROW — one word, e.g. Pattern / Chapter]
+[optional media — GIF/diagram, sized for readability]
+[one gist line — trigger → outcome, no field labels]
+[· up to 2 cues — short bullets, not paragraphs]
+[template / code block — if applicable]
+[list of items — problems, links, etc.]
+```
+
+Rules:
+
+| Do | Don't |
+|----|--------|
+| One eyebrow (`Pattern`, `Chapter`) | Separate “Blueprint”, “Signals”, “More signals” boxes |
+| Gist: `{trigger} → {win}` in one line | Labeled rows for Trigger / Constraint / Win |
+| Show **≤ 2** cues; cap ~90 chars each in UI | Dump full `howToIdentify` arrays on page |
+| Cap gist ~140 chars in formatter | Multi-sentence intro before the list |
+| Page `<h1>`/`h2` holds the name | Repeat name inside the guide card |
+| Same component for all items | Per-pattern layout forks |
+
+Implement via a shared component + props (`blueprint`, `signals`, `visual`) and constants (`MAX_CUES`, `MAX_GIST_CHARS`). Unit-test formatters.
+
+**List pages:** grid cards = **title + metadata** (count, badge) — drop redundant descriptions when the title is self-explanatory.
+
+### FAQ, About, legal
+
+- **FAQ:** ≤ 4–6 questions; **one-line answers**. Cut overlapping questions (Premium? company tags? cheat sheet? → merge).
+- **About:** one paragraph + optional quote + stats — not three story paragraphs + disclaimer + quote.
+- **Privacy / Terms:** plain-language essentials; avoid repeating the same disclaimer in footer, about, and legal.
+
+### Free tiers & tool directories **[applicable if affiliate / resource lists]**
+
+- Section header: eyebrow + title + **one** subtitle per band (Free vs Pro).
+- Tool cards: **name + eligibility badge + CTA** — drop taglines when the name is clear; hide long “how we use it” lists on card face (link out or `<details>` if truly needed).
+- Dividers between bands: one short line (`Need paid tools →`), not a paragraph.
+
+### Header chrome (multi-tab apps)
+
+- Single row: **logo `shrink-0` · nav `flex-1 min-w-0` (scroll) · lang + theme `ml-auto shrink-0`**.
+- Avoid `absolute` controls overlapping nav on mobile.
+- Theme default: explicit in app state (e.g. `'default'`), not an aesthetic preference baked in without product reason.
+
+### Routing & blank screens **[applicable if hash + path SEO landings]**
+
+- If `maybeRedirectLegacyHash()` (or equivalent) runs **before** React mount and returns `true`, the app **never renders** — blank screen with no console error.
+- **Fix:** when `pathname` already equals the canonical path, **return false** even if the hash has sub-routes (e.g. `/patterns#dsa/pattern/sliding-window`).
+- Add E2E for canonical path + hash sub-routes after any redirect refactor.
+
+### Attribution & vendored media
+
+- Local / anonymous assets: **no** author name or article links in UI unless legally required.
+- Third-party (e.g. Wikimedia): **Commons + optional Wikipedia overview** — not personal Medium/blog attribution mixed into pattern guides.
+
+### Brand & chrome
+
+- **Wordmark:** multi-word names get visible space (`Vivah` · `Albums`), not concatenated spans. One shared component for header + footer.
+- **Header:** logo `shrink-0` left; primary CTA right; `justify-between` + explicit `gap` — nav must not crowd the mark.
+- **Footer (tool-first sites):** two columns max — brand blurb + contact email; short Explore list (Designer, How it works, Privacy). One copyright line. No location pins unless the product is *about* place.
+- **Buttons:** one geometric language per tier (e.g. primary CTAs all `rounded-full`); do not mix pill and boxy on the same funnel step.
+
+### Idle onboarding (paste / upload flows)
+
+- **Narrow reading column** (`max-w-2xl` / `max-w-3xl`) — not full-bleed empty canvas.
+- **Hero stack:** job statement → single trust line (Privacy · process modal) → form. No sixth text layer.
+- **Sample / demo output:** show real thumbnails **inline** or omit entirely. Never a closed `<details>` that only shows a headline — users read it as broken.
+- **Remove** sidebar placeholders that restate what the main panel already does.
+
+### Workspace stats (one calm line)
+
+When users ingest batches (folders, galleries), expose **numbers only** in one `role="status"` line under the title:
+
+```text
+43 in folder · 31 shown · 9 duplicates hidden · 3 blur filtered · 4 selected
+```
+
+Rules:
+
+- Always: `N in folder · M shown`.
+- Append segments **only when > 0** (duplicates, blur-filtered, excluded, selected).
+- During async work: replace with `Analyzing…` or `Layout 12/43` — not the full stats string.
+- Implement via a pure formatter (e.g. `formatWorkspaceStats()`) + unit tests; do not scatter string templates in JSX.
+- Full breakdown belongs in **settings / curation dialog**, not repeated in the grid header.
+
+### Progressive disclosure that earns its keep
+
+- **Good:** Export PDF primary; Edit folder + Curation + Analyze batch in overflow `⋯`.
+- **Good:** Advanced thresholds inside collapsed `<details>` in a dialog.
+- **Bad:** Icon tabs plus a text heading repeating the tab name plus instructional microcopy for obvious interactions (“Click to select”).
+- **Bad:** Stats line when nothing is in progress and every number is duplicated elsewhere.
+
+### Verification for simplification **[core]**
+
+- Desktop + mobile screenshot: can a new user name the **one** primary action in 3 seconds?
+- Count distinct places the same noun (chapter name, photo count, brand, “free LeetCode”) appears — **≤ 2** per viewport.
+- Pattern/detail routes: exactly **one** guide card above the list; no `Trigger:` labels in DOM.
+- E2E smoke: assert stable copy on routes you keep; **remove** assertions for deleted boilerplate; update `page-objects` hero patterns when H1 changes.
+- After copy pass: run `npm test` + spot-check `/patterns#…/pattern/…` (or equivalent deep link) for blank-screen regressions.
+
+## SPA resilience & SEO **[core]**
+
+- **Error boundaries:** route- or section-level fallback UI with retry/home — never a blank screen on render failure.
+- **Code splitting:** lazy-load heavy routes (games, admin, charts) via dynamic `import()` or framework equivalent.
+- **Shareable UI state `[applicable if filters/tabs/search should be linkable]`:** put bookmarkable state in URL hash or query params — not ephemeral UI (modals, scroll, drafts) or sensitive values.
+- **SEO (per route):** unique `<title>`, meta description, canonical URL, Open Graph tags — even for hash routes, set document title on navigation.
+- **Third-party scripts & CSP `[applicable if you add external trackers/widgets]`:** update CSP to match what you actually load — do not add analytics by default; if you do add a tracker, allowlist its domains explicitly (avoid `'unsafe-inline'` / `'unsafe-eval'` unless your bundler requires them).
+- **`[applicable if TypeScript]`** enable `strict`; prefer `unknown` over `any`.
+
+## Performance & Optimization **[core]**
+
+- **Core Web Vitals (CWV):** Monitor and optimize for LCP (Largest Contentful Paint), INP (Interaction to Next Paint), and CLS (Cumulative Layout Shift).
+- **Asset & Image Optimization:** Use modern image formats (WebP/AVIF), provide responsive `srcset`, and use `loading="lazy"` for off-screen media.
+- **Progressive Web App (PWA):** `[applicable if offline capable]` Implement Service Workers using reliable caching strategies (e.g., stale-while-revalidate for assets, network-first for data) to provide resilient offline/flaky-network experiences.
+
+## SPA hosting **[core]**
+
+- Production build outputs to `dist/` (or equivalent).
+- **Cloudflare Workers / static assets:** `assets.directory` → `./dist`, `not_found_handling: single-page-application` so unknown paths fall back to `index.html`.
+- **Vercel / Netlify:** equivalent SPA rewrite rules in host config.
+- **Dev server:** if you vend a nested client SPA under `public/<app>/`, mirror SPA fallback in Vite (or host) preview so deep links work locally — not only in production.
+
+**DSA Patterns production deploy** → § *DSA Patterns site* below (Wrangler upload, CDN purge, `main`/`master` mirror).
+
+## Thin server on static apps **[applicable if Workers/API routes proxy third-party URLs or ingest user links]**
+
+Static-first does not mean zero server logic. When you add a **fetch proxy** or **link-ingest** handler (Drive folders, OG images, etc.), treat it as a shared resource every user hits.
+
+- **Allowlist upstream hosts** — HTTPS only; validate hostname *and* path pattern before `fetch`; re-check after redirects.
+- **Upstream timeout** — every outbound `fetch` gets `AbortController` + a strict deadline (e.g. 10s); return **504** on abort; `clearTimeout` in `finally` so hung calls cannot exhaust the connection pool.
+- **Rate limit by real client IP** — extract IP in order: `cf-connecting-ip` → first `x-forwarded-for` → `x-real-ip` → `"unknown"`. If deploy omits all headers, every user shares one bucket — document required proxy/CDN headers in README.
+- **Same-origin gate for browser proxies `[applicable if open relay abuse is a concern]`** — prefer matching `Origin` or `Referer`; know that strict deny-when-both-missing breaks some privacy browsers and non-browser clients — weigh abuse vs compatibility.
+- **Response hygiene** — enforce expected `content-type`, cap body size, use `cache-control: private` for user-specific bytes; generic error messages to clients (log upstream bodies server-side only).
+- **Server-side validation mirrors UI** — client regex is UX, not security; reject hostname bypass (e.g. `evil.com/folders/{id}`) in the handler before parsing IDs.
+- **Privacy-aligned defaults `[applicable if handling user media/links]`** — prefer client-side export over uploading user media when feasible; avoid PII in telemetry; do not persist user content server-side without a threat model (localStorage/session for prefs, auth, or cart is fine).
+
+Extract shared helpers (`getClientIp`, URL allowlist) into `src/lib/` and unit-test them.
+- **Proxied media URLs** — wrap third-party image URLs through one helper (e.g. `proxiedXUrl()`); keep helper and server allowlist in the **same module** with unit tests. When upstream changes hostname/path (e.g. `drive.google.com/thumbnail` vs `lh3.googleusercontent.com`), update both together or thumbnails break silently.
+
+## External link ingest **[applicable if users paste third-party folder/file URLs]**
+
+- **Primary + fallback paths** — API key (full listing) + best-effort fallback (smaller cap); log fallback server-side; toast honest limits to users (~60 vs 500+).
+- **Hard caps in code and tests** — max items ingested, folder depth, export batch size; constants referenced in unit tests and `product_spec.md`.
+- **Abort long ingest** — server handler timeout (e.g. 60s) separate from per-fetch proxy timeout.
+
+## Editor / workspace routes **[applicable if marketing landing + heavy tool on same site]**
+
+- **Progressive disclosure** — marketing chrome (header, footer) before first success; after success, **hide** site header; compact workspace toolbar. Keep escape hatches (privacy, edit source) in overflow — not a second row of equal-weight buttons.
+- **One primary action per workspace** — e.g. Export PDF filled; Download only when selection &gt; 0; everything else in `⋯` menu or Curation dialog.
+- **One stats line** — see § Simplification → Workspace stats; never restate counts in sidebar, grid header, and toolbar.
+- **Sidebar vs main** — sidebar = chapter list + mode icons (spreads/photos); main = content only. No dashed placeholder in sidebar when the grid lives in main.
+- **Main panel headings** — drop redundant chapter suffix when chapter is highlighted in sidebar; photos view needs no “Photos / Chapter / N photos · click to…” block — actions only (Select all / Clear).
+- **Contextual inspector `[applicable if complex editor]`** — right rail shows one context (cover, caption); instructional paragraphs → `sr-only` or dialog.
+- **Mobile tool nav `[applicable if editor has a side rail]`** — vertical rail → bottom filmstrip; pad main content above fixed nav.
+- **Human labels** — map internal enums to plain language (`blur filtered` not `filtered`; `duplicates hidden` not internal scorer jargon).
+
+## Trust UX for user-supplied input **[applicable if users paste links or run client-heavy export]**
+
+- **Process modal `[applicable if server reads user links/files]`** — deep trust dive in one modal; hero gets a single inline link (Privacy · How we process…). No third floating trust strip above the footer.
+- **Inline errors** — map domain failures (private link, timeout, rate limit) via a formatter; add one recovery hint; never stack traces.
+- **Client-heavy export `[applicable if PDF/canvas/render in browser]`** — detect OOM/memory failures and suggest recovery (fewer items, close tabs, split batches).
+- **Demo/sample output `[applicable if paste-or-upload onboarding]`** — optional **visible** sample row on landing; on the tool route, prefer doing the real job over sample chrome. If samples exist, they must be visible without a click — otherwise remove.
+
+## Hosting vendored sub-apps **[core]**
+
+When embedding a separate client build (games, tools):
+
+1. Upstream build sets correct **asset `base`** subpath.
+2. Copy artifacts to `public/<app-id>/` with `index.html` at folder root.
+3. Host SPA fallback for `/public-path/*` client routes (host config + dev middleware).
+4. Optional theme overlay CSS on parent chrome for contrast when iframe'd.
+5. **`[applicable if parent host is static-only]`** Static parent cannot run your Worker/API — ship embed/preview mode with mocked ingest; document that live third-party calls need full deploy + secrets. Hidden previews: `noindex`, omit from sitemap; sync script in parent repo after vendoring.
+6. For game-specific iframe height, embed detection, and engine rules → `create-web-game.mdc`.
+
+## Verification gate **[core]**
+
+Before claiming done:
+
+```bash
+npm test
+npm run build
+npm run test:e2e   # when present
+```
+
+- Structural/data tests under `tests/` when applicable.
+- **E2E smoke:** extend route list when adding hash or path pages; assert **stable copy** on each route.
+- Prefer **accessible role + name** for E2E selectors; use `data-testid` only when roles are ambiguous; reset state in `beforeEach`.
+- **Network mocking `[applicable if third-party APIs in CI]`:** use `page.route` / `cy.intercept` or env flags so CI stays deterministic.
+- **Funnel E2E `[applicable if multi-step submit → export flow]`:** one spec for the happy path, not only per-route smoke.
+- **Manual runbook `[applicable if CI mocks external APIs]`:** optional `teste2e.md` with real credentials for pre-release QA; keep CI mocked.
+- After changing vendored assets under `public/`, run full build so `dist/` matches.
+
+## Git & deploy **[core]**
+
+- **Canonical branch:** prefer `main`; if the remote still mirrors **`master`**, keep aligned: `git push origin main` then `git push origin main:master` when your workflow references both.
+- After deploy, if users see stale shells: purge CDN cache for `/` and `/assets/*` (and `/games/*` when vendored embeds changed), hard-refresh; confirm latest CI deploy succeeded.
+
+## DSA Patterns site (dsapatterns.io) **[applicable if dsapatterns-website repo]**
+
+**Project map** for agents working in `dsapatterns-website`. Embedded games → `create-web-game.mdc` §12 (*Host site integration*, *Legacy Equalize*).
+
+### Authoritative docs (read before large changes)
+
+| Doc | Use for |
+|-----|--------|
+| [`README.md`](README.md) | Dev commands, **Cloudflare Workers** deploy, Android/Capacitor, **Games** vendoring, testing, **design philosophy** (minimalist, focused) |
+| [`wrangler.jsonc`](wrangler.jsonc) | Cloudflare static assets from `./dist`, SPA `not_found_handling`; Worker `name` must match dashboard Worker |
+| [`design_specification.md`](design_specification.md) | Static-first React, Tailwind **without preflight** (`preflight: false` — branding in `style.css`), `public/data` JSON, component roles (`App.jsx`, `DSASection`, etc.) |
+| [`roadmap.md`](roadmap.md) | **Monetization paused** (`MONETIZATION_PAUSED`); restore pricing/auth later; **Equalize countdown mode** re-vendor when [upstream Equalize](https://github.com/deepansh90/deepansh90.github.io/blob/main/roadmap.md) ships it |
+| [`android/app/README_ANDROID.md`](android/app/README_ANDROID.md) | Native shell after `npm run build` + `npx cap copy/sync android` |
+
+### Stack and structure
+
+- **React 19**, **Vite**, **Tailwind v3** (layout utilities; global look/feel in [`style.css`](style.css)).
+- **Routing:** hash-based (`#dsa`, `#sysdes`, `#games/<slug>`, `#about`, etc.) — [`src/App.jsx`](src/App.jsx).
+- **Data:** static JSON under [`public/data/`](public/data/); curriculum markdown/images under `public/content/` where applicable.
+- **System Design UI:** reuse [`SystemDesignSection.jsx`](src/components/SystemDesignSection.jsx) patterns — `hi-sd-page`, `hi-sd-eyebrow`, `hi-sd-chapter`, article cards — for similar long-form or nav-heavy sections.
+
+### UI and UX (site-specific)
+
+- **Design philosophy:** simplicity, edge-to-edge readability, calm typography; avoid visual noise (see README).
+- **Themes:** **Default** and **Midnight** only — tokens in [`style.css`](style.css), switcher in [`Header.jsx`](src/components/Header.jsx), persistence in [`App.jsx`](src/App.jsx). Theme menu: opaque `.theme-switcher-menu` (no translucent bleed-through over trust bar).
+- **Copy:** English only — [`src/lib/i18n.js`](src/lib/i18n.js), `t()` with no locale argument. No language toggle without explicit product decision.
+- **Mobile:** semantic breakpoints (`sm:`, `lg:`), touch-friendly targets (~44px where it matters).
+- **Accessibility:** preserve `:focus-visible` from [`style.css`](style.css); keep keyboard affordances.
+
+### Monetization and premium code
+
+- **Monetization paused** unless explicitly re-enabling: search `MONETIZATION_PAUSED` in [`Header.jsx`](src/components/Header.jsx), [`App.jsx`](src/App.jsx), [`DSASection.jsx`](src/components/DSASection.jsx). Do not half-restore paywalls without [`roadmap.md`](roadmap.md).
+
+### Verification (dsapatterns)
+
+```bash
+npm test
+npm run build    # includes Equalize dist verification when games assets change
+npm run test:e2e
+```
+
+- Structural/SEO/data: `tests/*.test.mjs`.
+- Smoke: [`e2e/smoke.spec.mjs`](e2e/smoke.spec.mjs) — new hash pages need **stable copy** in the `pages` list.
+
+### Deployment (Cloudflare Workers + Git)
+
+Production for **dsapatterns.io** is driven from this repo via **Cloudflare** (Workers static assets), not only Vercel.
+
+- **Git integration:** Cloudflare dashboard links the Worker to **GitHub**; pushes to **`main`** trigger build. Treat **`main`** as source of truth; mirror **`master`** when workflow still references it (see § Git & deploy).
+- **Build + deploy:** `npm run build` then `npx wrangler versions upload`. [`wrangler.jsonc`](wrangler.jsonc): `assets.directory` = `./dist`, `not_found_handling` = `single-page-application`. **Do not** upload without successful Vite build — `dist/` must include `public/` (e.g. `public/games/**`).
+- **Worker name:** `"name"` in `wrangler.jsonc` must match Cloudflare Worker name.
+- **Stale live site:** Hashed `/assets/*` cache-bust each build; **`index.html`** may lag. After successful deploy: purge CDN (`/` and `/assets/*`, or purge all), hard-refresh/incognito; confirm deploy logs succeeded.
+- **Vercel-only config:** [`vercel.json`](vercel.json) rewrites apply on **Vercel**, not Cloudflare Worker. Nested game SPAs (`/games/<slug>/*`) may need extra routing on Cloudflare — `create-web-game.mdc` §12 *Cloudflare vs Vercel*.
+- **Sanity check:** `npm run build && npx wrangler versions upload --dry-run`.
+
+*Former `dsapatterns-website/.cursor/rules/website-conventions.mdc` content lives in this section.*
+
+## What this rule does not cover
+
+- System architecture documents → `system-design.mdc`
+- Product ideation, vision Q&A, scope essentialism → `incubation.mdc`; go/no-go critique → `incubation.mdc`
+- Browser job-application bots → `automation-software.mdc`
+- Game simulation, determinism, PWA inside the game → `create-web-game.mdc`
+
+
+---
+
+# Part B — Game development
+
+# Game Development
+
+**Intent:** Build any game genre (action, puzzle, idle, narrative) with optional determinism, embeds, and PWA — not general marketing site routing (see `create-web-game.mdc`). UI policy on all surfaces → `product-excellence.mdc` §2a.
+
+**Tag legend:** **[core]** every game should consider; **[applicable if …]** skip when irrelevant (e.g. do not force netcode rules on a casual puzzle).
+
+## §1 Product locks before scale **[core]**
+
+- Lock **visual direction**, **monetization ethics** (e.g. cosmetics-only, no pay-to-win), and **renderer/runtime** early. Name the **nearest genre reference** for UI/HUD (e.g. 2048 for tile puzzles, classic brawlers for fighters) — see `product-excellence.mdc` §2d.
+- Record **ADRs** in `docs/decisions/` so future agents know *why*, not only *what*.
+- **`[applicable if public roster / real-world names]`** — legal/name checklist before scaling content (trademark, slurs, restricted names).
+- **`[applicable if freemium]`** — document DLC scope; never sell gameplay power.
+
+## §1b Product design craft **[core]**
+
+Systems and feel before feature lists. Prefer Cursor agents `@game-designer`, `@level-designer`, `@narrative-designer`, `@technical-artist`, `@game-audio-engineer` when authoring GDDs or levels; keep this rule as the engineering checklist.
+
+- **Design pillars** — lock 3–5 non-negotiable player experiences before adding features; every mechanic must serve at least one pillar.
+- **Three-loop model** — document moment-to-moment (0–30s), session (5–30 min), and long-term (hours–weeks) loops. For puzzle embeds: solve beat → session of N levels → campaign/meta progression.
+- **Mechanic spec minimum** — for each core mechanic: purpose, player fantasy, inputs/outputs, success and failure states, edge cases, tuning levers. Mark unplaytested numbers `[PLACEHOLDER]` until validated.
+- **Onboarding checklist** — core verb within ~30s of first control; first success guaranteed; each new mechanic in low-stakes context; at least one discoverable without wall-of-text; first session ends on a hook (unlock, cliff-hanger, or “one more”).
+- **Level / pacing `[applicable if level-based]`** — per level: player fantasy, pacing arc, mechanic taught (spatially when possible), critical-path readability. Ship order: blockout (solvable grey box) → playtest → dress (VFX/audio). Do not art-polish an untested layout.
+- **Audio feel `[applicable if SFX/music]`** — every core verb gets a clear sonic cue when audio is on; keep gesture-gated unlock and volume controls per §5; prefer lean WebAudio / procedural SFX when download budget is tight (§3).
+
+## §2 Architecture: engine vs shell **[core]**
+
+- **Pure game core** — no UI framework, no DOM, no `window` in simulation code (`packages/<engine>/` or equivalent).
+- **Presentation shell** — menu routes in your web framework; Canvas/WebGL/DOM renderer **reads** core state only.
+- **Versioned schemas** for entities, levels, and events so saves and replays survive refactors.
+
+**`[applicable if action / fighting / sports / deterministic replay]`**
+
+- **Fixed timestep** sim (e.g. 60 Hz) in core; render may interpolate.
+- **Deterministic math** — fixed-point or integer-only physics; avoid raw floats for authoritative state.
+- **Seeded PRNG** — all gameplay randomness from a seed stored with the replay.
+- **Input ring buffer** — early presses still register within a small window.
+- **Central feel module** — hitstop, shake, freeze frames in one place for designers and replay parity.
+- **Replay = inputs + seed**; automated verify must reproduce identical outcomes before claiming netcode-ready.
+
+**`[applicable if puzzle / turn-based / low stakes]`**
+
+- Determinism optional; still separate **solver/level data** from UI; document algorithms honestly for educational hosts.
+
+## §3 Renderer & assets **[core]**
+
+- Pick renderer for **lowest common device** (Canvas 2D, DOM, SVG) unless you need WebGL **`[applicable if 3D or heavy particles]`**.
+- Document renderer choice in an ADR (Canvas for broad mobile support vs WebGL for effects — project decides).
+- **`[applicable if zero-download audio]`** — WebAudio synth / procedural SFX.
+- **`[applicable if large asset pipeline]`** — lazy load, cache strategy, mobile size budget.
+- **`[applicable if action / many spawned entities]`** — object pooling for bullets/particles; target ~**16 ms** sim slice per frame on low-end mobile.
+
+## §4 Screens, embeds, and host sites **[core]**
+
+Standalone PWA **or** iframe on a parent site:
+
+- Detect embed: `window.self !== window.top` → compact layout class on `<html>` (project-defined prefix).
+- **Iframe / shell height** — `clamp()` / `dvh` floors so menus and CTAs are not clipped; `@media (max-height: …)` fallback.
+- **Touch** — minimum targets; on-screen controls when keyboard unavailable **`[applicable if mobile browser]`**.
+- **`[applicable if portrait-first mobile]`** — dedicated HUD pass (after core loop is fun on landscape/desktop).
+- **Host vendoring** — build with correct `base` subpath → copy to `public/games/<id>/` → host SPA fallback → theme overlay CSS for parent contrast. Host shell height, checklist, and Equalize minify → §12 *Host site integration* and *Legacy Equalize*.
+- **`[applicable if educational host]`** — short note naming real algorithms used (accurate labels only).
+
+Host routing details → `create-web-game.mdc` (vendored folder only).
+
+## §5 Player experience baseline **[core]**
+
+- Remappable controls + persisted settings **`[applicable if keyboard/gamepad]`**.
+- Pause that **stops the simulation tick**, not only hides UI.
+- Live audio sliders (master / SFX / music).
+- In-match reference UI (moves, objectives) for onboarding.
+- Local settings + progress in `localStorage` / IndexedDB **`[applicable if client-only]`**.
+
+**Game HUD / UI:** apply `product-excellence.mdc` §1b; keep HUD minimal in embeds so play area is not shrunk by ornamental chrome.
+
+## §6 Tools & live ops (client-only) **`[applicable if designer-heavy]`**
+
+- Local telemetry (usage, win rates) — on-device, privacy-first.
+- Tuning overlay writing to local storage without redeploy for every tweak.
+- Hidden admin or `noindex` QA routes; keep player navigation clean.
+
+## §7 Delivery & hardening **[core]**
+
+- **`[applicable if offline / installable]`** — PWA with documented SW strategy; on embed subpaths, scope or disable SW so the **parent site's** service worker and routing are not hijacked — test both standalone and iframe before ship.
+- No debug globals exposing solver, full state, or level data in production; build verify fails if reintroduced. **Exception:** legacy Equalize `window.EqualizeDebug` is intentional upstream and stripped by the host minify gate — see §12 *Legacy Equalize*.
+- Minify shipped client JS; `drop_console` where appropriate; README states client bundles are not secret — license + server validation when cheating matters (deterrence, not secrecy).
+- **`[applicable if TanStack CSR embed suite]`** — Bharat `build-all-embeds.mjs` uses esbuild `drop: ['console']`; host `verify-game-dist-cloudflare.mjs` gates shipped assets.
+- Test on throttled network once before release.
+
+## §8 Testing & definition of done **[core]**
+
+- E2E (Playwright or equivalent): reach first interactive frame, complete minimal play path, screenshot on critical views.
+- **`[applicable if deterministic core]`** — automated replay verification in CI.
+- Smoke narrow + wide viewport; test embed and standalone if both ship.
+- **`[applicable if level-based puzzle]`** — **one unit test per level** (structure + solvability where provable); shared `level-count.test.mjs` asserting N levels in source; update E2E copy when total level count changes (e.g. `Puzzle 1 / 30` for Echo, `/ 20` for most suite games — never stale `/ 3` or `/ 15`).
+- **`[applicable if embed iframe on educational host]`** — run E2E against local preview server serving `dist/client` at `/games/<slug>/`; keep `?e2e=1` auto-win paths **runtime-only** (never `VITE_E2E` at build — `build-all-embeds.mjs` deletes it); clear `localStorage` progress keys in `beforeEach`; `campaign-5` (all **13** embeds, levels/waves 1–5) + `campaign-15` (subset 1–20); fast and deterministic (instant win when puzzle already solved).
+
+## §12 Embed puzzle suite — production learnings (Bharat Brawlers / dsapatterns) **[applicable if iframe embed on parent SPA]**
+
+Reference implementation: **thirteen TanStack Start CSR games** vendored to `public/games/<slug>/` on dsapatterns-website (`#games/<slug>` hash routes). Full inventory → Bharat Brawlers `docs/embed-dsapatterns-puzzles.md`; tier scores → `GAMES_RANKING.md`. Design craft (loops, onboarding, level pacing) → §1b before scaling new embeds.
+
+### Embed inventory (July 2026)
+
+| Display name | Slug | Hash route | Levels/waves |
+|--------------|------|------------|--------------|
+| TimeTwin | `time-twin` | `#games/time-twin` | 30 |
+| GhostLoop | `ghost-loop` | `#games/ghost-loop` | 20 |
+| Helicopter Rush | `helicopter-rush` | `#games/helicopter-rush` | 20 |
+| Tank Wars | `tank-wars` | `#games/tank-wars` | match |
+| Train Panic | `train-panic` | `#games/train-panic` | 20 |
+| Optic Beam Puzzle | `optic-beam-puzzle` | `#games/optic-beam-puzzle` | 30 |
+| Circuit Flow | `circuit-flow` | `#games/circuit-flow` | 20 |
+| GRID Tower Defense | `grid-tower-defense` | `#games/grid-tower-defense` | 20 |
+| Pocket Park Tycoon | `pocket-park-tycoon` | `#games/pocket-park-tycoon` | 20 |
+| Crush the Swappy | `crush-the-swappy` | `#games/crush-the-swappy` | 30 |
+| Orbit Defense | `orbit-defense` | `#games/orbit-defense` | 30 |
+| Attack the Army | `attack-the-army` | `#games/attack-the-army` | campaign |
+| Lumen Circuit | `lumen-circuit` | `#games/lumen-circuit` | 20 |
+| Jobsian Joy | `jobsian-joy` | `#games/jobsian-joy` | 150 |
+
+**GRID Tower Defense** (`grid-tower-defense`, ASCII roguelike TD) and **Orbit Defense** (`orbit-defense`, minimalist path TD) are distinct SKUs — never conflate slugs or copy.
+
+Slugs are stable for bookmarks/CDN; display names target Play Store keywords. Legacy hash routes (`#games/echo-node`, etc.) redirect to canonical slugs via `LEGACY_GAME_SLUG_REDIRECTS` in dsapatterns `routes.js`.
+
+**All fifteen TanStack embeds** must ship the **Equalize 5-theme switcher** (`balance`, `ember`, `zen`, `midnight`, `ocean`) via copied `useGameTheme.ts` + `ThemeSwitcher.tsx` + `equalize-theme-templates.css` (see Theme switcher below).
+
+### Tier strategy (investment order)
+
+Use `GAMES_RANKING.md` scores — do not polish all nine equally:
+
+- **Tier A (invest):** TimeTwin, GhostLoop — ghost overlays, share, campaign depth.
+- **Tier B (polish):** Helicopter Rush, Tank Wars — distinct hooks, OG share, PB ghost.
+- **Tier C (differentiate):** Train Panic, Optic Beam Puzzle, Circuit Flow — daily mode, beam preview, undo.
+- **Tier D (demo hooks only):** GRID Tower Defense, Pocket Park Tycoon — 20 levels shipped; juice/onboarding deferred.
+
+### Viral hooks (client-only — no server leaderboards)
+
+Copy templates from `scripts/games/templates/` into each game's `src/lib/` (never import `../../../scripts/` from game src — paths break in standalone builds):
+
+- `dailySeed.ts` + `?daily=1` — deterministic daily puzzle.
+- `shareResult.ts` + `shareOverlay.css` — emoji/OG share cards on win.
+- `localBest.ts` — local PB ghost replay.
+- `progress.ts` — campaign persist (`<slug>.progress` in `localStorage`).
+
+Cross-promo footers may reference UTC daily rotation; **Mind Pack hub is removed** — host lists all **thirteen** in `GamesSection`; legacy `#games/mind-pack` redirects only.
+
+### Theme switcher (Equalize tokens + Tailwind)
+
+- Import `equalize-theme-templates.css` **before** Tailwind; Tailwind `@layer base { body { background-color: var(--color-background) } }` **overrides** `body { background: var(--bg) }` — themes appear broken (always white/light).
+- **Fix:** after Tailwind base, force embed shells:
+  ```css
+  html[class$="-embed"],
+  html[class$="-embed"] body {
+    background-color: var(--bg) !important;
+    color: var(--txt-hi) !important;
+  }
+  ```
+- **`useGameTheme`:** always `document.documentElement.setAttribute('data-theme', theme)` — do not remove the attribute for midnight.
+- Game shells and canvas wrappers: **`var(--bg)` / `var(--txt-hi)`**, not hardcoded `#0A0A0F`, `bg-black`, etc. Theme button needs `pointer-events: auto` and high z-index in iframe.
+- **Placement (live audit Jun 2026):** default `ThemeSwitcher` at `bottom: 20px; right: 20px` overlaps bottom trays, modals, and touch zones (confirmed on Pocket Park Tycoon **Reset**, Helicopter Rush play area, Arrow Time arrow-type row). **Hide or relocate** when overlays/menus are open; verify at embed iframe width (~600px), not only full desktop viewport.
+
+### Host site integration (dsapatterns-website) **[applicable if dsapatterns host]**
+
+Vendored static bundles live under `public/games/<slug>/`. The React shell is `src/components/GamesSection.jsx` (hash routes `#games/<slug>`, default `#games/equalize` in `App.jsx`).
+
+#### Outer iframe shell (host)
+
+- **Width:** responsive cap on the games column (`60vw`, `max-w-[900px]`, centered).
+- **Height:** stable block so in-iframe CTAs are not clipped — e.g. `h-[clamp(760px,96dvh,2000px)]` on the shell and `h-full min-h-0 flex-1` on the `<iframe>` so it fills the shell. Tune per game if a title needs more headroom.
+- **`iframeSrc`:** TanStack CSR embeds use `'/games/<slug>/'` (trailing slash helps SPA entry resolve). Legacy Equalize uses `'/games/equalize/equalize.html'`.
+
+#### Host games page — mobile iframe visibility
+
+- On narrow host viewports (~650px), the games list stacks above the iframe; the embed can start **below the fold** (~1000px+ from top) so users do not see the game after tapping a title.
+- **Fix (host):** on `#games/<slug>` change, `scrollIntoView` the iframe region or collapse the nav list on small breakpoints.
+
+#### Tutorial UX inside the iframe (game-side)
+
+- **First-run tutorial** must stay usable when embedded: primary CTAs (**Next**, dots, **Start**) must not sit below a clipped fold.
+- **Detect embed early:** `window.self !== window.top` → add compact class on `<html>` as early as possible (inline script right after `<body>` for legacy single-file games; React mount for TanStack titles).
+- **Legacy Equalize (`html.eq-embed`):** scale deck (`width: min(96%, 60vw, 720px)`), fluid 3×3 grid (`minmax(0, 1fr)`, `aspect-ratio: 1`), `@media (max-height: 720px)` fallback; `#tut` needs `overflow-y: auto`, `-webkit-overflow-scrolling: touch`, generous `padding-bottom`, and `scroll-padding-bottom` so **Next** stays reachable.
+- **TanStack suite:** use `<slug>-embed` on `<html>` plus §12 *Iframe height* layout (`flex-col`, tray above canvas).
+
+#### Adding a vendored game (host checklist)
+
+1. **Upstream:** build with correct Vite `base` + router `basepath` (`/games/<slug>/`); fix or strip manifest / service worker `scope` and `start_url` for embed copy (see Bharat `docs/embed-dsapatterns-puzzles.md`).
+2. **Vendor:** copy **client** output only → `public/games/<slug>/` with `index.html` at that root (no SSR bundle required on static host).
+3. **`GamesSection.jsx`:** append to `GAMES` with `iframeSrc: '/games/<slug>/'`.
+4. **`App.jsx` / `routes.js`:** allow hash route; add `LEGACY_GAME_SLUG_REDIRECTS` if renaming slugs.
+5. **Embed CSS:** mirror compact iframe pattern if full-screen UI clips in short iframes.
+6. **Hardening:** strip debug globals before commit unless a parallel strip-and-verify pipeline exists (Equalize exception below; TanStack suite → `verify-game-dist-cloudflare.mjs`).
+7. **E2E:** add `#games/<slug>` to `e2e/smoke.spec.mjs` `pages` with **stable copy** the test asserts; extend Bharat `campaign-5` when adding a suite title.
+8. **README:** note vendored path, sync from upstream (`build-all-embeds.mjs`), honest security copy (client bundles are not secret).
+
+#### Cloudflare vs Vercel (nested SPA client routes)
+
+- `vercel.json` may rewrite `/games/<slug>/*` so deep links (e.g. `/play`) serve the **game** shell, not the marketing SPA.
+- **Cloudflare Workers** static hosting uses `wrangler.jsonc` `not_found_handling: single-page-application` for the **main** site — nested game SPAs may still need equivalent routing or path-specific rules; test live deep links after deploy and purge CDN for `/games/*` when hashes look stale.
+
+### Iframe height — critical UI above the fold (game-side)
+
+- Parent iframes are often **~370–500px tall** while a naive `min-h-screen` layout is **700px+**. Trays, CTAs, and instructions below the canvas are **invisible without scroll** (users report “missing mirrors / can’t play”).
+- **Fix:** `h-[100dvh] flex flex-col overflow-hidden` on root; **compact header (shrink-0)** → **interactive tray / primary actions (shrink-0, above canvas)** → **playfield (`flex-1 min-h-0`)**.
+- Screenshot or Playwright at **embed height**, not only full desktop viewport.
+
+### Touch vs drag (mirror / token trays)
+
+- HTML5 **drag-and-drop does not work reliably on mobile**. If gameplay is “drag from tray,” add **tap-to-select → tap grid cell to place** as the primary mobile path; keep drag as desktop enhancement.
+- Label empty tray honestly: puzzle may need **zero tray mirrors** (beam already hits target) — say so in UI, not only in README.
+
+### Level design at scale (20+ levels)
+
+- **Minimum bar:** 20 levels per puzzle game (Echo 30, Laser Mirror 30+); each level named and listed in source.
+- **Solvability:** for ray/path puzzles, ship a **solver** (brute-force tray placement + `traceBeam`) and run in CI (`scripts/games/validate-*-puzzles.ts` or test helper). Hand-authored mirror paths must be traced — `/` vs `\` reflection is easy to get wrong.
+- **Seeded procedural levels** (e.g. wire grid): `generatePuzzleForLevel(n)` with `LEVEL_COUNT` matching shipped count; clamp level index; verify connected/solvable path for e2e `skipShuffle` builds.
+- **Echo / timing games:** e2e uses `?e2e=1` to auto-complete or skip shuffle; `campaign-5` covers levels/waves 1–5 across all **thirteen** embeds.
+
+### Audio: `puzzleJuice.ts` (SFX) vs BGM
+
+- **SFX** — `puzzleJuice.ts` per game: WebAudio oscillators, haptics, slow-mo on solve. Call `unlockSfx()` on first user gesture.
+- **BGM** — separate from SFX. Two supported paths:
+  1. **File BGM** — `HTMLAudioElement` looping files via `scripts/games/templates/bgm.ts` (do not mix into `puzzleJuice.ts`).
+  2. **Procedural BGM** — step-sequencer loops via `scripts/games/templates/proceduralMusic/` (`tracks.ts`, `player.ts`) + thin `proceduralBgm.ts` wrapper. Copy into each game's `src/lib/` (never `../../../scripts/` imports). Used when no Suno asset exists (pixel-path `neon`, choppa `boss`, grid-td `dungeon`, parkos `tavern`). Crush the Swappy keeps an 11-track in-game picker (excludes tracks redistributed to embeds).
+- **Pilot pattern (file BGM)** — Echo Node reference:
+  1. Place loop at `public/audio/<slug>/bgm-loop.{m4a|mp3|ogg}` (Vite copies to `dist/client/`).
+  2. Copy `scripts/games/templates/bgm.ts` → `src/lib/bgm.ts`; add thin `gameAudio.ts` wiring `unlockSfx()` + `playBgmLoop()` on first gesture.
+  3. Runtime URL: `/games/<slug>/audio/<slug>/bgm-loop.*`
+  4. `localStorage` key `<slug>.musicEnabled` (default on; respect `prefers-reduced-motion`).
+  5. `duckBgm()` on win overlay; `stopBgm()` on route unmount.
+  6. Source tracks live in `games/<folder>/music/` — **do not commit** `music/` folders; only ship `public/audio/` assets. Manifest: `scripts/games/music-asset-manifest.json`; prompts: `docs/game-music-prompts.md`.
+
+### Game-specific pitfalls (verified in production)
+
+| Game | Pitfall | Fix |
+|------|---------|-----|
+| **Laser / mirror** | Tray below fold; puzzle 1 has 0 mirrors | Tray above canvas; tap-to-place; hint when tray empty |
+| **Pixel path** | Player orb only drawn when `running` | Draw orb + gold on title preview and whenever `screen === playing` |
+| **Track / urgency** | Random rotation of **path** tiles → instant derail | Scramble **decoys only** when enterable but unsolved; e2e `skipShuffle` + instant win if `isPathConnected` |
+| **Echo node** | Doors require plates held while walking to exit | **Latch** doors once both plates pressed together |
+| **Neon circuit** | E2E expects win overlay | Pre-solved grid when `?e2e=1`; skip rotation randomization |
+| **Theme switcher** | Fixed bottom-right chip overlaps trays/modals | Hide on overlay open or move to header; test ~600px embed width |
+| **Host games nav (mobile)** | Iframe below full game list | Scroll embed into view on select or collapse list on `sm:` breakpoints |
+| **GhostLoop / embed + skip tutorial** | Start screen hidden but `running` stays false → frozen canvas | On embed mount (not `?e2e=1`), set sim `running = true` when auto-starting past level 1 |
+| **Skip early levels** | Returning players stuck on old progress; E2E expects level 1 | Bump `PROGRESS_EPOCH`; floor at `START_LEVEL`; `?e2e=1` bypasses floor; route redirects honor `?e2e=1` |
+| **GRID Tower Defense** | Leaks not detected; win on same frame as leak | Pure `creepHasLeaked()` (path end **and** `x >= exit`); `gameOverRef`/`wonRef` in tick; `won = false` on 0 lives |
+| **Crush the Swappy / physics ammo** | Bomb only explodes on target hit | Detonate bomb on **any** Matter collision contact; swap launcher ammo when selecting type |
+| **Attack the Army / lane TD** | Too many lanes + weak hit feedback | Fewer lanes (e.g. 4) + one `LANES` constant; `damageFlash` vignette + visible miss counter beats more briefing copy |
+| **Rename game folder** | Broken embed paths after `git mv` | **Slug stays stable** for CDN/bookmarks; update `embed-registry.mjs`, e2e, `verify-game-dist-cloudflare.mjs`, host `public/games/<slug>/` only |
+
+### Legacy Equalize (single-file HTML) **[applicable if equalize bundle on host]**
+
+Equalize ships as one self-contained `public/games/equalize/equalize.html` (not the TanStack CSR pipeline). Host-specific gates live on **dsapatterns-website**:
+
+- **`window.EqualizeDebug`** from the canonical Equalize repo is intentional — upstream E2E depends on it. The host **minify plugin strips it** from `dist/`; **`verify-equalize-dist.mjs`** fails the build if it reappears in `dist/games/equalize/equalize.html`. Do not strip manually when syncing upstream unless the pipeline is broken.
+- **Production minify** (`scripts/vite-plugin-minify-equalize.mjs`, registered in `vite.config.js`): after Vite copies `public/` → `dist/`, Terser runs on Equalize **inline** script (`compress`, **`mangle: true`**, **`drop_console: true`**, no comments) and **`levels.js`** (`mangle: false` so global **`LEVELS`** stays valid). No source maps for that step.
+- **New games:** add parallel minify + verify only if shipping comparable inline debug hooks or one-liner `window` exports. TanStack suite uses Bharat embed build + `verify-game-dist-cloudflare.mjs` instead.
+
+### Embed build pipeline (CSR in iframe)
+
+- **`build-all-embeds.mjs`** orchestrates all **thirteen**: `DSAPATTERNS_EMBED=1` Vite build (`ssr: false`) → copy `.output/public` → `dist/client` → `patch-embed-client.mjs` (basepath, relative `./assets/`) → `generate-csr-index.mjs` (static `index.html` shell, no Nitro SSR fetch) → `patch-embed.mjs` (manifest / SW scope) → `vendor.mjs` rsync to `../dsapatterns-website/public/games/<slug>/`.
+- **Never set `VITE_E2E` at build** — build script deletes it; auto-win is runtime `?e2e=1` only.
+- Preview all thirteen: `node scripts/games/embed-preview-server.mjs` on port 5299; Playwright `baseURL` points there.
+- **Deploy:** after vendoring, in dsapatterns-website run `npm test && npm run test:e2e`, commit `public/games/`, push `main` (+ `main:master` mirror if used). Cloudflare Workers SPA fallback via `wrangler.jsonc` `not_found_handling`; purge CDN for `/` and `/games/*` if shell references stale JS hashes.
+
+### Verification checklist before push
+
+```bash
+node --test tests/games/*.test.mjs                              # level count + solvability + CSR shell
+node scripts/games/build-all-embeds.mjs                         # all 13 dists + vendor (or SKIP_VENDOR=1)
+npx playwright test -c playwright.games.config.mjs e2e/games/campaign-5.spec.mjs   # levels/waves 1→5, all 13
+npx playwright test -c playwright.games.config.mjs e2e/games/campaign-15.spec.mjs  # levels 1→20: Choppa, GRID, ParkOS, Longbow
+```
+
+E2E `beforeEach`: clear `<slug>.progress` / `_epoch` keys in `localStorage`. Do **not** commit scratch scripts (`check_*.mjs`, `staged_diff.txt`) or `games/*/music/` source folders.
+
+### Quick references (dsapatterns host)
+
+| Concern | Where |
+|--------|--------|
+| Iframe height / width | `dsapatterns-website` `GamesSection.jsx` |
+| Equalize embed CSS + `eq-embed` | `public/games/equalize/equalize.html` |
+| TanStack embed plan (upstream) | Bharat Brawlers `docs/embed-dsapatterns-puzzles.md` |
+| CSR embed build + vendor | Bharat `scripts/games/build-all-embeds.mjs` |
+| TanStack dist verification | Bharat `scripts/games/verify-game-dist-cloudflare.mjs` |
+| Equalize prod minify | `dsapatterns-website` `scripts/vite-plugin-minify-equalize.mjs`, `vite.config.js` |
+| Equalize dist verification | `dsapatterns-website` `scripts/verify-equalize-dist.mjs`, `package.json` `build` |
+| Honest security copy | `dsapatterns-website` `README.md` **Games** section |
+
+### Stale pitfalls (June 2026)
+
+| Stale assumption | Reality |
+|------------------|---------|
+| "Five embed games" / Mind Pack hub | Thirteen games; `#games/mind-pack` redirects only |
+| "Eleven embed games" (June 2026) | Thirteen after Attack the Army + Lumen Circuit |
+| "15 levels per game" | 20+ minimum; Echo 30, Laser 30 |
+| `import from '../../../scripts/games/templates/...'` in game `src/` | Copy template into `src/lib/` per game |
+| `VITE_E2E=1` at build time | Runtime `?e2e=1` only; build deletes `VITE_E2E` |
+| BGM via WebAudio in `puzzleJuice.ts` | SFX = WebAudio; BGM = file loop (`bgm.ts`) **or** procedural (`proceduralBgm.ts` + `proceduralMusic/`) |
+| Separate `games-embed-hardening.mdc` on dsapatterns | Merged into this file §12 *Host site integration* + *Legacy Equalize* |
+
+### Recent Learnings (July 2026)
+
+- **Web Share API (`navigator.share`) vs Clipboard**: Silently falling back to `navigator.clipboard.writeText` when `navigator.share` fails or is unsupported (common on some desktop environments) creates a jarring UX. Users expect a native share sheet; getting a silent "Copied to clipboard" instead is confusing. **Learning**: Avoid silent fallbacks. If native share isn't reliably supported, either hide the share button entirely, or provide explicit, separate "Copy Link" and "Share" buttons so the user knows exactly what will happen.
+- **Physics-Based CPU Opponents (Tank Wars)**: Implementing CPU AI in physics/trajectory games (like Tank Wars) doesn't require complex analytical math with wind integration. **Learning**: Use **Monte-Carlo simulation** during the CPU's turn. Run the deterministic physics loop headlessly 50-100 times with random angle/power variations, pick the trajectory that gets closest to the player, and add a small random `noise` variable to the final parameters so the CPU isn't unfairly perfect.
+- **Embed auto-start when skipping tutorial levels**: Hiding the start overlay in embed (`isEmbedMode() && !isE2eMode()`) is not enough if the sim tick gates on `running === false` — users see a static canvas ("hung"). **Learning**: When embed auto-jumps to `START_LEVEL_INDEX > 0`, set `running = true` on mount in the same code path that hides the start screen. E2E must still use `?e2e=1` to begin at level 1 for `campaign-5`.
+- **Progress epoch for start-level bumps**: Changing the first level players see invalidates old `localStorage` progress silently. **Learning**: Pair `START_LEVEL` / `START_LEVEL_INDEX` with a bumped `<slug>.progress_epoch`; on mismatch, reset progress to the new floor. Always exempt `?e2e=1` and document the epoch bump in the commit message.
+- **Tower defense leak detection**: Checking only `pathIdx >= path.length` misses creeps that visually passed the exit column. **Learning**: Extract testable helpers (`leakExitX`, `creepHasLeaked`, tier-based `leakLifeCost`); treat leak when path is exhausted **or** creep center `x >= exit column`. Unit-test leak predicates separately from React.
+- **TD win/lose same-frame race**: Clearing the last enemy and leaking on the same tick can show victory while lives hit zero. **Learning**: Mirror terminal flags in refs (`gameOverRef`, `wonRef`) read inside the RAF loop; stop `update()` when `gameOverRef` is true; on 0 lives set `won = false` explicitly — never infer defeat only from wave-clear logic.
+- **Physics special ammo (Crush the Swappy)**: Players expect bombs to explode on **any** impact, not only when hitting a crush target. **Learning**: In Matter.js `collisionActive`/`collisionStart`, detonate when `ammoKind === "bomb"` on either body; keep crush scoring on separate target collisions.
+- **Minimal embed copy beats briefing walls**: Long deploy/tutorial overlays shrink the playfield and do not improve retention. **Learning**: Steve-Jobs-style HUD — icon ammo bar, one-line goal, `⋯` for rare actions; invest juice in **damage feedback** (vignette, counters, near-miss signals) instead of more text.
+- **Stable slug vs display rename**: Folder/display name can change (`Game Genesis Forge-2` → `Crush the Swappy`) without breaking bookmarks if **embed slug** (`crush-the-swappy`) stays fixed. **Learning**: `git mv` the folder; update `scripts/games/embed-registry.mjs`, e2e paths, capture-screenshots — do not rename `public/games/<slug>/` unless intentionally migrating URLs.
+- **WinOverlay `testIdPrefix`**: Shared win overlay across games needs per-slug Playwright IDs without forking the component. **Learning**: Optional `testIdPrefix` prop → `{prefix}-win` / `{prefix}-continue`; pass slug-specific prefix from each game's play route.
+- **Pure sim helpers in TD/puzzle cores**: Leak checks and solvers belong in `src/lib/` with `node --test` coverage, not buried in component effects — enables fast regression when tuning wave scripts or grid size.
+- **TanStack route-tree build flake**: Occasional `Crawling result not available` during `routeTree.gen.ts` generation can fail `npm run build` for one game in `build-all-embeds.mjs`. **Learning**: Retry the single-game build; confirm new routes are imported in the router; do not vendor a partial dist to the host.
+- **Difficulty budgets with flat penalties**: When calculating dynamic level difficulty budgets (e.g. scores or time), a purely multiplicative modifier (like 2x moves) mathematically breaks when the game has flat penalties (like a -500 score drop). Multiplicative budgets give long levels massive buffers while giving short levels zero margin for error. **Learning**: Use a **hybrid formula**: `(Cost * Multiplier) + Flat Armor`. The multiplier (e.g., `1.25x`) gives percentage leeway for wandering, and the `Flat Armor` (e.g., `+1000` points) ensures players can always absorb exactly N flat penalties on ANY level length. **Specific Example**: In Equalize, a "2x budget" gave a 4-move level only 120 points of buffer—meaning one undo (-300) resulted in game over. Changing the formula to `(optimalMoves * 30 * 1.25) + 1000` guaranteed every level had enough armor to survive exactly 2 illegal moves (-500 each).
+
+| Tag | Topics |
+|-----|--------|
+| **`[applicable if online multiplayer]`** | Lock rating/replay-diff model; async ladder via verified replays when deterministic |
+| **`[applicable if cloud save]`** | Schema migration, conflict resolution, backend ADR before UI |
+| **`[applicable if Android native shell]`** | → `convert-web-to-mobile.mdc` (WebView/Capacitor, icons, themes, Play Store) |
+| **`[applicable if iOS shell]`** | WKWebView bundle parity; safe areas |
+| **`[applicable if hot-seat local multiplayer]`** | Shared keyboard/gamepad; no netcode |
+| **`[applicable if CPU opponents]`** | AI module; difficulty tiers from local telemetry when possible |
+| **`[applicable if second engine port]`** | Alternate engine SKU; web build remains data source of truth |
+| **`[applicable if WebGL renderer]`** | Fallback path for WebGL-less devices |
+
+## §10 Roadmap hygiene **[core]**
+
+- Public `ROADMAP.md` with status: shipped / in progress / next / parked — and **why parked**.
+- Tier 0 = playable loop; tier 1 = polish; tier 2 = content; tier 3 = multiplayer/cloud/port — do not block ship on tier 3.
+
+## §11 Android shell **[applicable if Android native shell]**
+
+WebView/Capacitor packaging, Play Store graphics, five-theme checklist, Gradle sync, signing, and common WebView errors → **`convert-web-to-mobile.mdc`** (moved here from this file — single source of truth).
+
+**Bharat Brawlers (14 TanStack games):** one-command pipeline at `scripts/games/android/run.mjs`; theme/audio parity via `audit-parity.mjs` + `music-asset-manifest.json`; only claim “5 themes” in Play copy when `ThemeSwitcher` is visible within 120s (§13).
+
+**Phase 8 — native shell & Play Vitals hardening** (when shipping WebView APKs): predictive back via `OnBackPressedDispatcher`, non-blocking `onCreate`, `IntentSanitizer` before external `startActivity`, `windowSoftInputMode="adjustResize"`, 16 KB NDK alignment if native libs are added, and `preBuild` Gradle asset sync for AGP 9. Enforced by `apply-native-hardening.mjs` / `audit-native-hardening.mjs` — see conversion rule §14 Phase 8 and skill `webapp-to-android` §5b–§7.

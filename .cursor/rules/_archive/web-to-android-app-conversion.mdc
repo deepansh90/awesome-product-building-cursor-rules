@@ -107,7 +107,11 @@ Generate from one **1024×1024** master (keep safe zone ~66% center for adaptive
 ### How we generate images (workflow)
 
 1. **Design brief** — one sentence: subject, background color, flat vs gradient, **no text** on launcher icon unless it exists in-app.
-2. **Master art** — Cursor **GenerateImage** or Figma export at 1024×1024 (icon) and 1024×500 (feature graphic). Prefer **simple geometric marks** (Equalize: stacked stones / 3×3 grid) over busy screenshots for the icon.
+2. **Master art** — Cursor **GenerateImage** or Figma export at 1024×1024 (icon) and 1024×500 (feature graphic).
+   - **App Icons**: Use [easyappicon.com](https://easyappicon.com/) to format and export production-ready Android adaptive icons.
+   - **Feature Graphics**: Use [screenshot-maker.appinstitute.com](https://screenshot-maker.appinstitute.com/feature-graphic) to generate exactly 1024×500 Feature Graphics.
+   - **10-inch Tablet Screenshots**: Use [appscreenshotskit.com](https://appscreenshotskit.com/editor) to generate 10-inch tablet screenshots (16:9 or 9:16, 1080px to 7680px).
+   - Prefer **simple geometric marks** (Equalize: stacked stones / 3×3 grid) over busy screenshots for the icon.
 3. **Resize / density export**
    - **Play listing icon:** Export **512×512 32-bit PNG** with alpha — verify with `file play-store-icon-512.png` (must say "PNG image data, 512 x 512, 8-bit/color RGBA"). **Never upload JPEG.**
    - **Android Studio:** Right-click `res` → **New → Image Asset** → Launcher Icons (Adaptive and Legacy) → import master PNG.
@@ -654,25 +658,48 @@ Output: `games/<Name>/dist/android-client/`. Gradle syncs this on next build (§
 
 ### E. Build signed release AAB
 
-**Do not upload debug APKs to Play.** Use a **production keystore** (back up securely — loss = cannot update the app).
+**Do not upload debug APKs to Play.** Use the **production keystore** (back up securely — loss = cannot update the app). Play Store requires **App Bundle (.aab)**, not APK.
 
-**Android Studio (recommended first time):**
+#### Production keystore (shared across all Bharat Brawlers games)
 
-1. **Build → Generate Signed App Bundle / APK…**
-2. Choose **Android App Bundle**.
-3. Create or select keystore (`release-key.keystore` is for **local test only** in repo shells).
-4. Build variant: **release**.
-5. Output: `app/build/outputs/bundle/release/app-release.aab`
+| Property | Value |
+|----------|-------|
+| Keystore file | `Untitled.jks` — stored at `/Users/deepanshrawal/Documents/git/Untitled.jks` (outside repo — never commit) |
+| Key alias | **`equalize@1`** |
+| Store/key password | _(ask maintainer — store in a password manager)_ |
 
-**CLI (CI / repeat uploads):**
+#### Android Studio (recommended first time)
+
+1. **Build → Generate Signed Bundle / APK…**
+2. Select **Android App Bundle** → **Next**
+3. Key store path: browse to `Untitled.jks`
+4. Key alias: `equalize@1`  ·  Key store password & Key password: _(ask maintainer)_
+5. Build variant: **release** → **Finish**
+6. Output: `app/build/outputs/bundle/release/app-release.aab`
+
+#### CLI / CI (repeat uploads)
+
+```bash
+# From repo root — builds web + signed AAB in one command
+KEYSTORE_PATH="/Users/deepanshrawal/Documents/git/Untitled.jks" \
+KEYSTORE_PASSWORD="your-secure-password" \
+KEY_ALIAS="equalize@1" \
+KEY_PASSWORD="your-secure-password" \
+node scripts/games/android/run.mjs <slug> --web --gradle
+```
+
+Or Gradle directly from the game's `android/` dir:
 
 ```bash
 export KEYSTORE_PASSWORD="your-secure-password"
-export KEY_ALIAS="release"
+export KEY_ALIAS="equalize@1"
 export KEY_PASSWORD="your-secure-password"
 cd games/<Name>/android
 ./gradlew :app:bundleRelease
+# Output: app/build/outputs/bundle/release/app-release.aab
 ```
+
+> **Never run `:app:assembleRelease`** for Play Store — upload the `.aab` only.
 
 Before upload: bump `versionCode` (+1) and `versionName` in `app/build.gradle.kts`.
 
@@ -743,3 +770,11 @@ Re-capture **Play screenshots from release build on emulator** (1080×2400) — 
 | Play Misleading Claims, listing audit | This rule §13 |
 | TanStack SPA → Play WebView pipeline | This rule §14 |
 | Android Studio test + Play publish | This rule §15 |
+
+## §16 ASO & Design Tooling **[core]**
+
+When preparing graphics for the Google Play Console, use these validated tools to ensure platform compliance:
+
+- **Screenshots:** Use [appscreenshotskit.com](https://appscreenshotskit.com) to generate polished device mockups for the Play Store gallery.
+- **Icons:** Use [easyappicon.com](https://easyappicon.com) to generate pixel-perfect adaptive Android icons (`ic_launcher` layers).
+- **Feature Graphic:** Use [screenshot-maker.appinstitute.com](https://screenshot-maker.appinstitute.com) to consistently generate compliant `1024x500` Google Play feature graphics.

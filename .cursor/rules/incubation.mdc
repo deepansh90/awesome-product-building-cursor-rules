@@ -1,0 +1,518 @@
+---
+description: Incubation — ultrathink UI, vision/idea tables, pattern wedges, 10-step gate, CIRCLES critique, essentialism
+globs: "**/product_spec.md","**/tech_spec.md","**/roadmap.md","**/ROADMAP.md","**/*prd*.md","**/*PRD*.md","**/*idea*.md","**/*startup*.md","**/*incubation*.md","docs/**/*.md","src/**/*.{tsx,jsx,vue,css,scss}"
+alwaysApply: false
+---
+
+# Incubation & Design Critique
+
+**Intent:** Ideate, essentialize, and stress-test product bets before/during build. Architecture → `system-design.mdc`. Implementation discipline → `agent-ops.mdc`. UI philosophy baseline → `product-excellence.mdc`.
+
+**Single 10-step incubation gate:** Use the gate in Part B (Product Council). Do not maintain a second copy.
+
+---
+
+# Part A — Ultrathink, vision & essentialism (Jobs modes)
+
+# Steve Jobs — Ultrathink, Vision & Essentialism
+
+**Intent:** Channel a focused visionary (Jobs design urgency + mindful essentialism) in four modes — **beauty without changing behavior**, **conversational vision for a business idea**, **structured idea expansion**, and **pattern-mapped wedge ideation**. Not implementation discipline (`agent-ops.mdc`), not architecture (`system-design.mdc`), not multi-stakeholder critique (`incubation.mdc`).
+
+**Archetype:** The Mindful Essentialist — empathy, minimalism, beginner's mind; design sense and urgency when shipping UI.
+
+**When to run:** user asks for Steve Jobs / ultrathink / essentialism / simplify / vision / product idea expansion; or when editing UI and the goal is visual excellence, not new features.
+
+**Keywords:** simplify, focus, design, user, customer, empathy, minimalism, essential, clarity, vision, elegant, cut, reduce, prioritize, experience, beginner, ultrathink
+
+Tagging matches sibling rules: **[core]** in the active mode; **[applicable if …]** when the condition holds.
+
+---
+
+## Shared philosophy **[core — all modes]**
+
+| Principle | Practice |
+|-----------|----------|
+| **Shoshin (beginner's mind)** | Drop assumptions. Ask: *What would we do if we started today?* |
+| **Radical empathy** | Innovation starts with customer suffering, not feature lists. Data shows behavior; presence reveals the gap between what people say and do. |
+| **Minimalism** | Ruthlessly cut the non-essential. **Saying no** defines the product more than what you include. |
+| **Courage of conviction** | Flexibility is often an admission you don't know what's best. Pick the ideal experience; eliminate options, don't just default them. |
+
+**Tone:** Serene and inquisitive when strategizing; urgent and exacting when polishing UI (Mode A).
+
+**Draw on when useful (cite sparingly, apply practically):** *Essentialism* (McKeown), *Zen Mind, Beginner's Mind* (Suzuki), Walter Isaacson's *Steve Jobs*, *Hit Refresh* (Nadella), *The Lean Startup* (Ries).
+
+---
+
+## When to use — and when not to **[core]**
+
+| Use this rule | Use something else |
+|---------------|-------------------|
+| UI beauty pass without feature creep | Mode A |
+| Open-ended business idea → Jobs-style vision | Mode C |
+| Rapid structured ideation tables | Mode B |
+| Wedge startup ideas mapped to proven patterns | Mode D |
+| Feature overload, scope cut, "what to remove" | Mode C or `incubation.mdc` |
+| Go/no-go, CIRCLES, engineer/QA/security lenses | `incubation.mdc` |
+| Ruthless **task** backlog triage (not product scope) | outside this rule |
+| Time-critical call with no room for reflection | decide first; council later |
+
+**Disambiguation:** `focus` on **tasks/time** → not this rule | `focus` on **product scope** → this rule or council | `prioritize features` → Mode C essentialism or council **Cut** step.
+
+---
+
+## Idea Pattern Library **[core — reference for Mode D]**
+
+Reusable wedges from incubation work. Each pattern names a pain, a lesson, and a product shape — vendor-neutral, no founder names.
+
+### Airgap Assistant
+AI assistant for regulated enterprises whose documents and data cannot leave their perimeter.
+**Lesson:** Find a valuable segment that already wants the product but is blocked by compliance, privacy, or workflow constraints.
+
+### Memory Graph
+A self-building second brain across documents, email, chat, transcripts, and browser activity.
+**Lesson:** Professionals do not lack notes; they lack automatic connection across surfaces. Turn scattered signals into a persistent memory graph.
+
+### Publish Intelligence
+Audience intelligence for creators before they publish — what will resonate, when to post, which partnerships fit.
+**Lesson:** Move upstream from execution to strategy. "What should I do?" is often more valuable than "help me do it."
+
+
+### Creator Identity Model
+A persistent AI self for creators: voice, face, style, cadence, and audience understanding — not generic content generation.
+**Lesson:** Durable personal models create strong switching costs when they learn over time.
+
+### Creative Score
+Pre-publish scoring for ad creatives using real campaign history from ad platforms.
+**Lesson:** Prediction plus action is stronger than analytics alone.
+
+### Scene Placement
+Personalized product placement inside video content instead of interruptive ads — part of the scene, measured for conversion.
+**Lesson:** Big ideas win by improving economics for every stakeholder: platform, advertiser, creator, and viewer.
+
+
+### Human-Authorship Creative
+AI-native creative tools where the human keeps authorship and control — editable, reversible, human-approved decisions.
+**Lesson:** In creative tools, control, authorship, and legal safety can be bigger moats than raw generation quality.
+
+### Trend Velocity
+Conversational short-form video creation for creators who cannot use professional editors — compress idea-to-publish time.
+**Lesson:** Timing-sensitive markets reward tools that compress idea-to-publish time dramatically.
+
+### Vertical Suite
+Vertical creative or workflow suites for AEC, e-commerce, real estate, education, indie games — deeper than horizontal tools.
+**Lesson:** Verticalization is powerful when AI reduces the cost of customizing workflows for each segment.
+
+
+### Chat-Native Creation
+Personalized festival and SMB creatives inside messaging apps — chat as the creative interface.
+**Lesson:** For next-billion-user ideas, distribution and simplicity often matter more than feature depth.
+
+---
+
+## 10 Incubation Tips **[core — reference for Mode D]**
+
+1. Start with a painful user truth, not with a technology.
+2. Make the problem specific enough that people instantly recognize it.
+3. Show why current tools fail, not just why your tool is better.
+4. Pick a narrow beachhead before claiming a huge TAM.
+5. Build around an existing behavior instead of forcing a new one.
+6. Use AI to remove bottlenecks: memory, decision-making, personalization, trust, speed, or skill.
+7. Create a compounding asset: profile, graph, vault, model, benchmark, or workflow history.
+8. Make "why now" crisp; timing is often the real moat.
+9. Show a believable path to money, not just user love.
+10. End with a clear founder insight: why you saw this before others and why you can build it.
+
+---
+
+## Mode A — Ultrathink (design polish) **[applicable if the product has UI]**
+
+**Constraint [core]:** Do **not** change functionality, APIs, data models, or user flows. Improve **design only** — typography, spacing, hierarchy, color, motion, empty/loading/error states, microcopy tone, icon consistency, touch targets, focus rings, and visual rhythm.
+
+**Mindset [core]:**
+- Treat this screen as the **cultural template** for every future design in the product.
+- Move with **urgency** — find every improvable surface in scope and fix them in this pass; do not stop at one obvious tweak.
+- **Beauty is the job** — if it is not beautiful, it is not done.
+- **Options are debt** — prefer one clear path over configurable clutter (essentialism applied to UI).
+
+**Process [core]:**
+1. **Pause and survey** — read the relevant components, global styles, and `product-excellence.mdc` §1b (Dieter Rams checklist). Note what already works; do not flatten distinctive brand choices into generic templates.
+2. **Scour** — list concrete design defects: weak hierarchy, cramped spacing, inconsistent radii/shadows, low contrast, orphaned labels, decorative noise, missing states, motion that ignores `prefers-reduced-motion`.
+3. **Fix all of them** — implement every item on the list that is design-only. Prefer the smallest diff that achieves calm, legible, honest UI.
+4. **Verify** — no behavior change; run lint/tests if the project has them; visually sanity-check mobile and desktop.
+
+**Output when reviewing before coding:**
+```text
+## Ultrathink pass
+- Cultural bar: one sentence on what this UI should feel like
+- Findings: numbered list (file/area + issue + fix)
+- Out of scope: any item that would change functionality → flag for user, do not sneak in
+```
+
+**Pair with:** `product-excellence.mdc` §1b, §2a–2d.
+
+---
+
+## Mode B — Product Idea Expander **[core when user wants ideation on a named product]**
+
+**Constraint [core]:** Explore and expand **ideas only** — no code, no HLD, no council verdict. Hand off to `incubation.mdc` after the user picks a direction. For wedge-style startup ideas mapped to proven patterns, prefer **Mode D**.
+
+**Opening [core]:** If the user has not named a product, ask once:
+> Tell me what product you would like to consider for your idea.
+
+**Compliance [core]:** When producing a table phase, **do the work** — output the table; do not narrate between phases unless the user said `next` / `stop` / changed topic.
+
+**Five phases — 5 rows each.** Markdown tables: **No. | Idea | Description**. Advance on `next`, or deliver all five if asked.
+
+| Phase | Table title | Focus |
+|-------|-------------|--------|
+| 1 | Fantastic Ideas | Bold, delightful concepts |
+| 2 | Expand Ideas | Combine new elements (tech, materials, audience, business model) |
+| 3 | Different Applications | Distinct use cases or markets |
+| 4 | Subscription Ideas | Recurring-revenue or membership angles |
+| 5 | Alternative Ideas | Lateral pivots — education, charity, platform, exchange, art |
+
+**Depth on request:** Expand one row with structure, audience, and outcomes — still ideation only.
+
+**Topic change:** Restart at phase 1 with the new product name.
+
+---
+
+## Mode C — Vision interview (business idea) **[core when user shares a problem or business idea]**
+
+**Constraint [core]:** Vision and advice only — no implementation. After vision, offer `incubation.mdc` for stress-test or `system-design.mdc` for architecture.
+
+**Opening [core]:** If no idea yet, ask once:
+> What's your business idea? What problem are you solving, or what opportunity do you want to seize?
+
+**Flow [core]:**
+1. **Listen** — restate the idea in one sentence; acknowledge ambition without empty praise.
+2. **Probe (2–4 questions)** — narrow vague pitches ("all aspects", "everything") into specifics: customer suffering, wedge market, renewable/core mechanism, distribution, education/awareness, role of technology. One question at a time unless the user gave a rich brief.
+3. **Vision** — deliver a Jobs-style synthesis: think different, one integrated story, scalable path, what to build first, what to **not** build, persistence through setbacks. End with concrete hope and next step (e.g. smallest proof, one customer conversation).
+
+**Voice [core]:** Direct, visionary, plain — conviction without cosplay. Use "we" and specifics; avoid filler quotes.
+
+**Essentialism probes (use when relevant):**
+
+| Situation | Ask or assert |
+|-----------|----------------|
+| Feature overload | *If you rebuilt with only five features today, which five?* Dependency ≠ need. |
+| Scattered focus | *One initiative for the next year — which survives?* Pause others 90 days; learn. |
+| Data but no sales | *When did you last listen without a script?* Don't-know mind beats dashboard certainty. |
+| Too many UI/options | *What does the ideal experience look like?* Eliminate the option, don't just default it. |
+| Creative block | Step away; then *one word* that describes who you are. |
+| Big customer custom | Platform or consultancy — you cannot be both. Find universal pain behind the ask. |
+
+**Output format:**
+```text
+## Vision summary
+One paragraph: the integrated idea in Jobs voice (substance, not theater).
+
+## What to build first
+Numbered: 3–5 concrete moves, smallest proof first.
+
+## What to cut or defer
+Explicit nos — these define the product.
+
+## Next step
+One action in the next 7 days.
+```
+
+---
+
+## Mode D — Pattern-Mapped Ideation **[core when user wants startup or wedge ideas]**
+
+**Constraint [core]:** Ideation only — no code, no HLD, no council verdict. No vendor-branded product names. No founder-name personalization unless the user supplies it in the current chat. Hand off to `incubation.mdc` incubation gate after the user picks a direction.
+
+**Trigger [core]:** user asks for startup ideas, wedge ideas, pattern-based ideation, or ideas tailored to a domain or technical background.
+
+**Input [core]:** optional domain (e.g. DevOps, games, SMB, compliance, creative tools). If missing, ask once:
+> What domain or background should I map patterns to?
+
+**Process [core]:**
+1. Pick **3–6 patterns** from the Idea Pattern Library that fit the domain.
+2. For each pattern, output one concept with: **User**, **Pain**, **Solution**, **Wedge**, **Moat** (one paragraph each).
+3. Name each concept generically — describe the product shape, not a vendor clone.
+4. End with: run `incubation.mdc` incubation gate → CIRCLES on the top pick.
+
+**Output format:**
+```text
+## Pattern-mapped ideas
+### 1. [Concept name] (from [Pattern name])
+User / Pain / Solution / Wedge / Moat — one paragraph.
+
+[Repeat for 3–6 concepts]
+
+## Recommended next step
+Pick one concept → `incubation.mdc` incubation gate + CIRCLES.
+```
+
+**Reference examples [core — pattern demonstrations, not prescriptions]:**
+
+| Pattern applied | Generic product concept | Domain |
+|-----------------|-------------------------|--------|
+| Airgap Assistant | **VaultDebug** — local agentic debugger inside VPC; logs never leave the network | Regulated SRE / FinTech |
+| Memory Graph | **ContextThread** — codebase institutional memory linking PRs, tickets, and chat | Engineering teams |
+| Publish Intelligence | **PlayTest Zero** — virality scoring for game mechanics before full build | Indie / mobile games |
+| Surface Overlay | **HaggleLayer** — AI negotiation layer on existing product pages | D2C e-commerce |
+| Chat-Native Creation | **ChatERP** — inventory and ledger ERP entirely inside messaging apps | SMB / next-billion users |
+| Trust Shield | **CodeArmour** — cryptographic human-authorship audit trail for AI-assisted code | Enterprise compliance |
+
+---
+
+## What this rule does not cover
+
+| Need | Use instead |
+|------|-------------|
+| Safe edits, commits, tests | `agent-ops.mdc` |
+| HLD/LLD, scale, APIs | `system-design.mdc` |
+| CIRCLES + multi-stakeholder verdict | `incubation.mdc` |
+| Incubation gate (10-step pre-council) | `incubation.mdc` §0 |
+| Brand positioning, tone of voice, segmentation | `seo-gtm.mdc` |
+| SEO, ads, stack-specific patterns | domain rules in this repo |
+
+**Do not** use Mode A to add features. **Do not** use Modes B/C/D to override explicit shipped constraints without calling that out.
+
+
+---
+
+# Part B — Product council (gate + CIRCLES)
+
+# Product Council (CIRCLES + Multi-Stakeholder Critique)
+
+**Intent:** Stress-test a product idea, feature pitch, or spec **before** implementation — not to write code, system diagrams, or stack-specific how-tos. Output is structured feedback, locked decisions, and open questions.
+
+**When to run [core]:** new product, major feature, monetization change, go/no-go milestone, or when the user asks for council / critic / PM review. Skip for typo fixes and single-file bugs.
+
+**Before council [optional]:** pattern-mapped wedge ideation → `incubation.mdc` Mode D + Idea Pattern Library; rapid idea tables or Jobs-style vision Q&A → Modes B/C. Council **stress-tests** a direction; it does not replace early ideation.
+
+Tagging matches other rules: **[core]** always in a council pass; **[applicable if …]** only when the product matches.
+
+---
+
+## 0. Pre-Council Incubation Gate **[core when idea not yet stress-tested]**
+
+Run this **before** CIRCLES when evaluating a new product or wedge. Skip if the user already completed incubation in this session.
+
+Work through all ten steps in order. Do not skip to solutions.
+
+| Step | Question |
+|------|----------|
+| **1. User** | Who has the pain, and how often do they feel it? |
+| **2. Pain** | What is broken, slow, expensive, risky, inaccessible, or emotionally frustrating? |
+| **3. Existing Behavior** | What are users already doing manually or with poor tools? |
+| **4. Why Now** | What changed recently in technology, regulation, behavior, cost, or distribution? |
+| **5. Solution** | What new product or workflow becomes possible now? |
+| **6. Wedge** | What narrow segment can you win first? |
+| **7. Moat** | What gets stronger over time: data, workflow memory, trust, network, integrations, brand, or distribution? |
+| **8. Business Model** | Who pays, how much, and why now? |
+| **9. Validation** | What evidence proves demand: prototype, interviews, usage, willingness to pay, comparable companies? |
+| **10. Scale Path** | How does the wedge expand into a larger platform or market? |
+
+**Incubation → CIRCLES mapping:**
+
+| Incubation step | CIRCLES step |
+|-----------------|--------------|
+| User, Pain, Existing Behavior | **C** Comprehend, **I** Identify, **R** Report needs |
+| Wedge | **C** Cut (beachhead) |
+| Solution, Moat | **L** List solutions |
+| Business Model, Validation | **E** Evaluate tradeoffs |
+| Scale Path | **S** Summarize |
+
+---
+
+## 1. CIRCLES (PM backbone) **[core]**
+
+Work through all seven steps in order. Do not skip to solutions.
+
+| Step | Action |
+|------|--------|
+| **C — Comprehend** | Restate the goal, context, and *why now*. List constraints (time, budget, platform, compliance). |
+| **I — Identify customer** | Name 1–3 segments; pick a **primary** segment for this decision. |
+| **R — Report needs** | Pain points and jobs-to-be-done for the primary segment — evidence or explicit assumptions. |
+| **C — Cut (prioritize)** | Pick the **one** need or bet to optimize now; defer the rest with reason. Ask: *If we rebuilt today with five features, which five?* Saying no defines the product. |
+| **L — List solutions** | 2–4 viable approaches (including “do nothing” or “smaller MVP”). |
+| **E — Evaluate tradeoffs** | Pros/cons per solution on impact, effort, risk, and ethics. |
+| **S — Summarize** | One recommended path, what to lock, what stays open, and success metrics. |
+
+---
+
+## 1b. Post-Ship Review (The Feedback Loop) **[core]**
+
+The council's job is not done at launch. 14 to 30 days post-launch, hold a brief review of the success metrics defined in the **Summarize** step.
+- Did it hit the metric without regressing others?
+- **Decision:** Keep, Tweak, or Kill. Do not leave zombie features in the codebase.
+
+---
+
+## 2. Council lenses **[core]**
+
+After CIRCLES, run each lens below. **Skip** lenses that clearly do not apply (e.g. monetization council on a free internal tool). Each lens must produce: **(a)** top concern, **(b)** one concrete ask, **(c)** pass / revise / block.
+
+| Lens | Questions this voice asks |
+|------|---------------------------|
+| **Product visionary** (Mindful Essentialist) | Is the core experience irresistible in one sentence? What should we **remove**? Does every screen serve the primary job? For each feature: *What suffering does this relieve?* — if none, it's noise. Prefer **eliminating options** over configurable defaults. Shoshin: *What would we do if we started today?* |
+| **Incubation reviewer** | Does the wedge hold? Is "why now" crisp? Is there a compounding asset (graph, vault, benchmark, model)? Believable path to revenue? |
+| **Product manager** | Does CIRCLES hang together? Are scope and milestone realistic? What is the smallest shippable slice? |
+| **Engineer** | What is the riskiest technical assumption? Can we stub or spike it in days, not weeks? What must be decided before schema/API lock? |
+| **QA lead** | What are acceptance criteria and failure modes? What is the Day-1 test matrix (browsers, offline, accessibility, load)? |
+| **Data/Analytics lead** `[applicable if you ship telemetry]` | How are we measuring success? Are events mapped before implementation? Privacy-first products may use enum-only, no-PII counters — skip third-party analytics unless product requires it. |
+| **Security/Privacy reviewer** | Does this introduce new PII collection or trust boundaries? Do we need new consent flows? |
+| **Global/Localization lead** | Does this design support text-expansion for German or RTL mirroring? Are date/time assumptions safe? |
+| **Platform / console director** `[applicable if console, store, or publisher path]` | Certification, age rating, platform policies, SKU/entitlement model, certification timeline. |
+| **Game developer** `[applicable if game or interactive sim]` | Core loop fun before polish? Determinism/replay needs? Renderer and fallback path real, not hand-waved? |
+| **Game player** `[applicable if game]` | 30-second hook? Fairness, readability, couch vs solo? Why return next week? |
+| **Android developer** `[applicable if Android surface]` | Min SDK, battery/thermal budget, background limits, store listing and content rating. |
+| **Web multiplayer engineer** `[applicable if realtime online]` | Transport choice, disconnect/reconnect UX, cheating surface, load test pass bars before public ranked. |
+| **Monetization** `[applicable if revenue]` | Model fits ethics and audience? Pay-to-win risk? Price localization? What unlocks when monetization is enabled in code/schema? |
+
+Do not invent stakeholder drama — be direct, evidence-based, and actionable.
+
+---
+
+## 3. Critic output format **[core]**
+
+Deliver feedback in this structure (adapt section depth to idea size):
+
+```text
+## Executive summary
+One paragraph: recommend proceed / proceed with changes / pause.
+
+## CIRCLES summary
+C → S in brief bullets; state primary segment and the one prioritized need.
+
+## Council table
+| Lens | Verdict (pass/revise/block) | Top concern | Concrete ask |
+|------|----------------------------|-------------|--------------|
+
+## Locks (decisions to stop re-litigating)
+Numbered list: each lock = one clear decision (no "A vs B" slashes left open).
+
+## Risks & mitigations
+Top 5; include legal/ethics/safety where relevant.
+
+## Open questions
+Only items that truly block the next milestone — max 3–5.
+
+## Suggested next artifact
+e.g. ADR, HLD stub, monetization doc, test protocol → point to system-design / universal-product / games-building as needed.
+```
+
+**Good critic habits (from strong product reviews):**
+- Replace vague options with **one locked choice** or a **gated decision** (date/phase when it must be decided).
+- Call out **architecturally impossible** fallbacks (e.g. claiming two incompatible render paths without an interface).
+- Require **fail paths** for legal, content, and compliance checklists — not only happy path.
+- Separate **MDP / MVP gate** from later phases; do not block ship on tier-3 scope.
+
+---
+
+## 4. Tie-in to other rules **[core]**
+
+| After council… | Use |
+|----------------|-----|
+| Pattern ideation / wedge ideas | `incubation.mdc` Mode D + Idea Pattern Library |
+| Early ideation / Jobs vision / ultrathink UI | `incubation.mdc` Modes A–C |
+| Architecture, scale, pitfall audit | `system-design.mdc` |
+| UI, a11y, privacy, Definition of Done | `product-excellence.mdc` |
+| Game engine, embed, determinism | `create-web-game.mdc` |
+| Web deploy, E2E smoke | `create-web-game.mdc` |
+| How the agent edits the repo | `agent-ops.mdc` |
+
+Council **does not** replace HLD/LLD or Rams §1b — it decides *whether* and *what* to build.
+
+---
+
+## What this rule does not cover
+
+- Writing or reviewing production code
+- Stack-specific implementation (Python, Java, SwiftUI rules)
+- Browser automation or agent git hygiene
+
+
+---
+
+# Part C — Startup incubation library (14 lessons, wedges)
+
+# Universal Startup Incubation & Idea Framework
+
+**Intent:** Evaluate, stress-test, and generate high-impact, non-company-specific startup ideas and product wedges before code implementation. Focuses on **pain, workflow persistence, trust infrastructure, and distribution moats**.
+
+**When to run [core]:** When brainstorming new startup concepts, evaluating a product pitch, finding a sharp wedge for an existing technology, or running structured pre-build incubation. Can be invoked alongside `incubation.mdc` or `incubation.mdc`.
+
+---
+
+## 1. The 14 Core Universal Lessons (Non-Company Specific) **[core]**
+
+When evaluating or generating product concepts, apply these 14 universal principles of product wedges and defensibility:
+
+1. **The Compliance & Firewall Wedge:** Find a high-value customer segment that urgently wants a modern technology (like cloud AI), but is blocked from adopting it due to compliance, privacy, or firewall constraints. Build the secure, local/sovereign bridge for them.
+2. **The Persistent Memory Graph:** Professionals rarely lack scattered notes or data; they lack automatic connection across fragmented tools. Great ideas turn isolated signals (chats, docs, commits, tickets) into a unified, self-building relationship graph.
+3. **Move Upstream to Strategy:** Instead of building another tool that helps users execute (`"help me do X"`), build an intelligence layer that tells them *what* to do (`"what should I build/post/price next?"`). Strategy and decision-making command higher willingness to pay than manual execution.
+4. **Solve Narrow Workflow Blockers:** When a broad technology struggles with a narrow consistency issue (e.g., character persistence, deterministic layout), fixing that single bottleneck for a high-frequency professional workflow creates a massive wedge.
+5. **Layer Over Existing Surfaces:** Add a monetizable, interactive layer directly on top of where users already consume content or do work (video streams, product pages, chat UIs), rather than forcing them to migrate to a new destination app.
+6. **Compounding Identity & Asset Models:** Build tools that create durable personal or organizational models (voice, style, code history, operational cadence). The longer the model learns directly from the user's workflow, the higher the switching cost.
+7. **Prediction + Action Loop:** Analytics dashboards that only show metrics are commodities. Combine predictive scoring (*"this creative/code has a 70% chance of failing"*) with immediate automated fixes (*"click here to apply the AI patch and deploy"*).
+8. **Multi-Stakeholder Economic Alignment:** The most scalable ideas improve unit economics for every participant in the ecosystem (e.g., platforms get retention, sellers get conversion, buyers get personalized value, and creators get fair revenue).
+9. **Trust Infrastructure in the Synthetic Era:** Whenever new technology creates new fraud, ambiguity, or security vectors (deepfakes, AI-generated bugs, unauthorized scraping), building the cryptographic verification and trust layer becomes a critical new category.
+10. **Human Authorship & Control as a Moat:** In creative and engineering workflows, full black-box automation often creates anxiety and legal risk. Designing tools where humans retain explicit authorship, fine-grained control, and auditability builds a deeper moat than raw generation speed.
+11. **Compress Idea-to-Execution Time:** In timing-sensitive or trend-driven markets, the winner is often not the most feature-heavy tool, but the one that radically compresses the time required to go from raw idea to published/shipped output.
+12. **AI-Enabled Verticalization:** Horizontal platforms eventually get displaced by specialized vertical suites tailored to specific industries (e.g., AEC, e-commerce, devops). AI now dramatically reduces the engineering cost required to build vertical-specific workflows and domain models.
+13. **Emotional & Recurring Human Needs:** Not every massive market requires enterprise B2B buyers. Products that serve high-frequency, emotionally resonant family or personal needs (legacy vaults, health reminders, personal safety) can achieve viral distribution and strong retention.
+14. **Channel-Native Distribution for Next-Billion Users:** For emerging markets or non-technical SMBs, feature depth is secondary to distribution friction. Bring the entire software experience directly into the communication channels they already live in (WhatsApp, SMS, Telegram).
+
+---
+
+## 2. The 10-Step Generic Incubation Framework **[core gate]**
+
+Use this structured checklist to evaluate any new startup hypothesis or wedge before approving engineering effort:
+
+| Step | Gate | Key Question & Validation Criteria |
+|---|---|---|
+| **1** | **User** | Who specifically feels the pain, what is their exact role/job title, and how often do they encounter it? |
+| **2** | **Pain** | What is broken, slow, expensive, risky, inaccessible, or emotionally frustrating right now? |
+| **3** | **Existing Behavior** | What hacks, spreadsheets, manual copy-pasting, or poorly stitched legacy tools are they currently using? |
+| **4** | **Why Now** | What exact catalyst changed recently in technology capabilities, regulation, cloud billing costs, or distribution channels? |
+| **5** | **Solution** | What precise workflow or capability becomes possible today that was impossible or economically unfeasible 2 years ago? |
+| **6** | **Wedge** | What narrow, underserved beachhead segment can you dominate first before expanding? |
+| **7** | **Moat** | What asset compounds over time as usage scales: data gravity, workflow memory, trust/audit logs, integrations, or distribution networks? |
+| **8** | **Business Model** | Who signs the check, how is pricing metered (per seat, per transaction, per infrastructure saving), and what drives expansion? |
+| **9** | **Validation** | What concrete evidence validates willingness to pay: pre-orders, LOIs, active manual prototypes, or high churn/complaints on existing alternatives? |
+| **10** | **Scale Path** | How does winning the initial narrow wedge naturally unlock adjacent product categories or horizontal TAM expansion? |
+
+---
+
+## 3. Ten Commandments for Startup Ideation **[mindset]**
+
+1. Start with a painful user truth, never with a solution searching for a problem.
+2. Make the problem description specific enough that the target user instantly feels seen.
+3. Articulate precisely why existing tools structurally fail, not just why your feature list is longer.
+4. Claim and win a sharp, narrow beachhead before boasting about a multi-billion-dollar TAM.
+5. Build smoothly around an existing, habitual user workflow instead of demanding behavior change.
+6. Use AI specifically to eliminate bottlenecks: institutional memory, complex decisions, verification, speed, or skill gaps.
+7. Always design for a compounding asset: an evolving graph, cryptographic audit trail, custom fine-tuned model, or historical benchmark.
+8. Make the **"Why Now?"** undeniable; market timing and technical feasibility catalysts are the ultimate multipliers.
+9. Demonstrate a believable, high-margin path to monetization, not just vanity metrics or engagement.
+10. Anchor the concept with a crisp founder insight: why you see the market shift before others, and why your technical background makes you uniquely qualified to build it.
+
+---
+
+## 4. Canonical Reference Concepts (Domain-Mapped Idea Repository)
+
+Reference these canonical concepts when applying the framework to specific technical domains (`Agentic AI`, `SRE/Observability`, `Chrome Extensions`, `Web-to-Mobile Architectures`):
+
+### A. Agentic AI & Sovereign Compute
+* **Sentinel-AI (Sovereign SRE Agent):** Air-gapped, local Agentic AI debugging tool running entirely inside enterprise VPC/firewall (`Lesson 1 - Compliance & Firewall Wedge`).
+* **AgentGuardian (Safety & Reversibility Wrapper):** Deterministic pre-flight simulation and human-in-the-loop approval wrapper for autonomous web-action agents (`Lesson 10 - Control as a Moat`).
+* **PlayTest Zero (Upstream Mechanics Oracle):** Pre-code predictive intelligence platform that scores raw gameplay/mechanic videos for viral retention before coding begins (`Lesson 3 - Upstream Strategy`).
+
+### B. SRE, Observability & Developer Tools
+* **ContextThread (Engineering Memory Graph):** Autonomous semantic graph linking codebase PRs to historical Slack debates and Jira decisions, surfaced via IDE/browser overlays (`Lesson 2 - Memory Graph`).
+* **TraceWeave (Observability & Cost Sampling Firewall):** AI-driven OpenTelemetry proxy that drops verbose logs during normal traffic and switches to 100% trace capture during anomalies (`Lesson 7 - Prediction + Action Loop`).
+* **CodeArmour (Codebase Provenance & Trust Layer):** Cryptographic attestation and audit pipeline proving human authorship vs. AI generation across enterprise repositories (`Lesson 9 - Trust Infrastructure`).
+
+### C. Chrome Extensions & Web Overlays
+* **HaggleLayer (E-Commerce Agentic Overlay):** Lightweight JS/Extension overlay that adds an autonomous, conversational haggling concierge to D2C product pages to close exit-intent shoppers (`Lesson 5 - Layer Over Surfaces`).
+* **ExtensionForge (Conversational Ops Automation):** Conversational Chrome Extension generator that turns natural language ops requirements into custom, locally deployed Manifest V3 extensions (`Lesson 11 - Compress Execution Time`).
+
+### D. Web-to-Mobile & Channel-Native Architectures
+* **ChatERP (Channel-Native Business OS):** Full business ledger, invoicing, and inventory suite operating entirely within WhatsApp/Telegram voice notes and chats (`Lesson 14 - Channel-Native Distribution`).
+* **PocketNode (Offline/Edge Field Operations Suite):** Offline-first React/Capacitor mobile suite powered by local Small Language Models (SLMs) and WebGPU for field defect reporting and data capture (`Lesson 12 - Verticalization`).

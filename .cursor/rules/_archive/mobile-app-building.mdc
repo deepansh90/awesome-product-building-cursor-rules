@@ -1,0 +1,126 @@
+---
+description: Mobile app product building guidance for iOS, Android, React Native, and Flutter
+alwaysApply: false
+---
+
+# Mobile Applications (Native + Cross-platform)
+
+**Intent:** Build high-quality mobile apps with platform-correct UX, predictable state, and production-ready release gates.
+
+## Scope
+
+- iOS (`SwiftUI`)
+- Android (`Jetpack Compose`)
+- Cross-platform (`React Native`, `Flutter`)
+- Mobile-first PWAs that behave like app shells
+
+## Build order
+
+1. Define one primary job-to-be-done per screen.
+2. Sketch navigation model (tabs, stack, modal, deep links).
+3. Define semantic design tokens (color, type, spacing, radius, elevation).
+4. Build core screens with accessibility + loading/error/empty states.
+5. Add analytics, crash reporting, and release checks.
+
+## UI system baseline
+
+- Keep one source of truth for tokens.
+- Prefer semantic tokens over hardcoded values.
+- Keep touch targets >=44pt iOS / >=48dp Android.
+- Do not rely on color only for status.
+- Respect reduced motion and dynamic type / font scaling.
+
+## Platform behavior rules
+
+- Follow native patterns before custom patterns.
+- iOS: prioritize tab + stack clarity, swipe-back compatibility.
+- Android: preserve system back and predictable top app bar behavior.
+- Cross-platform: match platform conventions where users expect them.
+
+## Reliability and state
+
+- Define explicit offline, loading, error, and success states.
+- Persist user-critical drafts locally when flows are multi-step.
+- Prevent duplicate submits with disabled/loading button states.
+- Use optimistic updates only when rollback is defined.
+
+## Performance gate
+
+- Keep startup lightweight; lazy-load heavy features.
+- Virtualize long lists.
+- Avoid layout thrash and unnecessary rerenders/rebuilds.
+- Compress and size media assets for mobile network constraints.
+
+## Security and privacy
+
+- Never hardcode credentials or secrets.
+- Store sensitive data in secure storage/keychain equivalents.
+- Minimize permissions to what the feature actually needs.
+- Add clear copy for data collection and camera/location usage.
+
+## Testing and release checklist
+
+- Unit tests for core business logic.
+- Integration tests for critical flows (auth, payment, upload, checkout).
+- Device coverage: small phone, large phone, and tablet (if supported).
+- Verify deep links, push notification routes, and back-stack behavior.
+- Verify dark mode, accessibility labels, and keyboard/voice support where applicable.
+
+## Design source options
+
+- For style anchoring, you may use a `DESIGN.md` file from `awesome-design-md`.
+- For fast UI system recommendations, use `ui-ux-pro-max-skill` design system patterns.
+- Keep brand adaptation explicit: cite chosen style family and why.
+
+## Google Play Console Standards
+
+When creating a new app in the Google Play Console, adhere to these standard baseline configurations for our game suite:
+
+- **App name:** Must exactly match the canonical `displayName` (max 30 characters).
+- **Package name:** Must match the reverse-DNS ID defined in the project (e.g., `com.bharatbrawlers.<slug>`). (max 150 characters).
+- **Default language:** `English (United States) – en-US`.
+- **App or game:** Select `Game` (unless explicitly building a non-game utility).
+- **Free or paid:** Select `Free` (unless specifically building a premium SKU).
+- **Declarations:** 
+  - Check *Confirm app meets Developer Program Policies*.
+  - Check *Accept US export laws*.
+
+Always ensure these are recorded correctly upon creation as some (like Package name) are permanent.
+
+### Creating a Production Release
+
+When creating a production release or rolling out a new app bundle (.aab), use the following standard configurations:
+
+- **Play Games Sidekick:** Leave **unchecked** (unless we are explicitly integrating Google Play Games Services achievements/leaderboards).
+- **Release name:** Use the semantic version number from `build.gradle.kts` (e.g., `1.0.0`). If the Play Console auto-fills this from the AAB, leave it as is.
+- **Release notes:** Must always be wrapped in the locale tags (e.g., `<en-US>...</en-US>`). Keep notes punchy, using bullet points to highlight new features or bug fixes. Example for V1:
+  ```text
+  <en-US>
+  Initial release! 
+  - Full game features
+  - Fully playable offline
+  </en-US>
+  ```
+
+### Privacy Policy
+
+- **Privacy Policy URL:** When submitting an app to the Play Console (under App Content -> Privacy Policy), always use `https://dsapatterns.io/privacy.html`. This is a unified zero-data privacy policy covering all games in the suite.
+
+### Content Ratings & App Content Declarations
+
+When filling out the **App Content** questionnaires in the Google Play Console, use these standard zero-data/safe answers:
+
+- **Content Ratings:**
+  - Answer **No** to all sensitive topics (Violence, Fear, Sexuality, Gambling, Language, Substance, Crude Humor).
+  - This ensures an E (Everyone) or PEGI 3 rating, keeping the app safe for all audiences.
+- **Target Audience:**
+  - Select **13-15**, **16-17**, and **18 and over**.
+  - Appeal to children: **No**.
+  - *(Reasoning: Selecting under 13 requires joining the Designed for Families program, which has stricter ad SDK and data compliance reviews. 13+ is the safest path for rapid approval).*
+- **Data Safety:** 
+  - Does your app collect or share any of the required user data types? **No**.
+  - *(Our games are fully offline and use no analytics or crashlytics tracking by default).*
+- **Government apps:** **No**.
+- **Financial features:** **No**.
+- **Health apps:** **No**.
+

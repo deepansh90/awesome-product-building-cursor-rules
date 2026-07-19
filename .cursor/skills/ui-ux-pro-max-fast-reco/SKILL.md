@@ -23,7 +23,7 @@ For fast UI system recommendations, use `ui-ux-pro-max-skill` design system patt
    - one palette direction
    - one typography direction
 3. Validate against local rule files:
-   - `website-building.mdc`
-   - `mobile-app-building.mdc`
-   - `games-building.mdc`
+   - `create-web-game.mdc`
+   - `convert-web-to-mobile.mdc`
+   - `create-web-game.mdc`
 4. Return concise implementation-ready guidance.

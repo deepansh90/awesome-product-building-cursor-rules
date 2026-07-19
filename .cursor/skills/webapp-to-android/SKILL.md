@@ -8,7 +8,7 @@ description: >-
 
 # WebApp to Android — Bharat Brawlers
 
-Canonical rule: `awesome-product-building-cursor-rules/.cursor/rules/web-to-android-app-conversion.mdc` §14–§15.
+Canonical rule: `awesome-product-building-cursor-rules/.cursor/rules/convert-web-to-mobile.mdc` §14–§15.
 
 **One command:**
 
@@ -25,24 +25,24 @@ Registry: `scripts/games/android/registry.mjs` (14 games; Equalize excluded).
 
 ## §0 Architectural and philosophical pillars
 
-### 1. Steve Jobs ultrathink and UI essentialism (`steve-jobs.mdc`)
+### 1. Steve Jobs ultrathink and UI essentialism (`incubation.mdc`)
 
 - **Ruthless HUD economy:** Every control earns its place on mobile. Prefer icons over redundant labels.
 - **Frictionless loops:** Replace multi-step game-over dialogs with instant ≤0.5s restart.
 - **Visual rhythm and high contrast:** Calm typography across all five themes.
 
-### 2. Game engineering and juice (`games-building.mdc`)
+### 2. Game engineering and juice (`create-web-game.mdc`)
 
 - **Universal 5-theme engine:** `balance`, `ember`, `zen`, `midnight`, `ocean` via `useGameTheme` + `ThemeSwitcher` in `__root.tsx`.
 - **Audio and music:** `music-asset-manifest.json` — file loops or procedural BGM; `unlockGameAudio()` on first gesture.
 - **Haptic tactility:** `puzzleJuice.ts` / `navigator.vibrate()` on placements, impacts, victories.
 
-### 3. Web and SPA resilience (`website-building.mdc`)
+### 3. Web and SPA resilience (`create-web-game.mdc`)
 
 - **Strict build isolation:** Play ships `dist/android-client/` only — never embed `dist/client`.
 - **SPA fallbacks:** `SpaAssetsPathHandler.kt` — empty path and extension-less routes → `index.html`.
 
-### 4. Play Store honesty (`product-marketing-context.mdc`, conversion rule §13)
+### 4. Play Store honesty (`seo-gtm.mdc`, conversion rule §13)
 
 - **120-second discoverability:** Every screenshot bullet must be reachable offline on cold launch.
 - **Exact store assets:** 512×512 PNG icon (15% safe zone), real 1080×2400 gameplay screenshots.

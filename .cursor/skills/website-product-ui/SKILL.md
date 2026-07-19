@@ -8,7 +8,7 @@ disable-model-invocation: true
 
 Use this skill for website and SPA UI work.
 
-For deeper visual-system or brand-personality passes, optional Cursor agents: `@ui-designer`, `@ux-architect`, `@brand-guardian`, `@whimsy-injector` — still obey Rams / simplification rules in `universal-product.mdc` and `website-building.mdc`.
+For deeper visual-system or brand-personality passes, optional Cursor agents: `@ui-designer`, `@ux-architect`, `@brand-guardian`, `@whimsy-injector` — still obey Rams / simplification rules in `product-excellence.mdc` and `create-web-game.mdc`.
 
 ## Inputs to collect
 
@@ -30,7 +30,7 @@ For deeper visual-system or brand-personality passes, optional Cursor agents: `@
 ## Delight and empty states
 
 - Loading, empty, and error surfaces may carry brand personality (tone, light motion, helpful microcopy).
-- Whimsy must serve clarity or reduce friction — never decorative chrome that fails the `website-building.mdc` simplification audit or the user's anti-generic frontend rules.
+- Whimsy must serve clarity or reduce friction — never decorative chrome that fails the `create-web-game.mdc` simplification audit or the user's anti-generic frontend rules.
 - Respect `prefers-reduced-motion`; never convey meaning through motion alone.
 
 ## Non-negotiable checks

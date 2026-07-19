@@ -36,6 +36,7 @@ Sync via Git: UI tool pushes layout; IDE pushes logic and tests. Use `product_sp
 
 ## Git & session hygiene
 
+- **Always take latest remote code before merge/rebase/push** to a shared branch — `git fetch` then pull/ff-only (or rebase onto) the updated base so local work does not overwrite newer remote commits. See `git-sync-before-merge.mdc`.
 - Commit (or stash) before long autonomous agent runs.
 - **Conventional Commits:** `type(scope): description` — types `feat|fix|docs|refactor|test|chore|ci|perf|build`; optional body explains *why*; `BREAKING CHANGE:` footer or `feat!` when APIs break.
 - **PR body must include:** purpose, implementation notes, tests run (exact commands), rollout/rollback note if relevant, linked issue/ticket.

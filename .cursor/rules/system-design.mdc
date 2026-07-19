@@ -11,7 +11,7 @@ A generic rule for producing useful **High-Level** and **Low-Level** designs for
 
 ## 0. Frame the Problem Before Designing **[core]**
 
-Spend the first 10–15 minutes clarifying, not drawing (implementation workflow → `cursor-agent-discipline.mdc`). Emerge with a one-line problem statement, written requirements, and scale numbers.
+Spend the first 10–15 minutes clarifying, not drawing (implementation workflow → `agent-ops.mdc`). Emerge with a one-line problem statement, written requirements, and scale numbers.
 
 - **Functional requirements:** what the system *does*. List as user-visible jobs and APIs. Reject ambiguity in writing.
 - **Non-functional requirements (NFRs):** **availability** target (99.9 ≈ 1.5 min/day, 99.99 ≈ 8.6 s/day, 99.999 ≈ 0.86 s/day downtime), **consistency** (strong vs eventual — CAP framing), **latency** budget (e.g., p99 < 200 ms), **scale** (DAU, QPS, storage, bandwidth), **security/compliance** scope.
@@ -72,7 +72,7 @@ Goal: each implementer can code without re-deriving decisions. Translate HLD wor
 - **State machines [applicable if entity has > 2 meaningful states]** — explicit ADT/enum, allowed transitions, terminal states.
 - **Config + flags** — new config keys (typed), defaults, feature-flag names and rollout plan.
 - **Test specification** — per work unit: happy path, edge cases, failure modes, test type (unit / integration / contract / E2E), expected coverage on changed code.
-- **UI component spec [applicable if UI work unit]** — props/state, accessibility name + role, responsive behaviour, loading/empty/error states (per `universal-product.mdc` §1b Rams checklist where relevant), platform notes for Android (Compose) / iOS (SwiftUI) / web.
+- **UI component spec [applicable if UI work unit]** — props/state, accessibility name + role, responsive behaviour, loading/empty/error states (per `product-excellence.mdc` §1b Rams checklist where relevant), platform notes for Android (Compose) / iOS (SwiftUI) / web.
 
 **LLD style rules [core]:** table format, no code blocks longer than a signature line, 300–600 lines total, deterministic enough that two implementers would produce equivalent code.
 
@@ -89,4 +89,4 @@ After HLD + LLD, pick the 1–2 highest-risk components — usually the ones fla
 
 A design is ready to implement only when: problem + NFRs + scale are written; HLD diagrams + traceability + DAG + pitfall audit exist; LLD signatures + schemas + test specs are filled in for every work unit; risks have mitigations; rollback is one click; and a peer who didn't write the doc can answer "what changes, why, in what order, and how do we know it worked."
 
-For product ship criteria (tests, observability, privacy), see `universal-product.mdc` §7.
+For product ship criteria (tests, observability, privacy), see `product-excellence.mdc` §7.

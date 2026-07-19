@@ -1,0 +1,43 @@
+---
+description: Always fetch/pull latest remote code before merge, rebase, or push to avoid overwriting
+alwaysApply: true
+---
+
+# Git: take latest code before merge
+
+Never merge, rebase, cherry-pick onto a shared branch, or push assuming local `main`/`master` is current. Stale local tips silently overwrite remote work.
+
+## Before merge / rebase / push to a shared branch
+
+1. **Fetch first:** `git fetch origin` (or the active remote).
+2. **Integrate latest into your base:**
+   - Merging to `main`: `git checkout main && git pull --ff-only origin main` (or rebase your feature onto updated `main`).
+   - Updating a feature branch: rebase/merge **from** the updated base — do not force-push over others' commits.
+3. **Re-check status:** `git status` and `git log HEAD..origin/<base> --oneline` — if remote is ahead, integrate before continuing.
+4. **Resolve conflicts deliberately** — never discard remote changes with `git checkout --theirs/--ours` or reset without stating what you are dropping.
+
+## Before long edit sessions
+
+- If the working tree may be stale vs remote: `git fetch` + note whether `origin/<branch>` is ahead.
+- Prefer **stash or commit** local WIP before pulling so a pull cannot clobber uncommitted edits.
+- After pull, **re-read files you are about to edit** — do not apply patches written against an older tip.
+
+## Anti-patterns
+
+```text
+❌ Edit for 30 minutes, then git push --force to main
+❌ git merge feature without git fetch / pull on the target branch
+❌ Overwrite local files from an old checkout while origin has newer commits
+❌ Assume "up to date" from session start after others may have pushed
+```
+
+```text
+✅ git fetch origin
+✅ git pull --ff-only origin main   # on the merge target
+✅ rebase/merge feature onto updated main
+✅ push only after local base matches remote (or intentional non-ff with user OK)
+```
+
+## Exception
+
+Skip only when the user explicitly says to work offline / ignore remote, or when pushing a brand-new branch with no upstream yet (still `fetch` first when the base branch exists).
