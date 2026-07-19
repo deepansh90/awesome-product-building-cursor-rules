@@ -1,5 +1,6 @@
 node_modules/
 .DS_Store
+.cursor/rules/**/*.code-workspace
 
 # Local-only cursor rules (moved out of tracked rules)
 .cursor/Don't include these/

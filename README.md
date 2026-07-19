@@ -15,6 +15,17 @@ Canonical Cursor rule books for shipping products with AI coding agents. Install
 | **Incubation** | `incubation.mdc` | Ultrathink UI, vision/idea tables, pattern wedges, 10-step gate, CIRCLES critique. |
 | **SEO & GTM** | `seo-gtm.mdc` | Product marketing context, brand/copy, on-page & programmatic SEO, site-wide audit. |
 
+## Optional integration rules
+
+| Integration | File | When it applies |
+|-------------|------|-----------------|
+| **Xquik MCP Product Research** | [`xquik-mcp-research.mdc`](.cursor/rules/xquik-mcp-research.mdc) | Public X research for launches, competitors, trends, and customer signals through the Xquik remote MCP server. |
+
+The Xquik rule uses OAuth 2.1 by default, begins with the read-only discovery
+tool, and requires explicit approval before any account-changing operation.
+Xquik is an independent third-party service. Not affiliated with X Corp.
+"Twitter" and "X" are trademarks of X Corp.
+
 ## Recommended installs
 
 | Surface | Books |
@@ -36,6 +47,7 @@ Canonical Cursor rule books for shipping products with AI coding agents. Install
   system-design.mdc
   incubation.mdc
   seo-gtm.mdc
+  xquik-mcp-research.mdc  # optional Xquik integration
   _archive/          # superseded single-purpose rules (kept for history)
 ```
 
