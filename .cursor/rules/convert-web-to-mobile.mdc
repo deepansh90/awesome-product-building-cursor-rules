@@ -582,3 +582,9 @@ Canonical Kotlin/manifest snippets: `Bharat Brawlers/scripts/games/android/nativ
 | Web/game source product | `create-web-game.mdc` |
 | UI/a11y baseline | `product-excellence.mdc` |
 | Signed AAB, Play listing, Studio publish, ASO | `publish-mobile.mdc` |
+
+## Android Keystore Best Practices
+- **Shared Keystore for Local Testing:** When a production `Untitled.jks` is missing or the password is unknown, use a dummy keystore `shared-release-key.keystore` generated with `-alias equalize@1` and password `dummy123`.
+- **build.gradle.kts:** Ensure that all games' `build.gradle.kts` files use `keyAlias = System.getenv("KEY_ALIAS") ?: "equalize@1"` and `storePassword = System.getenv("KEYSTORE_PASSWORD") ?: "dummy123"` to seamlessly support this fallback.
+- **Do not commit production secrets**: Ensure `Untitled.jks` is never committed. 
+- Avoid overriding or replacing keystores in individual game apps manually if `scripts/games/android/run.mjs` handles the copying. 
