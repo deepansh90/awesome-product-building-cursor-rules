@@ -480,6 +480,19 @@ Gate **release** Play builds: strip `?e2e=1` auto-win paths in Gradle `stripRele
 | `game_url` → `index.html` without empty-path handler | Trailing-slash URL + `SpaAssetsPathHandler` normalize |
 | Fake / composited screenshots | Emulator from release APK/AAB only |
 | `com.dsapatterns.*` on standalone game | Per-game `applicationId` (e.g. `com.circuitflow.puzzle`) |
+| New Play listing for soft-archived embed | After hub hard-delete, **do not** scaffold/publish `lumen-circuit` / `orbit-defense` / `ghost-loop` APKs — players get those fantasies inside Circuit / GRID / TimeTwin |
+| Android registry out of sync with embed registry | `android/registry.mjs` ⊆ `EMBED_GAMES` (Equalize excluded); drop archived slugs from preview-assertions in the same PR |
+| Patch only host `public/games/` for Android bugs | Fix upstream game source → `npm run android -- <slug>` / `android:all` → rebuild AAB |
+
+### Portfolio consolidation (July 2026) **[applicable if multi-game Android fleet]**
+
+When web portfolio merges secondary titles into flagship **modes**:
+
+1. Remove archived slugs from `scripts/games/android/registry.mjs` and `preview-assertions.mjs`.
+2. Keep Gradle shells under `games/<Archived>/android/` only if still useful for mode-source builds — do **not** list them for Play release.
+3. Listing copy for flagships may mention the mode (e.g. “includes Orbit Defense mode”) — never claim a separate app ID for the archived slug.
+4. After `android:all`, commit intentional manifest/source changes; whitespace-only Gradle churn is fine to include if the pipeline regenerated it.
+5. Release priority after Equalize + Attack the Army: TimeTwin → Crush → Circuit Flow → Tank Wars → Optic (see `create-web-game.mdc` §12 tier strategy).
 
 ### Phase 8 — Native shell & Play Vitals hardening **[applicable if Android native shell]**
 

@@ -62,6 +62,7 @@ For **each** bullet in short description, full description, and “What’s new�
 | **Hints** | “Help reopens tutorial”, “blocked-path alert”, “undo/reset” — only claim a Hint button if one exists |
 | **Online** / multiplayer / cloud save | Only with real network features and `INTERNET` permission + Data safety disclosure |
 | Parent brand (e.g. study portal name) on a **standalone** game listing | App name + puzzle identity only; separate privacy policy URL if needed |
+| Separate Play apps for **soft-archived** web embeds (Lumen / Orbit / Ghost after flagship merge) | One flagship listing; mention mode in description if needed — do not create/relive archived `applicationId`s |
 
 ### Discoverable UI for listed features
 

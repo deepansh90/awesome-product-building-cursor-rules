@@ -100,6 +100,12 @@ Skip only when the user explicitly says to work offline / ignore remote, or when
 - Handle edge cases; consider security on every change.
 - Add or update tests for new behaviour at trust boundaries.
 
+## Multi-repo game fleets **[applicable if upstream game monorepo + host vendor + Android shells]**
+
+- **Upstream-first:** fix embeds / WebView bugs in the game monorepo (e.g. Ranbhoomi), rebuild, then vendor to the host and regenerate Android — do not patch only `public/games/` or a one-off APK asset tree.
+- **Catalog as source of truth:** portfolio size and slugs come from the embed registry; host hub, SEO, SPA rewrites, Android registry, and contract tests must change in the same change-set.
+- **Branch pairs:** when both `main` and `master` exist, push `main` then **fast-forward** `master` — never force-overwrite remote tips. Details → `create-web-game.mdc` §12.
+
 ## What this rule does not cover
 
 - System design documents → `system-design.mdc`

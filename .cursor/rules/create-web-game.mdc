@@ -330,8 +330,8 @@ npm run test:e2e
 
 Production for **dsapatterns.io** is driven from this repo via **Cloudflare** (Workers static assets), not only Vercel.
 
-- **Git integration:** Cloudflare dashboard links the Worker to **GitHub**; pushes to **`main`** trigger build. Treat **`main`** as source of truth; mirror **`master`** when workflow still references it (see § Git & deploy).
-- **Build + deploy:** `npm run build` then `npx wrangler versions upload`. [`wrangler.jsonc`](wrangler.jsonc): `assets.directory` = `./dist`, `not_found_handling` = `single-page-application`. **Do not** upload without successful Vite build — `dist/` must include `public/` (e.g. `public/games/**`).
+- **Git integration:** Cloudflare dashboard links the Worker to **GitHub**; pushes to **`main`** trigger build when configured. Treat **`main`** as source of truth; **FF-sync `master`** after every `main` push when both exist (`git merge --ff-only` — never force over remote tips).
+- **Build + deploy:** `npm run build` then `npx wrangler versions upload` when Git auto-deploy is missing or stuck. **Do not assume `git push` alone updates live Workers.** [`wrangler.jsonc`](wrangler.jsonc): `assets.directory` = `./dist`, `not_found_handling` = `single-page-application`. **Do not** upload without successful Vite build — `dist/` must include `public/` (e.g. `public/games/**`).
 - **Worker name:** `"name"` in `wrangler.jsonc` must match Cloudflare Worker name.
 - **Stale live site:** Hashed `/assets/*` cache-bust each build; **`index.html`** may lag. After successful deploy: purge CDN (`/` and `/assets/*`, or purge all), hard-refresh/incognito; confirm deploy logs succeeded.
 - **Vercel-only config:** [`vercel.json`](vercel.json) rewrites apply on **Vercel**, not Cloudflare Worker. Nested game SPAs (`/games/<slug>/*`) may need extra routing on Cloudflare — `create-web-game.mdc` §12 *Cloudflare vs Vercel*.
@@ -445,45 +445,53 @@ Host routing details → `create-web-game.mdc` (vendored folder only).
 - **`[applicable if deterministic core]`** — automated replay verification in CI.
 - Smoke narrow + wide viewport; test embed and standalone if both ship.
 - **`[applicable if level-based puzzle]`** — **one unit test per level** (structure + solvability where provable); shared `level-count.test.mjs` asserting N levels in source; update E2E copy when total level count changes (e.g. `Puzzle 1 / 30` for Echo, `/ 20` for most suite games — never stale `/ 3` or `/ 15`).
-- **`[applicable if embed iframe on educational host]`** — run E2E against local preview server serving `dist/client` at `/games/<slug>/`; keep `?e2e=1` auto-win paths **runtime-only** (never `VITE_E2E` at build — `build-all-embeds.mjs` deletes it); clear `localStorage` progress keys in `beforeEach`; `campaign-5` (all **13** embeds, levels/waves 1–5) + `campaign-15` (subset 1–20); fast and deterministic (instant win when puzzle already solved).
+- **`[applicable if embed iframe on educational host]`** — run E2E against local preview server serving `dist/client` at `/games/<slug>/`; keep `?e2e=1` auto-win paths **runtime-only** (never `VITE_E2E` at build — `build-all-embeds.mjs` deletes it); clear `localStorage` progress keys in `beforeEach`; `campaign-5` / smoke matrices follow **current** `EMBED_GAMES` (+ inlined mode routes for archived fantasies); fast and deterministic (instant win when puzzle already solved).
 
 ## §12 Embed puzzle suite — production learnings (Bharat Brawlers / dsapatterns) **[applicable if iframe embed on parent SPA]**
 
-Reference implementation: **thirteen TanStack Start CSR games** vendored to `public/games/<slug>/` on dsapatterns-website (`#games/<slug>` hash routes). Full inventory → Bharat Brawlers `docs/embed-dsapatterns-puzzles.md`; tier scores → `GAMES_RANKING.md`. Design craft (loops, onboarding, level pacing) → §1b before scaling new embeds.
+Reference implementation: TanStack Start CSR games vendored to `public/games/<slug>/` on dsapatterns-website (`#games/<slug>` hash routes). Canonical catalog → Bharat `scripts/games/embed-registry.mjs` + `GAMES_RANKING.md` (do not trust older “13 embeds” counts in docs). Design craft → §1b before scaling new embeds.
 
-### Embed inventory (July 2026)
+### Embed inventory (July 2026 — post flagship consolidation)
 
-| Display name | Slug | Hash route | Levels/waves |
-|--------------|------|------------|--------------|
-| TimeTwin | `time-twin` | `#games/time-twin` | 30 |
-| GhostLoop | `ghost-loop` | `#games/ghost-loop` | 20 |
-| Helicopter Rush | `helicopter-rush` | `#games/helicopter-rush` | 20 |
-| Tank Wars | `tank-wars` | `#games/tank-wars` | match |
-| Train Panic | `train-panic` | `#games/train-panic` | 20 |
-| Optic Beam Puzzle | `optic-beam-puzzle` | `#games/optic-beam-puzzle` | 30 |
-| Circuit Flow | `circuit-flow` | `#games/circuit-flow` | 20 |
-| GRID Tower Defense | `grid-tower-defense` | `#games/grid-tower-defense` | 20 |
-| Pocket Park Tycoon | `pocket-park-tycoon` | `#games/pocket-park-tycoon` | 20 |
-| Crush the Swappy | `crush-the-swappy` | `#games/crush-the-swappy` | 30 |
-| Orbit Defense | `orbit-defense` | `#games/orbit-defense` | 30 |
-| Attack the Army | `attack-the-army` | `#games/attack-the-army` | campaign |
-| Lumen Circuit | `lumen-circuit` | `#games/lumen-circuit` | 20 |
-| Jobsian Joy | `jobsian-joy` | `#games/jobsian-joy` | 150 |
+**Hub / vendor / Android catalog = 10 embeds** (+ Equalize + Ranbhoomi brawler on the host). Soft-archived standalones live as **inlined modes** — not separate hub cards or `public/games/<archived>/` trees.
 
-**GRID Tower Defense** (`grid-tower-defense`, ASCII roguelike TD) and **Orbit Defense** (`orbit-defense`, minimalist path TD) are distinct SKUs — never conflate slugs or copy.
+| Display name | Slug | Notes |
+|--------------|------|--------|
+| TimeTwin | `time-twin` | Flagship; GhostLoop mode at `/modes/ghost` |
+| Circuit Flow | `circuit-flow` | Flagship; Lumen mode at `/modes/lumen` |
+| Optic Beam Puzzle | `optic-beam-puzzle` | |
+| Train Panic | `train-panic` | |
+| Helicopter Rush | `helicopter-rush` | |
+| GRID Tower Defense | `grid-tower-defense` | Flagship; Orbit mode at `/modes/orbit` |
+| Tank Wars | `tank-wars` | |
+| Crush the Cups | `crush-the-cups` | legacy slug `crush-the-swappy` |
+| Attack the Army | `attack-the-army` | |
+| Arrow Puzzle Rush | `arrow-puzzle-rush` | legacy `jobsian-joy` / `arrow-time` |
 
-Slugs are stable for bookmarks/CDN; display names target Play Store keywords. Legacy hash routes (`#games/echo-node`, etc.) redirect to canonical slugs via `LEGACY_GAME_SLUG_REDIRECTS` in dsapatterns `routes.js`.
+**Archived standalones (redirect only — no hub card, no public embed, no Android SKU):**
 
-**All fifteen TanStack embeds** must ship the **Equalize 5-theme switcher** (`balance`, `ember`, `zen`, `midnight`, `ocean`) via copied `useGameTheme.ts` + `ThemeSwitcher.tsx` + `equalize-theme-templates.css` (see Theme switcher below).
+| Old slug | Redirects to | Mode path |
+|----------|--------------|-----------|
+| `lumen-circuit` | `circuit-flow` | `/games/circuit-flow/modes/lumen/` |
+| `orbit-defense` / `bloons-vision` | `grid-tower-defense` | `/games/grid-tower-defense/modes/orbit/` |
+| `ghost-loop` / `pixel-path` | `time-twin` | `/games/time-twin/modes/ghost/` |
+
+Keep **source trees** (`games/Lumen circuit`, `Bloons Vision`, `GhostLoop`) for mode sync / unit tests. Hard-delete = hub + `public/games/<slug>/` + embed/android registries + SPA rewrite lists — **not** mode source.
+
+**GRID** (ASCII roguelike TD) and **Orbit** (path TD) remain distinct *fantasies*; Orbit is no longer a separate hub SKU.
+
+Slugs are stable for bookmarks/CDN. Legacy hashes redirect via `LEGACY_GAME_SLUG_REDIRECTS` in both Bharat `embed-registry.mjs` and dsapatterns `routes.js` (keep both maps aligned).
+
+**Theme switcher:** flagship embeds ship Equalize 5 themes unless **locked** (e.g. Lumen Filament — skip `ThemeSwitcher` / equalize template overwrite in `sync-embed-ui.mjs`). Mode nests sync `embed-game-ui.css` via `MODE_EMBED_CSS` paths under the flagship.
 
 ### Tier strategy (investment order)
 
-Use `GAMES_RANKING.md` scores — do not polish all nine equally:
+Use `GAMES_RANKING.md` — invest in flagships that absorb modes; do not polish archived standalones as separate products.
 
-- **Tier A (invest):** TimeTwin, GhostLoop — ghost overlays, share, campaign depth.
-- **Tier B (polish):** Helicopter Rush, Tank Wars — distinct hooks, OG share, PB ghost.
-- **Tier C (differentiate):** Train Panic, Optic Beam Puzzle, Circuit Flow — daily mode, beam preview, undo.
-- **Tier D (demo hooks only):** GRID Tower Defense, Pocket Park Tycoon — 20 levels shipped; juice/onboarding deferred.
+- **Tier A:** TimeTwin, Crush the Cups — clearest hooks + modes.
+- **Tier B:** Tank Wars, Optic Beam, Arrow Puzzle Rush.
+- **Tier C:** Circuit Flow (+ Lumen), Train Panic, Helicopter Rush, Attack the Army.
+- **Tier D:** GRID (+ Orbit) — deep strategy; ship after A–C unless Orbit coverage is the goal.
 
 ### Viral hooks (client-only — no server leaderboards)
 
@@ -494,7 +502,7 @@ Copy templates from `scripts/games/templates/` into each game's `src/lib/` (neve
 - `localBest.ts` — local PB ghost replay.
 - `progress.ts` — campaign persist (`<slug>.progress` in `localStorage`).
 
-Cross-promo footers may reference UTC daily rotation; **Mind Pack hub is removed** — host lists all **thirteen** in `GamesSection`; legacy `#games/mind-pack` redirects only.
+Cross-promo footers may reference UTC daily rotation; **Mind Pack hub is removed** — host lists **catalog embeds only** in `GamesSection`; legacy `#games/mind-pack` redirects only.
 
 ### Theme switcher (Equalize tokens + Tailwind)
 
@@ -518,7 +526,7 @@ Vendored static bundles live under `public/games/<slug>/`. The React shell is `s
 #### Outer iframe shell (host)
 
 - **Width:** responsive cap on the games column (`60vw`, `max-w-[900px]`, centered).
-- **Height:** stable block so in-iframe CTAs are not clipped — e.g. `h-[clamp(760px,96dvh,2000px)]` on the shell and `h-full min-h-0 flex-1` on the `<iframe>` so it fills the shell. Tune per game if a title needs more headroom.
+- **Height:** stable block so in-iframe CTAs / mode lobbies are not clipped. Host mobile shell often needs **≥ ~960px** effective game height (or `min-h` + `max-h` clamp) — short shells clip Orbit/GRID lobbies and rush home chrome. Prefer `h-[clamp(…)]` / `100dvh` floors; tune per title after screenshot at 390×844.
 - **`iframeSrc`:** TanStack CSR embeds use `'/games/<slug>/'` (trailing slash helps SPA entry resolve). Legacy Equalize uses `'/games/equalize/equalize.html'`.
 
 #### Host games page — mobile iframe visibility
@@ -565,7 +573,7 @@ Vendored static bundles live under `public/games/<slug>/`. The React shell is `s
 - **Minimum bar:** 20 levels per puzzle game (Echo 30, Laser Mirror 30+); each level named and listed in source.
 - **Solvability:** for ray/path puzzles, ship a **solver** (brute-force tray placement + `traceBeam`) and run in CI (`scripts/games/validate-*-puzzles.ts` or test helper). Hand-authored mirror paths must be traced — `/` vs `\` reflection is easy to get wrong.
 - **Seeded procedural levels** (e.g. wire grid): `generatePuzzleForLevel(n)` with `LEVEL_COUNT` matching shipped count; clamp level index; verify connected/solvable path for e2e `skipShuffle` builds.
-- **Echo / timing games:** e2e uses `?e2e=1` to auto-complete or skip shuffle; `campaign-5` covers levels/waves 1–5 across all **thirteen** embeds.
+- **Echo / timing games:** e2e uses `?e2e=1` to auto-complete or skip shuffle; `campaign-5` covers levels/waves 1–5 across catalog embeds (and mode URLs for inlined fantasies).
 
 ### Audio: `puzzleJuice.ts` (SFX) vs BGM
 
@@ -598,6 +606,12 @@ Vendored static bundles live under `public/games/<slug>/`. The React shell is `s
 | **Crush the Swappy / physics ammo** | Bomb only explodes on target hit | Detonate bomb on **any** Matter collision contact; swap launcher ammo when selecting type |
 | **Attack the Army / lane TD** | Too many lanes + weak hit feedback | Fewer lanes (e.g. 4) + one `LANES` constant; `damageFlash` vignette + visible miss counter beats more briefing copy |
 | **Rename game folder** | Broken embed paths after `git mv` | **Slug stays stable** for CDN/bookmarks; update `embed-registry.mjs`, e2e, `verify-game-dist-cloudflare.mjs`, host `public/games/<slug>/` only |
+| **Celebrate / win overlay** | `prefers-reduced-motion` dwell = solve-hold → overlay never paints | Separate `CELEBRATE_VISIBLE_MS` / `solveHoldMs`; never set reduced-motion dwell ≤ hold; `delayMs={0}` on overlay must still allow paint |
+| **Rush lobby labels** | Duplicate text (`Survival Survival`) | Secondary line ≠ `MODE_LABELS` (use lives / timed copy) |
+| **Audio / SFX dock** | Dock overlaps Modes rail / primary CTA on short mobile | Bottom-right chip + lobby `padding-bottom`; hide when overlays open (same as ThemeSwitcher) |
+| **Inlined mode routes** | E2E still hits `/games/orbit-defense/play` | Target flagship mode path; Orbit is often `/modes/orbit/` (GameShell inlined — **no** nested `/play`) |
+| **Hard-delete standalone** | Left hub card or vercel rewrite → 404 / zombie SKU | Update together: `embed-registry`, android registry, `GamesSection`, SEO, `GAME_SPA_SLUGS`, `vercel.json`, verify scripts, e2e hub lists, portfolio tests |
+| **Catalog count drift** | Docs/tests still say “13 embeds” | Single source = `EMBED_GAMES.length` in registry; update contracts + ranking header in same PR |
 
 ### Legacy Equalize (single-file HTML) **[applicable if equalize bundle on host]**
 
@@ -609,18 +623,19 @@ Equalize ships as one self-contained `public/games/equalize/equalize.html` (not 
 
 ### Embed build pipeline (CSR in iframe)
 
-- **`build-all-embeds.mjs`** orchestrates all **thirteen**: `DSAPATTERNS_EMBED=1` Vite build (`ssr: false`) → copy `.output/public` → `dist/client` → `patch-embed-client.mjs` (basepath, relative `./assets/`) → `generate-csr-index.mjs` (static `index.html` shell, no Nitro SSR fetch) → `patch-embed.mjs` (manifest / SW scope) → `vendor.mjs` rsync to `../dsapatterns-website/public/games/<slug>/`.
-- **Never set `VITE_E2E` at build** — build script deletes it; auto-win is runtime `?e2e=1` only.
-- Preview all thirteen: `node scripts/games/embed-preview-server.mjs` on port 5299; Playwright `baseURL` points there.
-- **Deploy:** after vendoring, in dsapatterns-website run `npm test && npm run test:e2e`, commit `public/games/`, push `main` (+ `main:master` mirror if used). Cloudflare Workers SPA fallback via `wrangler.jsonc` `not_found_handling`; purge CDN for `/` and `/games/*` if shell references stale JS hashes.
+- **`build-all-embeds.mjs`** orchestrates every slug in `EMBED_GAMES`: `DSAPATTERNS_EMBED=1` Vite build (`ssr: false`) → copy `.output/public` → `dist/client` → `patch-embed-client.mjs` (basepath, relative `./assets/`) → `generate-csr-index.mjs` (static `index.html` shell, no Nitro SSR fetch) → `patch-embed.mjs` (manifest / SW scope) → `vendor.mjs` rsync to `../dsapatterns-website/public/games/<slug>/`.
+- **Never set `VITE_E2E` at build** — build script deletes it; auto-win is runtime `?e2e=1` only. Production no-auto-win e2e must hit **real** play/mode URLs without baking e2e into the bundle.
+- Preview catalog: `node scripts/games/embed-preview-server.mjs` on port 5299; Playwright `baseURL` points there.
+- **Upstream-first:** screenshot / bug from dsapatterns embeds or Android shells → fix in **Ranbhoomi / Bharat Brawlers** first, rebuild, then vendor. Do not patch only the host `public/games/` copy.
+- **Deploy:** after vendoring, in dsapatterns-website run `npm test` (+ e2e as needed), commit `public/games/` + hub/SEO if catalog changed, push **`main` then FF-sync `master`** (`git merge --ff-only` — never force-overwrite). Cloudflare: git push alone may not refresh Workers — run `npm run build` + `wrangler versions upload` when Git integration is not the sole deploy path; purge CDN for `/` and `/games/*` if shells reference stale hashes.
 
 ### Verification checklist before push
 
 ```bash
-node --test tests/games/*.test.mjs                              # level count + solvability + CSR shell
-node scripts/games/build-all-embeds.mjs                         # all 13 dists + vendor (or SKIP_VENDOR=1)
-npx playwright test -c playwright.games.config.mjs e2e/games/campaign-5.spec.mjs   # levels/waves 1→5, all 13
-npx playwright test -c playwright.games.config.mjs e2e/games/campaign-15.spec.mjs  # levels 1→20: Choppa, GRID, ParkOS, Longbow
+node --test tests/games/registry-contracts.test.mjs tests/contracts/portfolio.test.mjs
+node scripts/games/build-all-embeds.mjs                         # EMBED_GAMES dists + vendor (or SKIP_VENDOR=1)
+npx playwright test -c playwright.games.config.mjs e2e/games/campaign-5.spec.mjs
+npx playwright test -c playwright.games.config.mjs e2e/games/no-auto-win.spec.mjs
 ```
 
 E2E `beforeEach`: clear `<slug>.progress` / `_epoch` keys in `localStorage`. Do **not** commit scratch scripts (`check_*.mjs`, `staged_diff.txt`) or `games/*/music/` source folders.
@@ -638,20 +653,27 @@ E2E `beforeEach`: clear `<slug>.progress` / `_epoch` keys in `localStorage`. Do 
 | Equalize dist verification | `dsapatterns-website` `scripts/verify-equalize-dist.mjs`, `package.json` `build` |
 | Honest security copy | `dsapatterns-website` `README.md` **Games** section |
 
-### Stale pitfalls (June 2026)
+### Stale pitfalls (June–July 2026)
 
 | Stale assumption | Reality |
 |------------------|---------|
-| "Five embed games" / Mind Pack hub | Thirteen games; `#games/mind-pack` redirects only |
-| "Eleven embed games" (June 2026) | Thirteen after Attack the Army + Lumen Circuit |
-| "15 levels per game" | 20+ minimum; Echo 30, Laser 30 |
+| "Five / eleven / thirteen embed games" | **Catalog = `EMBED_GAMES.length`** (10 after Lumen/Orbit/Ghost hard-delete); Mind Pack hub removed |
+| Standalone Lumen / Orbit / Ghost hub cards | Soft-archived → modes on Circuit / GRID / TimeTwin; redirects only |
+| "15 levels per game" | 20+ minimum for campaign puzzles; rush/endless differ |
 | `import from '../../../scripts/games/templates/...'` in game `src/` | Copy template into `src/lib/` per game |
 | `VITE_E2E=1` at build time | Runtime `?e2e=1` only; build deletes `VITE_E2E` |
 | BGM via WebAudio in `puzzleJuice.ts` | SFX = WebAudio; BGM = file loop (`bgm.ts`) **or** procedural (`proceduralBgm.ts` + `proceduralMusic/`) |
 | Separate `games-embed-hardening.mdc` on dsapatterns | Merged into this file §12 *Host site integration* + *Legacy Equalize* |
+| Android SKUs for archived standalones | Ship **flagships** (TimeTwin / Circuit / GRID); do not publish `lumencircuit` / `orbitdefense` / `ghostloop` as new listings |
 
 ### Recent Learnings (July 2026)
 
+- **Flagship mode consolidation (hard-delete standalones):** When two titles share a fantasy, **inline the secondary as `/modes/<name>`** under one flagship. **Learning**: (1) Keep mode source + unit tests. (2) Remove hub card, `public/games/<old>/`, embed + Android registry entries, SPA rewrite lists. (3) Add `LEGACY_GAME_SLUG_REDIRECTS` on **both** repos. (4) Retarget e2e/smoke/no-auto-win to mode URLs. (5) Challenge-relay payloads with `game: "lumen-circuit"` etc. must still resolve (storage keys / slug strings inside the mode may stay). Do **not** delete mode source because the hub card is gone.
+- **Win celebrate vs `prefers-reduced-motion`:** If reduced-motion dwell equals (or is shorter than) the solve-hold before chrome mounts, the win overlay never paints and players think the game soft-locked. **Learning**: Split **hold** (keep solved board visible) from **celebrate visibility** (`CELEBRATE_VISIBLE_MS` ≥ ~2–4s even under reduced motion, or skip hold under reduced motion). Probe with `?celebrateProbe=1` / e2e asserting overlay ≥2s. Do not reintroduce confetti/`delayMs=4000` plans that fight the dwell/hold design.
+- **Host shell height for mode lobbies:** Mode chrome + lobby CTAs need more vertical room than a bare canvas. **Learning**: Prefer ~**960px** floors / taller `clamp` on the host embed shell; verify Orbit/Lumen/Ghost mode home at 390×844 before calling mobile done.
+- **Audio dock steals taps:** Shared mute/volume dock at top or mid-rail overlaps Modes / Play on short viewports. **Learning**: Equalize-style bottom-right chip + lobby bottom padding; pause overlays own their mute controls when present.
+- **Catalog sync checklist:** One PR that changes the portfolio must touch registry, host `GamesSection` + SEO + routes, verify scripts, vercel/SPA slug lists, android registry + preview assertions, portfolio/registry contract tests, and ranking docs — or CI/host will disagree.
+- **Dual-branch deploy hygiene:** After push to `main`, FF-sync `master` (`fetch` → `merge --ff-only`); never force-push over remote commits. Vendor script often pushes DSA `main` only — sync `master` in the same session.
 - **Web Share API (`navigator.share`) vs Clipboard**: Silently falling back to `navigator.clipboard.writeText` when `navigator.share` fails or is unsupported (common on some desktop environments) creates a jarring UX. Users expect a native share sheet; getting a silent "Copied to clipboard" instead is confusing. **Learning**: Avoid silent fallbacks. If native share isn't reliably supported, either hide the share button entirely, or provide explicit, separate "Copy Link" and "Share" buttons so the user knows exactly what will happen.
 - **Physics-Based CPU Opponents (Tank Wars)**: Implementing CPU AI in physics/trajectory games (like Tank Wars) doesn't require complex analytical math with wind integration. **Learning**: Use **Monte-Carlo simulation** during the CPU's turn. Run the deterministic physics loop headlessly 50-100 times with random angle/power variations, pick the trajectory that gets closest to the player, and add a small random `noise` variable to the final parameters so the CPU isn't unfairly perfect.
 - **Embed auto-start when skipping tutorial levels**: Hiding the start overlay in embed (`isEmbedMode() && !isE2eMode()`) is not enough if the sim tick gates on `running === false` — users see a static canvas ("hung"). **Learning**: When embed auto-jumps to `START_LEVEL_INDEX > 0`, set `running = true` on mount in the same code path that hides the start screen. E2E must still use `?e2e=1` to begin at level 1 for `campaign-5`.
@@ -686,6 +708,6 @@ E2E `beforeEach`: clear `<slug>.progress` / `_epoch` keys in `localStorage`. Do 
 
 WebView/Capacitor packaging, Play Store graphics, five-theme checklist, Gradle sync, signing, and common WebView errors → **`convert-web-to-mobile.mdc`** (moved here from this file — single source of truth).
 
-**Bharat Brawlers (14 TanStack games):** one-command pipeline at `scripts/games/android/run.mjs`; theme/audio parity via `audit-parity.mjs` + `music-asset-manifest.json`; only claim “5 themes” in Play copy when `ThemeSwitcher` is visible within 120s (§13).
+**Bharat Brawlers:** one-command pipeline at `scripts/games/android/run.mjs` over `scripts/games/android/registry.mjs` (**catalog embeds only** — no archived Lumen/Orbit/Ghost SKUs). Theme/audio parity via `audit-parity.mjs` + `music-asset-manifest.json`; only claim “5 themes” in Play copy when `ThemeSwitcher` is visible within 120s (§13). Prefer releasing **flagships that include modes** (TimeTwin, Circuit Flow, GRID) over resurrecting deleted standalones.
 
 **Phase 8 — native shell & Play Vitals hardening** (when shipping WebView APKs): predictive back via `OnBackPressedDispatcher`, non-blocking `onCreate`, `IntentSanitizer` before external `startActivity`, `windowSoftInputMode="adjustResize"`, 16 KB NDK alignment if native libs are added, and `preBuild` Gradle asset sync for AGP 9. Enforced by `apply-native-hardening.mjs` / `audit-native-hardening.mjs` — see conversion rule §14 Phase 8 and skill `webapp-to-android` §5b–§7.
