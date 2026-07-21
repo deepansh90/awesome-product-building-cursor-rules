@@ -664,16 +664,16 @@ Output: `games/<Name>/dist/android-client/`. Gradle syncs this on next build (§
 
 | Property | Value |
 |----------|-------|
-| Keystore file | `Untitled.jks` — stored at `/Users/deepanshrawal/Documents/git/Untitled.jks` (outside repo — never commit) |
-| Key alias | **`equalize@1`** |
+| Keystore file | `equalize.jks` — stored at `/Users/deepanshrawal/Documents/git/Bharat Brawlers/games/Equalize/android/app/equalize.jks` (outside repo — never commit) |
+| Key alias | **`play3`** |
 | Store/key password | _(ask maintainer — store in a password manager)_ |
 
 #### Android Studio (recommended first time)
 
 1. **Build → Generate Signed Bundle / APK…**
 2. Select **Android App Bundle** → **Next**
-3. Key store path: browse to `Untitled.jks`
-4. Key alias: `equalize@1`  ·  Key store password & Key password: _(ask maintainer)_
+3. Key store path: browse to `equalize.jks`
+4. Key alias: `play3`  ·  Key store password & Key password: _(ask maintainer)_
 5. Build variant: **release** → **Finish**
 6. Output: `app/build/outputs/bundle/release/app-release.aab`
 
@@ -681,9 +681,9 @@ Output: `games/<Name>/dist/android-client/`. Gradle syncs this on next build (§
 
 ```bash
 # From repo root — builds web + signed AAB in one command
-KEYSTORE_PATH="/Users/deepanshrawal/Documents/git/Untitled.jks" \
+KEYSTORE_PATH="/Users/deepanshrawal/Documents/git/Bharat Brawlers/games/Equalize/android/app/equalize.jks" \
 KEYSTORE_PASSWORD="your-secure-password" \
-KEY_ALIAS="equalize@1" \
+KEY_ALIAS="play3" \
 KEY_PASSWORD="your-secure-password" \
 node scripts/games/android/run.mjs <slug> --web --gradle
 ```
@@ -692,7 +692,7 @@ Or Gradle directly from the game's `android/` dir:
 
 ```bash
 export KEYSTORE_PASSWORD="your-secure-password"
-export KEY_ALIAS="equalize@1"
+export KEY_ALIAS="play3"
 export KEY_PASSWORD="your-secure-password"
 cd games/<Name>/android
 ./gradlew :app:bundleRelease

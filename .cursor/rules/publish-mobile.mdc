@@ -185,20 +185,22 @@ Output: `games/<Name>/dist/android-client/`. Gradle syncs this on next build (§
 
 **Do not upload debug APKs to Play.** Use the **production keystore** (back up securely — loss = cannot update the app). Play Store requires **App Bundle (.aab)**, not APK.
 
-#### Production keystore (shared across all Bharat Brawlers games)
+#### Production keystore (canonical Play upload key)
 
 | Property | Value |
 |----------|-------|
-| Keystore file | `Untitled.jks` — stored at `/Users/deepanshrawal/Documents/git/Untitled.jks` (outside repo — never commit) |
-| Key alias | **`equalize@1`** |
-| Store/key password | _(ask maintainer — store in a password manager)_ |
+| Keystore file | `equalize.jks` — `/Users/deepanshrawal/Documents/git/Bharat Brawlers/games/Equalize/android/app/equalize.jks` (never commit) |
+| Key alias | **`play3`** |
+| Store/key password | _(ask maintainer — password manager / env only)_ |
+
+> Legacy `Untitled.jks` / alias `equalize@1` are retired. Equalize Play upload key was reset to `play3` (Jul 2026). Other Play apps still on the old upload cert need their own reset before this key can upload them.
 
 #### Android Studio (recommended first time)
 
 1. **Build → Generate Signed Bundle / APK…**
 2. Select **Android App Bundle** → **Next**
-3. Key store path: browse to `Untitled.jks`
-4. Key alias: `equalize@1`  ·  Key store password & Key password: _(ask maintainer)_
+3. Key store path: browse to `games/Equalize/android/app/equalize.jks`
+4. Key alias: `play3`  ·  Key store password & Key password: _(ask maintainer)_
 5. Build variant: **release** → **Finish**
 6. Output: `app/build/outputs/bundle/release/app-release.aab`
 
@@ -206,9 +208,9 @@ Output: `games/<Name>/dist/android-client/`. Gradle syncs this on next build (§
 
 ```bash
 # From repo root — builds web + signed AAB in one command
-KEYSTORE_PATH="/Users/deepanshrawal/Documents/git/Untitled.jks" \
+KEYSTORE_PATH="/Users/deepanshrawal/Documents/git/Bharat Brawlers/games/Equalize/android/app/equalize.jks" \
 KEYSTORE_PASSWORD="your-secure-password" \
-KEY_ALIAS="equalize@1" \
+KEY_ALIAS="play3" \
 KEY_PASSWORD="your-secure-password" \
 node scripts/games/android/run.mjs <slug> --web --gradle
 ```
@@ -217,7 +219,7 @@ Or Gradle directly from the game's `android/` dir:
 
 ```bash
 export KEYSTORE_PASSWORD="your-secure-password"
-export KEY_ALIAS="equalize@1"
+export KEY_ALIAS="play3"
 export KEY_PASSWORD="your-secure-password"
 cd games/<Name>/android
 ./gradlew :app:bundleRelease

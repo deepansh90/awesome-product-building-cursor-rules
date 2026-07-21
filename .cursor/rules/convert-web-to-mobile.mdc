@@ -413,7 +413,7 @@ tasks.named("preBuild").configure { dependsOn(syncGameWebAssets) }
 
 **`strings.xml`:** `game_url` = `https://appassets.androidplatform.net/assets/` (trailing slash, not `index.html`).
 
-### `SpaAssetsPathHandler` (SPA fallback + empty path)
+### `SpaAssetsPathHandlerkey` (SPA fallback + empty path)
 
 TanStack routes (`/play`, `/leaderboard`) and trailing-slash entry URLs need `index.html` fallback. **Use paths without a leading slash** for `AssetsPathHandler.handle`.
 
@@ -440,7 +440,7 @@ Register: `.addPathHandler("/assets/", SpaAssetsPathHandler(this))`.
 
 ### Repo hygiene
 
-Gitignore per shell: `**/android/.gradle/`, `**/android/local.properties`, `**/android/app/release-key.keystore`, `**/android/**/build/`.
+Gitignore per shell: `**/android/.gradle/`, `**/android/local.properties`, `**/android/app/release-key.keystore`, `**/android/app/equalize.jks`, `**/android/app/*.jks`, `**/android/app/upload_certificate.pem`, `**/android/**/build/`.
 
 **Launcher icons:** resize `playstore-icon.png` per mipmap density (`resize-launcher-icons.mjs` / `sips`) — do not copy one 500KB PNG into every `mipmap-*` folder.
 
@@ -597,7 +597,25 @@ Canonical Kotlin/manifest snippets: `Bharat Brawlers/scripts/games/android/nativ
 | Signed AAB, Play listing, Studio publish, ASO | `publish-mobile.mdc` |
 
 ## Android Keystore Best Practices
-- **Shared Keystore for Local Testing:** When a production `Untitled.jks` is missing or the password is unknown, use a dummy keystore `shared-release-key.keystore` generated with `-alias equalize@1` and password `dummy123`.
-- **build.gradle.kts:** Ensure that all games' `build.gradle.kts` files use `keyAlias = System.getenv("KEY_ALIAS") ?: "equalize@1"` and `storePassword = System.getenv("KEYSTORE_PASSWORD") ?: "dummy123"` to seamlessly support this fallback.
-- **Do not commit production secrets**: Ensure `Untitled.jks` is never committed. 
-- Avoid overriding or replacing keystores in individual game apps manually if `scripts/games/android/run.mjs` handles the copying. 
+
+### Production Play upload key (canonical — Equalize reset Jul 2026)
+
+| Property | Value |
+|----------|-------|
+| **Keystore path** | `/Users/deepanshrawal/Documents/git/Bharat Brawlers/games/Equalize/android/app/equalize.jks` |
+| **Repo-relative** | `games/Equalize/android/app/equalize.jks` |
+| **Key alias** | **`play3`** |
+| **Passwords** | Never commit — password manager / env only (`KEYSTORE_PASSWORD`, `KEY_PASSWORD`) |
+
+Export PEM for Play upload-key reset:
+
+```bash
+cd games/Equalize/android/app
+keytool -export -rfc -keystore equalize.jks -alias play3 -file upload_certificate.pem
+```
+
+- **Do not** use legacy alias `equalize@1` or lost `Untitled.jks` for new Equalize uploads.
+- **Gitignore** `equalize.jks`, `*.jks`, `upload_certificate.pem`, `release-key.keystore` under `android/app/`.
+- **Local/CI fallback only:** `scripts/games/android/shared-release-key.keystore` with alias `play3` / password `dummy123` when production `.jks` is absent — not for Play.
+- **build.gradle.kts:** `keyAlias = System.getenv("KEY_ALIAS") ?: "play3"`; prefer copying canonical `equalize.jks` via `KEYSTORE_PATH` / `build-native.mjs`.
+- Avoid hand-editing per-game keystores when `run.mjs` copies the canonical file into `release-key.keystore`.

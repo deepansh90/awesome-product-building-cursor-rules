@@ -136,7 +136,7 @@ override fun handle(path: String): WebResourceResponse? {
 | `basepath` → `./assets/` after patch | Restore `basepath:"/assets/"` in patch-client |
 | Wrong Gradle sync path | `../../dist/android-client` from `app/` module |
 | Claim themes on Play without UI | ThemeSwitcher visible on home within 120s |
-| Test keystore on Play | `dummy123` is local only — production keystore per app |
+| Test keystore on Play | `dummy123` is local only — Play upload key is `games/Equalize/android/app/equalize.jks` alias **`play3`** |
 | WebView slow/choppy animation | Missing `<application android:hardwareAccelerated="true">` in manifest |
 
 ---
