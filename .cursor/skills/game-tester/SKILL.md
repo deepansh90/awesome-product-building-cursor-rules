@@ -93,11 +93,14 @@ Each persona returns **P0/P1/P2** with `file:line` evidence. Parent synthesizes;
 
 ## 2. Live playtest (≥10 minutes)
 
-Serve DSA public (or Vite preview), then Playwright or browser MCP:
+Prefer a real browser (Playwright or browser MCP). If browser tools fail, fall back to **deep static analysis** of assigned game React/HTML under `$RANBHOOMI/games/` — still emit P0/P1/P2 with `file:line`.
+
+Serve options:
 
 ```bash
-# example static serve
+# Vendored embeds (DSA public) — recommended for ship verification
 cd "$DSA" && npx --yes serve public -l 4177
+# Dev hub (if Vite already running): http://localhost:5173/games/<slug>/
 ```
 
 Requirements:
