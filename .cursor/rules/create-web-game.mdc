@@ -527,7 +527,7 @@ Vendored static bundles live under `public/games/<slug>/`. The React shell is `s
 
 - **Width:** responsive cap on the games column (`60vw`, `max-w-[900px]`, centered).
 - **Height:** stable block so in-iframe CTAs / mode lobbies are not clipped. Host mobile shell often needs **≥ ~960px** effective game height (or `min-h` + `max-h` clamp) — short shells clip Orbit/GRID lobbies and rush home chrome. Prefer `h-[clamp(…)]` / `100dvh` floors; tune per title after screenshot at 390×844.
-- **`iframeSrc`:** TanStack CSR embeds use `'/games/<slug>/'` (trailing slash helps SPA entry resolve). Legacy Equalize uses `'/games/equalize/equalize.html'`.
+- **`iframeSrc` / registry `iframePath` — lobby roots only:** TanStack CSR embeds use `'/games/<slug>/'` (trailing slash). Legacy Equalize: `'/games/equalize/equalize.html'`. **Never** hub-iframe `/play`, `/campaign`, or `/rush/*` — those are client routes, not static files; on Cloudflare they fall through to the **parent DSA SPA** and show the cheat sheet inside the game frame. First emotion = lobby CTAs *inside* the game after lobby load. Contracts: Ranbhoomi `fleet-hub-fixes.test.mjs` + DSA `hub-iframe-titles.test.mjs`. Rule: `hub-iframe-lobby-roots.mdc`.
 
 #### Host games page — mobile iframe visibility
 
@@ -689,7 +689,7 @@ E2E `beforeEach`: clear `<slug>.progress` / `_epoch` keys in `localStorage`. Do 
 - **Difficulty budgets with flat penalties**: When calculating dynamic level difficulty budgets (e.g. scores or time), a purely multiplicative modifier (like 2x moves) mathematically breaks when the game has flat penalties (like a -500 score drop). Multiplicative budgets give long levels massive buffers while giving short levels zero margin for error. **Learning**: Use a **hybrid formula**: `(Cost * Multiplier) + Flat Armor`. The multiplier (e.g., `1.25x`) gives percentage leeway for wandering, and the `Flat Armor` (e.g., `+1000` points) ensures players can always absorb exactly N flat penalties on ANY level length. **Specific Example**: In Equalize, a "2x budget" gave a 4-move level only 120 points of buffer—meaning one undo (-300) resulted in game over. Changing the formula to `(optimalMoves * 30 * 1.25) + 1000` guaranteed every level had enough armor to survive exactly 2 illegal moves (-500 each).
 - **Embed CSS vs touch:** Per-game `*-embed.css` can shrink shared chrome below 44px — audit computed size in the iframe, not source Tailwind alone.
 - **Unused engine mechanics:** If filters/splitters/etc. already exist in the engine (Optic), ship levels that use them before inventing new systems or deleting the title.
-- **Hub first emotion:** Registry `iframePath` / host iframeSrc should land on lobby or campaign first emotion — not buried rush/survival unless intentional.
+- **Hub iframe ≠ deep first emotion (Jul 2026 incident):** Pointing hub `iframeSrc` at `/play`, `/campaign`, or `/rush/blitz` made dsapatterns.io load the **website** inside the game iframe. **Learning:** hub + `iframePath` = **lobby roots only** (`/games/<slug>/`). Put Campaign/Rush CTAs on the game lobby. Keep Ranbhoomi and DSA hub tests aligned (never let one assert deep links while the other asserts lobby roots). Playtest must open `#games/<slug>` and assert in-frame game brand, not DSA chrome.
 
 | Tag | Topics |
 |-----|--------|

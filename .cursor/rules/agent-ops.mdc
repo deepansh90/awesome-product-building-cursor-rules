@@ -104,6 +104,7 @@ Skip only when the user explicitly says to work offline / ignore remote, or when
 
 - **Upstream-first:** fix embeds / WebView bugs in the game monorepo (e.g. Ranbhoomi), rebuild, then vendor to the host and regenerate Android — do not patch only `public/games/` or a one-off APK asset tree.
 - **Catalog as source of truth:** portfolio size and slugs come from the embed registry; host hub, SEO, SPA rewrites, Android registry, and contract tests must change in the same change-set.
+- **Hub iframe lobby roots only:** host `GamesSection` `iframeSrc` and registry `iframePath` must be `/games/<slug>/` (not `/play` `/campaign` `/rush/*`) or the parent SPA loads inside the game iframe. See `hub-iframe-lobby-roots.mdc`.
 - **Branch pairs:** when both `main` and `master` exist, push `main` then **fast-forward** `master` — never force-overwrite remote tips. Details → `create-web-game.mdc` §12.
 
 ## What this rule does not cover

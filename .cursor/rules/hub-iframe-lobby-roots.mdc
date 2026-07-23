@@ -1,0 +1,43 @@
+---
+description: DSA hub iframeSrc / Ranbhoomi iframePath must be lobby roots only — deep routes load parent SPA in-frame
+alwaysApply: true
+---
+
+# Hub iframe = lobby roots only
+
+**Incident (Jul 2026):** Hub `iframeSrc` used `/play`, `/campaign`, `/rush/blitz`. On dsapatterns.io those paths are not static files → Cloudflare/SPA fallthrough served the **parent website** (cheat sheet) inside the game iframe.
+
+## Hard rule
+
+| Surface | Allowed `src` / `iframePath` |
+|---------|--------------------------------|
+| DSA `GamesSection.jsx` `iframeSrc` | `/games/<slug>/` only (Equalize: `/games/equalize/equalize.html`) |
+| Ranbhoomi `EMBED_GAMES[].iframePath` | Same lobby root — never deep client routes |
+
+```text
+✅ /games/optic-beam-puzzle/
+✅ /games/grid-tower-defense/
+✅ /games/arrow-rush/
+❌ /games/optic-beam-puzzle/play
+❌ /games/grid-tower-defense/campaign
+❌ /games/arrow-rush/rush/blitz
+```
+
+**First emotion** = lobby CTAs *inside* the game after lobby loads — not hub iframe deep-links.
+
+## Contracts that must stay green
+
+- Ranbhoomi: `tests/games/fleet-hub-fixes.test.mjs` — lobby-root only
+- DSA: `tests/hub-iframe-titles.test.mjs` — forbids `/play|/rush/|/campaign` in hub iframeSrc
+
+## Playtest / ship gate
+
+Before claiming games hub OK: open `#games/<slug>`, assert iframe `src` is lobby root **and** iframe document is the game shell (brand in title/body), not DSA site chrome.
+
+## Do not
+
+- “Fix first emotion” by pointing hub iframe at `/play` or `/campaign`
+- Let DSA hub tests assert deep links while Ranbhoomi asserts lobby roots
+- Playtest only `/games/<slug>/` and skip hub `#games/<slug>` iframe checks
+
+Details → `create-web-game.mdc` §12 · `game-tester` skill · `docs/embed-dsapatterns.md`
