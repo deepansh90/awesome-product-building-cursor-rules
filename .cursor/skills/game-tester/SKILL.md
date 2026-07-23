@@ -100,7 +100,7 @@ Launch **3+ subagents** with isolated prompts. Ground each in RULES + Pro Max hi
 | **Mobile Optimizer** | `convert-web-to-mobile.mdc`, embed-game-ui.css + Pro Max touch/web | Patchwork, ArrowRush, Grid TD, Equalize | Safe-area; **≥44×44** hit (`min-h/min-w`, not padding alone); **≥8px** gaps; no hover-only; no `w-6`/`h-6` icon-only chrome; dock vs fragmented chrome; Undo border when disabled; check **embed CSS cascade** (`dsapatterns-*-embed.css` + game `embed-game-ui.css`), not only Tailwind `min-h`/`min-w` |
 | **Game Designer** | `create-web-game.mdc`, incubation / Jobs HUD | Equalize, TimeTwin, Helicopter, Sanctum/Orbit | Minimal HUD; first-session teach; fail/win juice; pacing; max **1–2** key motions that don't block input |
 | **UI/UX Critic** | `product-excellence.mdc` Rams + Pro Max Quick Ref | Train Panic, Optic, Tank Wars, Circuit, Crush | Contrast **4.5:1**; icon-only `aria-label`; `prefers-reduced-motion`; bottom nav **≤5**; predictable back + modal dismiss; Lucide/Heroicons (no emoji chrome); style clash vs Equalize dock |
-| **SEO / Hub** (optional) | `seo-gtm.mdc` | embed-registry + GAME_BRIEF | displayName parity; levelCount truth; iframePath = first emotion |
+| **SEO / Hub** (optional) | `seo-gtm.mdc` | embed-registry + GAME_BRIEF | displayName parity; levelCount truth; **iframePath / hub iframeSrc = lobby roots only** (`/games/<slug>/`) — never `/play`, `/campaign`, `/rush/*` |
 
 ### Pro Max → fleet chrome (UI/UX Critic + Mobile)
 
@@ -123,6 +123,7 @@ Prior fleet findings (re-check when relevant):
 - Equalize footer = reference dock (Home · Sound · Undo · Reset · Theme)
 - Fleet BR theme/vol pill vs in-board actions = unify over time
 - Sanctum nested routes (`/campaign`): SPA fallback smoke — DSA `serve.json` and/or CF/Vercel rewrite; plain `npx serve` without SPA = 404 P0
+- **Hub iframe deep links load DSA cheat sheet in-frame (P0):** hub `iframeSrc` / registry `iframePath` must be **lobby roots only** (`/games/<slug>/`). Never `/play`, `/campaign`, `/rush/*` in the hub iframe — on dsapatterns.io those paths are not static files and CF/SPA fallthrough serves the **parent DSA SPA** inside the game iframe. Cross-repo: DSA `GamesSection` iframeSrc must match Ranbhoomi `EMBED_GAMES` iframePath lobby contract. Playtest must open hub `#games/<slug>`, assert iframe `src` is lobby root **and** iframe document is the game shell (title/body contains game brand), not DSA cheat-sheet chrome
 
 Each persona returns **P0/P1/P2** with `file:line` (+ search cite). Incomplete agents (1–2 lines, no severity) → **re-run**. Parent synthesizes; prefer a Cursor Canvas for the aggregated report.
 
@@ -160,7 +161,8 @@ Requirements:
 - Visit **≥ 8** slugs (rotate): equalize, patchwork, arrow-rush, grid-tower-defense, time-twin, crush-the-cups, train-panic, circuit-flow, optic-beam-puzzle, helicopter-rush, tank-wars
 - Per visit: dismiss tutorial → poke board/canvas → try Undo/Hint/Reset → Theme/Mute if present → screenshot
 - Record: dock present? theme btn count? audio btn count? undo border/disabled ghost? pageerrors? deep-link 404s?
-- Deep-link at least one nested SPA route (e.g. `/games/grid-tower-defense/campaign`) when using `serve`; expect SPA fallback not 404
+- **Hub iframe contract:** for each visited slug, open hub `#games/<slug>`, assert iframe `src` is lobby root (`/games/<slug>/` or `equalize.html`) **and** iframe document is game shell (title/body contains game brand) — not DSA cheat-sheet chrome
+- Deep-link at least one nested SPA route (e.g. `/games/grid-tower-defense/campaign`) when using `serve` **directly** (not as hub iframeSrc); expect SPA fallback not 404
 
 **Pro Max playtest add-ons:**
 
@@ -277,6 +279,8 @@ Non-ff `main:master` → stop; no `--force` unless user asks.
 ❌ Re-implementing walkthrough items without re-checking HEAD
 ❌ Auditing Tailwind touch mins while ignoring embed CSS rem overrides
 ❌ Flagging ThemeSwitcher 44px when shared embed-game-ui already sets 2.75rem
+❌ Hub iframeSrc / registry iframePath with `/play`, `/campaign`, or `/rush/*` (CF/static fallthrough → parent DSA SPA in frame)
+❌ Playtest that only hits `/games/<slug>/` directly and never asserts hub `#games/<slug>` iframe src + in-frame game brand
 ```
 
 ## Related
