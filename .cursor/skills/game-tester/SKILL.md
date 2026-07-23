@@ -120,7 +120,7 @@ Prior fleet findings (re-check when relevant):
 - **Embed CSS overrides touch:** measure computed size with `dsapatterns-*-embed.css` + game `embed-game-ui.css` together — rem caps (`2rem`/`2.5rem`) can beat source 44px (Crush)
 - **ThemeSwitcher false P0:** do not flag "needs 44px" if shared `.btn-theme-switcher` already has min ≥ `2.75rem` — verify computed size
 - Patchwork Undo: never `disabled:border-transparent` — keep chip stroke
-- Equalize footer = reference dock (Home · Sound · Undo · Reset · Theme)
+- Equalize footer = **reference** dock (Home · Sound · Undo · Reset · Theme) — **reference ≠ require** an identical 5-button bar on every title; fleet default remains BR Theme+Audio chips, migrate toward Equalize over time
 - Fleet BR theme/vol pill vs in-board actions = unify over time
 - Sanctum nested routes (`/campaign`): SPA fallback smoke — DSA `serve.json` and/or CF/Vercel rewrite; plain `npx serve` without SPA = 404 P0
 - **Hub iframe deep links load DSA cheat sheet in-frame (P0):** hub `iframeSrc` / registry `iframePath` must be **lobby roots only** (`/games/<slug>/`). Never `/play`, `/campaign`, `/rush/*` in the hub iframe — on dsapatterns.io those paths are not static files and CF/SPA fallthrough serves the **parent DSA SPA** inside the game iframe. Cross-repo: DSA `GamesSection` iframeSrc must match Ranbhoomi `EMBED_GAMES` iframePath lobby contract. Playtest must open hub `#games/<slug>`, assert iframe `src` is lobby root **and** iframe document is the game shell (title/body contains game brand), not DSA cheat-sheet chrome
@@ -162,7 +162,7 @@ Requirements:
 - Per visit: dismiss tutorial → poke board/canvas → try Undo/Hint/Reset → Theme/Mute if present → screenshot
 - Record: dock present? theme btn count? audio btn count? undo border/disabled ghost? pageerrors? deep-link 404s?
 - **Hub iframe contract:** for each visited slug, open hub `#games/<slug>`, assert iframe `src` is lobby root (`/games/<slug>/` or `equalize.html`) **and** iframe document is game shell (title/body contains game brand) — not DSA cheat-sheet chrome
-- Deep-link at least one nested SPA route (e.g. `/games/grid-tower-defense/campaign`) when using `serve` **directly** (not as hub iframeSrc); expect SPA fallback not 404
+- Deep-link at least one nested SPA route (e.g. `/games/grid-tower-defense/campaign`) when using `serve` **directly** — **not** as hub `iframeSrc` (hub stays lobby roots); expect SPA fallback not 404
 
 **Pro Max playtest add-ons:**
 

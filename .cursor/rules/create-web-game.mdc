@@ -453,20 +453,25 @@ Reference implementation: TanStack Start CSR games vendored to `public/games/<sl
 
 ### Embed inventory (July 2026 — post flagship consolidation)
 
-**Hub / vendor / Android catalog = 10 embeds** (+ Equalize + Ranbhoomi brawler on the host). Soft-archived standalones live as **inlined modes** — not separate hub cards or `public/games/<archived>/` trees.
+**Hub / vendor / Android catalog = 11 embeds** (`EMBED_GAMES.length` SoT) (+ Equalize + Ranbhoomi brawler on the host — not in the embed count). Soft-archived standalones live as **inlined modes** — not separate hub cards or `public/games/<archived>/` trees.
+
+**Soft-archive** = remove hub / `public/games/<slug>/` / registry SKU; **keep mode source**. Hard-delete hub artifacts ≠ delete mode trees.
 
 | Display name | Slug | Notes |
 |--------------|------|--------|
 | TimeTwin | `time-twin` | Flagship; GhostLoop mode at `/modes/ghost` |
 | Circuit Flow | `circuit-flow` | Flagship; Lumen mode at `/modes/lumen` |
-| Optic Beam Puzzle | `optic-beam-puzzle` | |
+| Optic | `optic-beam-puzzle` | |
 | Train Panic | `train-panic` | |
 | Helicopter Rush | `helicopter-rush` | |
-| GRID Tower Defense | `grid-tower-defense` | Flagship; Orbit mode at `/modes/orbit` |
+| Sanctum Defense | `grid-tower-defense` | Flagship; Orbit mode at `/modes/orbit` |
 | Tank Wars | `tank-wars` | |
 | Crush the Cups | `crush-the-cups` | legacy slug `crush-the-swappy` |
-| Attack the Army | `attack-the-army` | |
-| Arrow Puzzle Rush | `arrow-puzzle-rush` | legacy `jobsian-joy` / `arrow-time` |
+| Last Line | `attack-the-army` | |
+| ArrowRush | `arrow-rush` | legacy `arrow-puzzle-rush` / `jobsian-joy` / `arrow-time` |
+| Patchwork | `patchwork` | |
+
+**Equalize dock (reference ≠ fleet mandate):** Equalize’s 5-icon footer is **reference quality**. Fleet TanStack default = BR Theme+Audio chips — migrate toward Equalize over time; do **not** require an identical 5-button bar on every title.
 
 **Archived standalones (redirect only — no hub card, no public embed, no Android SKU):**
 
@@ -478,7 +483,7 @@ Reference implementation: TanStack Start CSR games vendored to `public/games/<sl
 
 Keep **source trees** (`games/Lumen circuit`, `Bloons Vision`, `GhostLoop`) for mode sync / unit tests. Hard-delete = hub + `public/games/<slug>/` + embed/android registries + SPA rewrite lists — **not** mode source.
 
-**GRID** (ASCII roguelike TD) and **Orbit** (path TD) remain distinct *fantasies*; Orbit is no longer a separate hub SKU.
+**Sanctum Defense** / GRID (ASCII roguelike TD) and **Orbit** (path TD) remain distinct *fantasies*; Orbit is no longer a separate hub SKU.
 
 Slugs are stable for bookmarks/CDN. Legacy hashes redirect via `LEGACY_GAME_SLUG_REDIRECTS` in both Bharat `embed-registry.mjs` and dsapatterns `routes.js` (keep both maps aligned).
 
@@ -489,9 +494,9 @@ Slugs are stable for bookmarks/CDN. Legacy hashes redirect via `LEGACY_GAME_SLUG
 Use `GAMES_RANKING.md` — invest in flagships that absorb modes; do not polish archived standalones as separate products.
 
 - **Tier A:** TimeTwin, Crush the Cups — clearest hooks + modes.
-- **Tier B:** Tank Wars, Optic Beam, Arrow Puzzle Rush.
-- **Tier C:** Circuit Flow (+ Lumen), Train Panic, Helicopter Rush, Attack the Army.
-- **Tier D:** GRID (+ Orbit) — deep strategy; ship after A–C unless Orbit coverage is the goal.
+- **Tier B:** Tank Wars, Optic, ArrowRush.
+- **Tier C:** Circuit Flow (+ Lumen), Train Panic, Helicopter Rush, Last Line, Patchwork.
+- **Tier D:** Sanctum Defense (+ Orbit) — deep strategy; ship after A–C unless Orbit coverage is the goal.
 
 ### Viral hooks (client-only — no server leaderboards)
 
@@ -556,6 +561,7 @@ Vendored static bundles live under `public/games/<slug>/`. The React shell is `s
 
 - `vercel.json` may rewrite `/games/<slug>/*` so deep links (e.g. `/play`) serve the **game** shell, not the marketing SPA.
 - **Cloudflare Workers** static hosting uses `wrangler.jsonc` `not_found_handling: single-page-application` for the **main** site — nested game SPAs may still need equivalent routing or path-specific rules; test live deep links after deploy and purge CDN for `/games/*` when hashes look stale.
+- **Host hub `iframeSrc` must still be lobby roots only** (`hub-iframe-lobby-roots.mdc`) — SPA rewrites for direct `/games/<slug>/campaign` smoke do **not** authorize deep hub `iframeSrc`.
 
 ### Iframe height — critical UI above the fold (game-side)
 
@@ -657,7 +663,7 @@ E2E `beforeEach`: clear `<slug>.progress` / `_epoch` keys in `localStorage`. Do 
 
 | Stale assumption | Reality |
 |------------------|---------|
-| "Five / eleven / thirteen embed games" | **Catalog = `EMBED_GAMES.length`** (10 after Lumen/Orbit/Ghost hard-delete); Mind Pack hub removed |
+| "Five / eleven / thirteen embed games" | **Catalog = `EMBED_GAMES.length`** (`EMBED_GAMES.length` — currently 11); Mind Pack hub removed |
 | Standalone Lumen / Orbit / Ghost hub cards | Soft-archived → modes on Circuit / GRID / TimeTwin; redirects only |
 | "15 levels per game" | 20+ minimum for campaign puzzles; rush/endless differ |
 | `import from '../../../scripts/games/templates/...'` in game `src/` | Copy template into `src/lib/` per game |

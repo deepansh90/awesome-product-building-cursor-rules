@@ -15,3 +15,6 @@ Hub iframes used deep SPA paths (`/play`, `/campaign`, `/rush/blitz`). On dsapat
 - RULES: `hub-iframe-lobby-roots.mdc` (alwaysApply), `create-web-game.mdc` §12, `agent-ops.mdc`, `game-tester` skill
 - Ranbhoomi: `.cursorrules`, `fleet-hub-fixes.test.mjs`, `embed-registry.mjs`
 - DSA: `hub-iframe-titles.test.mjs`, `GamesSection.jsx`
+
+## SEO / docs trap
+SEO and host docs must **not** say “deep paths OK with rewrites” for **hub** `iframeSrc` / `iframePath`. Rewrites help direct URL smoke only; the hub contract stays lobby roots (`hub-iframe-lobby-roots.mdc`).

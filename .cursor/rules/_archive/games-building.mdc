@@ -2,6 +2,9 @@
 description: Game development — engine/shell split, determinism, screens/embeds, host iframe hardening, PWA, testing; tagged optional sections
 alwaysApply: false
 ---
+
+> SUPERSEDED by create-web-game.mdc §12. Do not follow catalog counts in this archive.
+
 # Game Development
 
 **Intent:** Build any game genre (action, puzzle, idle, narrative) with optional determinism, embeds, and PWA — not general marketing site routing (see `website-building.mdc`). UI policy on all surfaces → `universal-product.mdc` §2a.

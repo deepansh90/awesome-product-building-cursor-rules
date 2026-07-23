@@ -413,7 +413,7 @@ tasks.named("preBuild").configure { dependsOn(syncGameWebAssets) }
 
 **`strings.xml`:** `game_url` = `https://appassets.androidplatform.net/assets/` (trailing slash, not `index.html`).
 
-### `SpaAssetsPathHandlerkey` (SPA fallback + empty path)
+### `SpaAssetsPathHandler` (SPA fallback + empty path)
 
 TanStack routes (`/play`, `/leaderboard`) and trailing-slash entry URLs need `index.html` fallback. **Use paths without a leading slash** for `AssetsPathHandler.handle`.
 
