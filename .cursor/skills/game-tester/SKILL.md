@@ -97,7 +97,7 @@ Launch **3+ subagents** with isolated prompts. Ground each in RULES + Pro Max hi
 
 | Persona | Rules / skill | Games (split catalog) | Must check |
 |---------|---------------|------------------------|------------|
-| **Mobile Optimizer** | `convert-web-to-mobile.mdc`, embed-game-ui.css + Pro Max touch/web | Patchwork, ArrowRush, Grid TD, Equalize | Safe-area; **≥44×44** hit (`min-h/min-w`, not padding alone); **≥8px** gaps; no hover-only; no `w-6`/`h-6` icon-only chrome; dock vs fragmented chrome; Undo border when disabled |
+| **Mobile Optimizer** | `convert-web-to-mobile.mdc`, embed-game-ui.css + Pro Max touch/web | Patchwork, ArrowRush, Grid TD, Equalize | Safe-area; **≥44×44** hit (`min-h/min-w`, not padding alone); **≥8px** gaps; no hover-only; no `w-6`/`h-6` icon-only chrome; dock vs fragmented chrome; Undo border when disabled; check **embed CSS cascade** (`dsapatterns-*-embed.css` + game `embed-game-ui.css`), not only Tailwind `min-h`/`min-w` |
 | **Game Designer** | `create-web-game.mdc`, incubation / Jobs HUD | Equalize, TimeTwin, Helicopter, Sanctum/Orbit | Minimal HUD; first-session teach; fail/win juice; pacing; max **1–2** key motions that don't block input |
 | **UI/UX Critic** | `product-excellence.mdc` Rams + Pro Max Quick Ref | Train Panic, Optic, Tank Wars, Circuit, Crush | Contrast **4.5:1**; icon-only `aria-label`; `prefers-reduced-motion`; bottom nav **≤5**; predictable back + modal dismiss; Lucide/Heroicons (no emoji chrome); style clash vs Equalize dock |
 | **SEO / Hub** (optional) | `seo-gtm.mdc` | embed-registry + GAME_BRIEF | displayName parity; levelCount truth; iframePath = first emotion |
@@ -116,10 +116,13 @@ Launch **3+ subagents** with isolated prompts. Ground each in RULES + Pro Max hi
 
 Prior fleet findings (re-check when relevant):
 
+- **External walkthroughs** (Gemini/Antigravity/etc.): re-validate every item against **current HEAD** before implementing — most are often already fixed
+- **Embed CSS overrides touch:** measure computed size with `dsapatterns-*-embed.css` + game `embed-game-ui.css` together — rem caps (`2rem`/`2.5rem`) can beat source 44px (Crush)
+- **ThemeSwitcher false P0:** do not flag "needs 44px" if shared `.btn-theme-switcher` already has min ≥ `2.75rem` — verify computed size
 - Patchwork Undo: never `disabled:border-transparent` — keep chip stroke
 - Equalize footer = reference dock (Home · Sound · Undo · Reset · Theme)
 - Fleet BR theme/vol pill vs in-board actions = unify over time
-- Sanctum nested routes need SPA fallback smoke
+- Sanctum nested routes (`/campaign`): SPA fallback smoke — DSA `serve.json` and/or CF/Vercel rewrite; plain `npx serve` without SPA = 404 P0
 
 Each persona returns **P0/P1/P2** with `file:line` (+ search cite). Incomplete agents (1–2 lines, no severity) → **re-run**. Parent synthesizes; prefer a Cursor Canvas for the aggregated report.
 
@@ -157,6 +160,7 @@ Requirements:
 - Visit **≥ 8** slugs (rotate): equalize, patchwork, arrow-rush, grid-tower-defense, time-twin, crush-the-cups, train-panic, circuit-flow, optic-beam-puzzle, helicopter-rush, tank-wars
 - Per visit: dismiss tutorial → poke board/canvas → try Undo/Hint/Reset → Theme/Mute if present → screenshot
 - Record: dock present? theme btn count? audio btn count? undo border/disabled ghost? pageerrors? deep-link 404s?
+- Deep-link at least one nested SPA route (e.g. `/games/grid-tower-defense/campaign`) when using `serve`; expect SPA fallback not 404
 
 **Pro Max playtest add-ons:**
 
@@ -216,6 +220,8 @@ EOF
 git fetch origin && git push origin main && git push origin main:master
 ```
 
+**RULES repo:** push `main` only (no `main:master` unless a `master` branch exists and is documented).
+
 Non-ff `main:master` → stop; no `--force` unless user asks.
 
 ---
@@ -268,6 +274,9 @@ Non-ff `main:master` → stop; no `--force` unless user asks.
 ❌ Force-push main/master
 ❌ Skip 44–48px check on canvas-overlay HTML controls
 ❌ Strip borders on disabled Undo/Hint (looks "broken")
+❌ Re-implementing walkthrough items without re-checking HEAD
+❌ Auditing Tailwind touch mins while ignoring embed CSS rem overrides
+❌ Flagging ThemeSwitcher 44px when shared embed-game-ui already sets 2.75rem
 ```
 
 ## Related
