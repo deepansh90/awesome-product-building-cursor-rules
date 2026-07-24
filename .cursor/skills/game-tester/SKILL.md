@@ -5,8 +5,8 @@ description: >-
   search bootstrap, multi-persona UI/gameplay audit (mobile, game design, UX),
   live playtest ≥10 minutes across games, unit/e2e regression, rebuild DSA embeds
   + Android web, then push main and fast-forward master on Ranbhoomi + dsapatterns.
-  Use when the user asks for game-tester, regression ship, playtest, fleet UI
-  audit, or regenerate DSA/Android games.
+  Use when the user asks for game-tester, /game-tester, regression ship, playtest,
+  fleet UI audit, or regenerate DSA/Android games.
 ---
 
 # game-tester
