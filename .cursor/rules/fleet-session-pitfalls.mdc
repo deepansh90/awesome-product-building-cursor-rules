@@ -19,6 +19,10 @@ Lessons from Jul 2026 agent sessions. Follow these to avoid repeat failures.
 
 Lobby roots only: `/games/<slug>/` — never hub `iframeSrc` `/play`, `/campaign`, `/rush/*` (loads parent DSA SPA). See `hub-iframe-lobby-roots.mdc`.
 
+- Playtest **embeds**: `npx serve public -l 4177` (game shells under `/games/<slug>/`).
+- Playtest **hub `#games/<slug>` iframes**: `npx serve dist -l 4178` (or Vite preview) — `serve public` has no React `GamesSection`, so iframe `src` is always null.
+- Touch: Orbit/Sanctum header Restart must be `min-h/min-w` ≥44 — `px-3 py-1.5` alone fails the floor.
+
 ## Android launchers
 
 - Do **not** seed Circuit Flow / GTD Equalize-wordmark art as fleet default.
