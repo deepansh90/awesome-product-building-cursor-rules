@@ -1,0 +1,57 @@
+---
+description: Fleet session pitfalls — wrong scripts, WinOverlay sync, launchers, contrast, e2e asserts, vendor pin
+alwaysApply: true
+---
+
+# Fleet session pitfalls (Ranbhoomi / DSA / Android)
+
+Lessons from Jul 2026 agent sessions. Follow these to avoid repeat failures.
+
+## Scripts & paths
+
+| Wrong | Right |
+|-------|--------|
+| `npm run build:all-embeds` | `npm run build:embed:games` or `node scripts/games/build-all-embeds.mjs` |
+| Assume `parallel-cli` on PATH | Check `which parallel-cli`; fall back to WebSearch / Context7 |
+| Edit only DSA `public/games/` | Fix upstream in Ranbhoomi, then rebuild + vendor |
+
+## Hub iframes
+
+Lobby roots only: `/games/<slug>/` — never hub `iframeSrc` `/play`, `/campaign`, `/rush/*` (loads parent DSA SPA). See `hub-iframe-lobby-roots.mdc`.
+
+## Android launchers
+
+- Do **not** seed Circuit Flow / GTD Equalize-wordmark art as fleet default.
+- Fallback: `scripts/games/android/assets/fleet-default-playstore-icon.png`.
+- Per-game icons: install into `android/app/src/main/playstore-icon.png` then `resize-launcher-icons.mjs` (or EasyAppIcon pack).
+- `fix-icons.mjs` only fills **missing** mipmaps — wrong icons stay until replaced.
+
+## Shared templates / sync
+
+- Edit `scripts/games/templates/` then `sync-embed-ui.mjs` / `sync-win-overlay.mjs`.
+- **Never** overwrite game-specific WinOverlays: keep `SKIP_WIN_OVERLAY` for `Circuit Flow`, `Optic Beam Puzzle`, `Helicopter Rush` (custom `optic-new-best`, `nextLabel`, etc.).
+- After sync, re-run tests that assert game-specific overlay strings.
+
+## Contrast & chrome
+
+- `--txt-lo` must stay ≥ ~4.5:1 on `--bg` / `--surface` (never `#4a4a4a` on `#0a0a0a`).
+- Do not use `var(--btn-pri-bg)` (often a **gradient**) as CSS `color` for text — use `--txt-hi` / `--pp-accent` / `--pp-gold`.
+- Passport badge: `var(--pp-gold)`, not hardcoded `#FFD700` on cream zen.
+- Canvas HUD under GameDock: raise engine Y / dock clearance — lobby `padding-bottom` does **not** shrink full-bleed canvas.
+
+## Tests & e2e
+
+- Assert visible copy users see (`/Cleared/i`), not only aria-label prose (`Level cleared`).
+- After adding redirects, do not `doesNotMatch` all `navigate({ to: "/rush/$mode" })` — scope to Again/Home CTAs.
+- Update structural tests when intentional class changes (e.g. `bottom-4` → `bottom-28` for dock clearance).
+
+## Ship / vendor
+
+1. Commit Ranbhoomi **before** final vendor so `VENDOR-MANIFEST` `ranbhoomiSha` == `git rev-parse HEAD`.
+2. Docs-only commits after vendor → re-run `vendor-dsapatterns.mjs` or pin drifts.
+3. Push: Ranbhoomi `main` then `main:master`; DSA same; RULES `main` only.
+4. Use skill `fleet-regenerate-ship` for rebuild+test+push without full game-tester audit.
+
+## Do not commit
+
+- `.DS_Store`, `*.code-workspace` junk, local keystores, secrets.
