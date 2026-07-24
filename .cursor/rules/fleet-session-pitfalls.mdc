@@ -22,6 +22,8 @@ Lobby roots only: `/games/<slug>/` — never hub `iframeSrc` `/play`, `/campaign
 - Playtest **embeds**: `npx serve public -l 4177` (game shells under `/games/<slug>/`).
 - Playtest **hub `#games/<slug>` iframes**: `npx serve dist -l 4178` (or Vite preview) — `serve public` has no React `GamesSection`, so iframe `src` is always null.
 - Touch: Orbit/Sanctum header Restart must be `min-h/min-w` ≥44 — `px-3 py-1.5` alone fails the floor.
+- **Wrong-slug false P0:** display-name URLs (`/games/arrowrush/`, `timetwin/`, `last-line/`, `sanctum-defense/`, `optic/`) are **not** embed folders. Cloudflare SPA fallthrough returns the DSA hub HTML (200 + LeetCode title). Canonical slugs (`arrow-rush`, `time-twin`, `attack-the-army`, `grid-tower-defense`, `optic-beam-puzzle`) already ship `index.html`. Host aliases live in `lib/game-spa-routes.mjs` `GAME_SPA_ALIASES` + Ranbhoomi `DISPLAY_NAME_URL_ALIASES`. Do not “fix missing index.html” for those aliases.
+- Ranbhoomi mode tiles are `<a href>` (TanStack `Link`) — keyboard-tabbable. “0 buttons” is not an a11y P0; do not force `role="button"` onto navigation links.
 
 ## Android launchers
 
