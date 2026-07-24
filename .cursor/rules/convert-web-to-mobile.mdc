@@ -492,7 +492,7 @@ When web portfolio merges secondary titles into flagship **modes**:
 2. Keep Gradle shells under `games/<Archived>/android/` only if still useful for mode-source builds — do **not** list them for Play release.
 3. Listing copy for flagships may mention the mode (e.g. “includes Orbit Defense mode”) — never claim a separate app ID for the archived slug.
 4. After `android:all`, commit intentional manifest/source changes; whitespace-only Gradle churn is fine to include if the pipeline regenerated it.
-5. Release priority after Equalize + Attack the Army: TimeTwin → Crush → Circuit Flow → Tank Wars → Optic (see `create-web-game.mdc` §12 tier strategy).
+5. Release priority after Equalize + Attack the Army: TimeTwin → Crush → Circuit Flow → Tank Wars → ArrowRush (see `create-web-game.mdc` §12 tier strategy).
 
 ### Phase 8 — Native shell & Play Vitals hardening **[applicable if Android native shell]**
 

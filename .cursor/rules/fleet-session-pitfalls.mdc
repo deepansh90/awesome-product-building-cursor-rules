@@ -22,7 +22,7 @@ Lobby roots only: `/games/<slug>/` — never hub `iframeSrc` `/play`, `/campaign
 - Playtest **embeds**: `npx serve public -l 4177` (game shells under `/games/<slug>/`).
 - Playtest **hub `#games/<slug>` iframes**: `npx serve dist -l 4178` (or Vite preview) — `serve public` has no React `GamesSection`, so iframe `src` is always null.
 - Touch: Orbit/Sanctum header Restart must be `min-h/min-w` ≥44 — `px-3 py-1.5` alone fails the floor.
-- **Wrong-slug false P0:** display-name URLs (`/games/arrowrush/`, `timetwin/`, `last-line/`, `sanctum-defense/`, `optic/`) are **not** embed folders. Cloudflare SPA fallthrough returns the DSA hub HTML (200 + LeetCode title). Canonical slugs (`arrow-rush`, `time-twin`, `attack-the-army`, `grid-tower-defense`, `optic-beam-puzzle`) already ship `index.html`. Host aliases live in `lib/game-spa-routes.mjs` `GAME_SPA_ALIASES` + Ranbhoomi `DISPLAY_NAME_URL_ALIASES`. Do not “fix missing index.html” for those aliases.
+- **Wrong-slug false P0:** display-name URLs (`/games/arrowrush/`, `timetwin/`, `last-line/`, `sanctum-defense/`, `optic/`) are **not** embed folders. Cloudflare SPA fallthrough returns the DSA hub HTML (200 + LeetCode title). Canonicals already ship `index.html`. Host aliases live in `lib/game-spa-routes.mjs` `GAME_SPA_ALIASES` + Ranbhoomi `DISPLAY_NAME_URL_ALIASES`. **Optic hard-deleted (Jul 2026):** `optic*` / `optic-beam-puzzle` / `neon-ray` → `circuit-flow` (source tree removed; redirects only).
 - Ranbhoomi mode tiles are `<a href>` (TanStack `Link`) — keyboard-tabbable. “0 buttons” is not an a11y P0; do not force `role="button"` onto navigation links.
 - **Quick wins regression:** `tests/games/qa-quick-wins.test.mjs` — Equalize theme labels without emoji; Orbit Restart SVG + 44px; CSR titles ≠ hub; display-name aliases. DSA mirrors title/alias checks in `tests/game-metadata.test.mjs` + `tests/hub-iframe-titles.test.mjs`.
 
@@ -36,7 +36,7 @@ Lobby roots only: `/games/<slug>/` — never hub `iframeSrc` `/play`, `/campaign
 ## Shared templates / sync
 
 - Edit `scripts/games/templates/` then `sync-embed-ui.mjs` / `sync-win-overlay.mjs`.
-- **Never** overwrite game-specific WinOverlays: keep `SKIP_WIN_OVERLAY` for `Circuit Flow`, `Optic Beam Puzzle`, `Helicopter Rush` (custom `optic-new-best`, `nextLabel`, etc.).
+- **Never** overwrite game-specific WinOverlays: keep `SKIP_WIN_OVERLAY` for `Circuit Flow`, `Helicopter Rush` (custom next labels / best UX).
 - After sync, re-run tests that assert game-specific overlay strings.
 
 ## Contrast & chrome

@@ -461,7 +461,6 @@ Reference implementation: TanStack Start CSR games vendored to `public/games/<sl
 |--------------|------|--------|
 | TimeTwin | `time-twin` | Flagship; GhostLoop mode at `/modes/ghost` |
 | Circuit Flow | `circuit-flow` | Flagship; Lumen mode at `/modes/lumen` |
-| Optic | `optic-beam-puzzle` | |
 | Train Panic | `train-panic` | |
 | Helicopter Rush | `helicopter-rush` | |
 | Sanctum Defense | `grid-tower-defense` | Flagship; Orbit mode at `/modes/orbit` |
@@ -494,7 +493,7 @@ Slugs are stable for bookmarks/CDN. Legacy hashes redirect via `LEGACY_GAME_SLUG
 Use `GAMES_RANKING.md` — invest in flagships that absorb modes; do not polish archived standalones as separate products.
 
 - **Tier A:** TimeTwin, Crush the Cups — clearest hooks + modes.
-- **Tier B:** Tank Wars, Optic, ArrowRush.
+- **Tier B:** Tank Wars, ArrowRush.
 - **Tier C:** Circuit Flow (+ Lumen), Train Panic, Helicopter Rush, Last Line, Patchwork.
 - **Tier D:** Sanctum Defense (+ Orbit) — deep strategy; ship after A–C unless Orbit coverage is the goal.
 
@@ -694,7 +693,7 @@ E2E `beforeEach`: clear `<slug>.progress` / `_epoch` keys in `localStorage`. Do 
 - **TanStack route-tree build flake**: Occasional `Crawling result not available` during `routeTree.gen.ts` generation can fail `npm run build` for one game in `build-all-embeds.mjs`. **Learning**: Retry the single-game build; confirm new routes are imported in the router; do not vendor a partial dist to the host.
 - **Difficulty budgets with flat penalties**: When calculating dynamic level difficulty budgets (e.g. scores or time), a purely multiplicative modifier (like 2x moves) mathematically breaks when the game has flat penalties (like a -500 score drop). Multiplicative budgets give long levels massive buffers while giving short levels zero margin for error. **Learning**: Use a **hybrid formula**: `(Cost * Multiplier) + Flat Armor`. The multiplier (e.g., `1.25x`) gives percentage leeway for wandering, and the `Flat Armor` (e.g., `+1000` points) ensures players can always absorb exactly N flat penalties on ANY level length. **Specific Example**: In Equalize, a "2x budget" gave a 4-move level only 120 points of buffer—meaning one undo (-300) resulted in game over. Changing the formula to `(optimalMoves * 30 * 1.25) + 1000` guaranteed every level had enough armor to survive exactly 2 illegal moves (-500 each).
 - **Embed CSS vs touch:** Per-game `*-embed.css` can shrink shared chrome below 44px — audit computed size in the iframe, not source Tailwind alone.
-- **Unused engine mechanics:** If filters/splitters/etc. already exist in the engine (Optic), ship levels that use them before inventing new systems or deleting the title.
+- **Unused engine mechanics:** If filters/splitters/etc. already exist in an engine, ship levels that use them before inventing new systems or deleting the title.
 - **Hub iframe ≠ deep first emotion (Jul 2026 incident):** Pointing hub `iframeSrc` at `/play`, `/campaign`, or `/rush/blitz` made dsapatterns.io load the **website** inside the game iframe. **Learning:** hub + `iframePath` = **lobby roots only** (`/games/<slug>/`). Put Campaign/Rush CTAs on the game lobby. Keep Ranbhoomi and DSA hub tests aligned (never let one assert deep links while the other asserts lobby roots). Playtest must open `#games/<slug>` and assert in-frame game brand, not DSA chrome.
 
 | Tag | Topics |

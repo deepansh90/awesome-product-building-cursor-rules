@@ -98,9 +98,9 @@ Launch **3+ subagents** with isolated prompts. Ground each in RULES + Pro Max hi
 | Persona | Rules / skill | Games (split catalog) | Must check |
 |---------|---------------|------------------------|------------|
 | **Mobile Optimizer** | `convert-web-to-mobile.mdc`, embed-game-ui.css + Pro Max touch/web | Patchwork, ArrowRush, Grid TD, Equalize | Safe-area; **≥44×44** hit (`min-h/min-w`, not padding alone); **≥8px** gaps; no hover-only; no `w-6`/`h-6` icon-only chrome; dock vs fragmented chrome; Undo border when disabled; check **embed CSS cascade** (`dsapatterns-*-embed.css` + game `embed-game-ui.css`), not only Tailwind `min-h`/`min-w` |
-| **Game Designer** | `create-web-game.mdc`, incubation / Jobs HUD | Equalize, TimeTwin, Helicopter, Sanctum/Orbit | Minimal HUD; first-session teach; fail/win juice; pacing; max **1–2** key motions that don't block input |
-| **UI/UX Critic** | `product-excellence.mdc` Rams + Pro Max Quick Ref | Train Panic, Optic, Tank Wars, Circuit, Crush | Contrast **4.5:1**; icon-only `aria-label`; `prefers-reduced-motion`; bottom nav **≤5**; predictable back + modal dismiss; Lucide/Heroicons (no emoji chrome); style clash vs Equalize dock |
-| **SEO / Hub** (optional) | `seo-gtm.mdc` | embed-registry + GAME_BRIEF | displayName parity; levelCount truth; **iframePath / hub iframeSrc = lobby roots only** (`/games/<slug>/`) — never `/play`, `/campaign`, `/rush/*` |
+| **Game Designer** | `create-web-game.mdc`, incubation / Jobs HUD | Equalize, TimeTwin, Helicopter, Sanctum/Orbit | Minimal HUD; first-session teach; fail/win juice; pacing; max **1–2** key motions that don't block input; **Helo:** count `AudioContext was not allowed to start` **before** first gesture (should be 0 after gate fix; after gesture quiet) |
+| **UI/UX Critic** | `product-excellence.mdc` Rams + Pro Max Quick Ref | Train Panic, Tank Wars, Circuit, Crush, **Ranbhoomi lobby** | Contrast **4.5:1**; icon-only `aria-label`; `prefers-reduced-motion`; bottom nav **≤5**; predictable back + modal dismiss; Lucide/Heroicons (no emoji chrome); style clash vs Equalize dock; **Ranbhoomi:** mode chips (Stage/Fight/LF2) must have accessible name (`button` or `role="button"`) — never a11y-P0 from `querySelectorAll('button').length === 0` alone |
+| **SEO / Hub** (optional) | `seo-gtm.mdc` | embed-registry + GAME_BRIEF | displayName parity; levelCount truth; **iframePath / hub iframeSrc = lobby roots only** (`/games/<slug>/`) — never `/play`, `/campaign`, `/rush/*`; **alias smoke ≠ hub iframeSrc** (hub always canonical slug; aliases are Worker/`GAME_SPA_ALIASES` or Vercel 301 only) |
 
 ### Pro Max → fleet chrome (UI/UX Critic + Mobile)
 
@@ -124,6 +124,9 @@ Prior fleet findings (re-check when relevant):
 - Fleet BR theme/vol pill vs in-board actions = unify over time
 - Sanctum nested routes (`/campaign`): SPA fallback smoke — DSA `serve.json` and/or CF/Vercel rewrite; plain `npx serve` without SPA = 404 P0
 - **Hub iframe deep links load DSA cheat sheet in-frame (P0):** hub `iframeSrc` / registry `iframePath` must be **lobby roots only** (`/games/<slug>/`). Never `/play`, `/campaign`, `/rush/*` in the hub iframe — on dsapatterns.io those paths are not static files and CF/SPA fallthrough serves the **parent DSA SPA** inside the game iframe. Cross-repo: DSA `GamesSection` iframeSrc must match Ranbhoomi `EMBED_GAMES` iframePath lobby contract. Playtest must open hub `#games/<slug>`, assert iframe `src` is lobby root **and** iframe document is the game shell (title/body contains game brand), not DSA cheat-sheet chrome
+- **Display-name direct URLs (Jul 2026 false P0):** `arrowrush`, `timetwin`, `last-line`, `sanctum-defense` are **aliases**, not missing static files. If canonical `/games/<slug>/` works, do **not** call CDN / Cloudflare Pages `_redirects` Blocker — check Worker `GAME_SPA_ALIASES` / Vercel 301s. See §2 URL contract.
+- **Helicopter dual canvas:** bg + main canvases can be intentional parallax — verify before “unmount duplicate.”
+- **Passport / LS drift:** inconsistent keys across titles = **P2 backlog** unless the user explicitly asks for namespace unification — not a fleet P0.
 
 Each persona returns **P0/P1/P2** with `file:line` (+ search cite). Incomplete agents (1–2 lines, no severity) → **re-run**. Parent synthesizes; prefer a Cursor Canvas for the aggregated report.
 
@@ -137,7 +140,7 @@ After §1, parent emits a **ranked** quick-wins list (each ≤ ~30 min) before s
 |----------|---------|
 | P0 | Touch <44, missing `aria-label`, contrast fails, hover-only primary |
 | P1 | 8px gaps, emoji chrome icons, disabled Undo ghost border, reduced-motion |
-| P2 | Style clash, dock unify, dense Tailwind cleanup |
+| P2 | Style clash, dock unify, dense Tailwind cleanup; Passport/LS mega-unify (unless user asked) |
 
 If user said **"fix quick wins"**: implement **P0/P1 touch/a11y first**, then continue playtest/ship. Otherwise list in report and proceed unless user stops for fixes.
 
@@ -155,12 +158,38 @@ cd "$DSA" && npx --yes serve public -l 4177
 # Dev hub (if Vite already running): http://localhost:5173/games/<slug>/
 ```
 
+### URL contract (canonical first)
+
+Primary probes use **canonical lobby roots** only:
+
+```text
+/games/arrow-rush/   /games/time-twin/   /games/attack-the-army/
+/games/grid-tower-defense/   (+ other EMBED_GAMES slugs)
+Equalize: /games/equalize/equalize.html
+```
+
+**Alias smoke** (not primary Blockers): `arrowrush`, `timetwin`, `last-line`, `sanctum-defense`
+
+```text
+→ expect game brand in title/body via Worker GAME_SPA_ALIASES (or Vercel 301).
+If alias fails but canonical OK → alias/Worker regression, NOT “static missing” / Pages _redirects.
+If both fail with DSA cheat-sheet chrome → real SPA fallthrough P0.
+Hub iframeSrc is always canonical — alias smoke ≠ hub iframeSrc.
+```
+
+### Evidence integrity
+
+Before claiming **Blocker/Major**: `ls` cited evidence paths (screenshots, `fleet.json`, `/tmp/browser/...`). Missing files → mark **Unverified**; do not ship severity from empty paths.
+
 Requirements:
 
 - Wall clock **≥ 10 minutes** of interaction across games
-- Visit **≥ 8** slugs (rotate): equalize, patchwork, arrow-rush, grid-tower-defense, time-twin, crush-the-cups, train-panic, circuit-flow, optic-beam-puzzle, helicopter-rush, tank-wars
+- Visit **≥ 8** **canonical** slugs (rotate): equalize, patchwork, arrow-rush, grid-tower-defense, time-twin, crush-the-cups, train-panic, circuit-flow, helicopter-rush, tank-wars, attack-the-army (Last Line)
+- Plus **alias smoke** once each for arrowrush / timetwin / last-line / sanctum-defense (brand OK, not cheat sheet)
 - Per visit: dismiss tutorial → poke board/canvas → try Undo/Hint/Reset → Theme/Mute if present → screenshot
 - Record: dock present? theme btn count? audio btn count? undo border/disabled ghost? pageerrors? deep-link 404s?
+- **Helo:** console AC warnings before first gesture; after pointerdown/Space should be quiet; do not flag dual canvas as double-mount without checking bg vs main
+- **Ranbhoomi:** mode entry via role/accessible name (not `<button>` count alone)
 - **Hub iframe contract:** for each visited slug, open hub `#games/<slug>`, assert iframe `src` is lobby root (`/games/<slug>/` or `equalize.html`) **and** iframe document is game shell (title/body contains game brand) — not DSA cheat-sheet chrome
 - Deep-link at least one nested SPA route (e.g. `/games/grid-tower-defense/campaign`) when using `serve` **directly** — **not** as hub `iframeSrc` (hub stays lobby roots); expect SPA fallback not 404
 
@@ -250,8 +279,10 @@ Non-ff `main:master` → stop; no `--force` unless user asks.
 3. …
 
 ### Playtest
-- Duration: Xm · Games: … · Crashes: 0/N
+- Duration: Xm · Games: … (canonical list) · Alias smoke: pass/fail · Crashes: 0/N
+- Evidence paths checked on disk: yes/no
 - Pro Max: reduced-motion / icon labels / 8px gaps / landscape: yes/no/skip
+- Helo AC pre-gesture warnings: N · Ranbhoomi mode a11y: ok/fail/skip
 - Chrome bugs: Undo ghost / missing dock / contrast / …
 
 ### Ship
@@ -281,11 +312,20 @@ Non-ff `main:master` → stop; no `--force` unless user asks.
 ❌ Flagging ThemeSwitcher 44px when shared embed-game-ui already sets 2.75rem
 ❌ Hub iframeSrc / registry iframePath with `/play`, `/campaign`, or `/rush/*` (CF/static fallthrough → parent DSA SPA in frame)
 ❌ Playtest that only hits `/games/<slug>/` directly and never asserts hub `#games/<slug>` iframe src + in-frame game brand
+❌ Primary QA on display-name URLs (arrowrush, timetwin, last-line, sanctum-defense)
+   and calling CDN / Pages _redirects Blocker when /games/<canonical>/ works
+❌ Citing /tmp/... screenshots or fleet.json that are not on disk
+❌ Flagging Helicopter’s two canvases as double-mount without checking
+   bgCanvas (parallax) vs main game canvas
+❌ Diagnosing CF Pages _redirects when host is Workers + GAME_SPA_ALIASES
+❌ A11y P0 from document.querySelectorAll('button').length === 0 alone
+❌ Opening Passport / localStorage mega-unify as P0 without user ask
 ```
 
 ## Related
 
 - **ui-ux-pro-max (upstream + search):** `$UIUX_PRO_MAX` · `SEARCH_PY` — BB mirror checklist only: `$RANBHOOMI/.cursor/skills/ui-ux-pro-max/SKILL.md`
 - `webapp-to-android` · `convert-web-to-mobile.mdc` · `create-web-game.mdc` · `product-excellence.mdc` · `seo-gtm.mdc`
+- Hub iframe lobby roots: `hub-iframe-lobby-roots.mdc` (aliases ≠ hub iframeSrc — see §2 URL contract)
 - Embed: `build-all-embeds.mjs` · `vendor-dsapatterns.mjs`
 - Git hygiene: `agent-ops.mdc`
